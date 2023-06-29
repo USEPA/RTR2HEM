@@ -1,6 +1,8 @@
 {
     "columns": {
         "epg": "emission_process_group",
-        "reg_code": "regulatory_code"
+        "reg_code": "regulatory_code",
+        "a": "state_county_fips",
+        "b": "sppd_facility_identifier"
     }
 }

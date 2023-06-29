@@ -6,6 +6,7 @@ import pypyodbc
 import sqlalchemy as sq
 from GUI.epg_popup import EpgGUI
 from GUI.regCodes_popup import RegCodesGUI
+from modules.initial_processing import InitialProcessing
 
 """
 Demo refactories data settings
@@ -53,7 +54,6 @@ input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
 static_df = pd.read_excel(config["Static"]["static_files"])
 
-
 """
 7b
 these names are taken from the "EMISSION_PROCESS_GROUP" column
@@ -83,5 +83,9 @@ reg_codes = input_df["regulatory_code"]
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()
+
+input_df = input_df.replace(np.nan, "")
+processed_df = InitialProcessing(input_df, reg_codes).run()
+
 
 print("!")

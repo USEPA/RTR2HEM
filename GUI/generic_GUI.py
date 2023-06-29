@@ -97,6 +97,7 @@ class GUI(ErrorHandling):
         """
         Hitting 'enter' will move typing to next entry
         """
+
         def go_to_next_entry(event, entry_list, this_index):
             next_index = (this_index + 1) % len(entry_list)
             entry_list[next_index].focus_set()
