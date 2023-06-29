@@ -1,0 +1,6 @@
+{
+    "columns": {
+        "epg": "emission_process_group",
+        "reg_code": "regulatory_code"
+    }
+}
