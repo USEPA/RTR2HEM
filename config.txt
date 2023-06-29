@@ -10,7 +10,7 @@ only_category_records=False
 # Actual Emissions
 # Allowable Emissions
 # Acute Emissions
-emission_type="Actual Emissions"
+emission_type=Actual Emissions
 
 # 'False' to import previously generated source ids
 create_new_src_ids=True

@@ -1,12 +1,8 @@
-import datetime, json
-import configparser
-import pandas as pd
 import numpy as np
-import pypyodbc
-import sqlalchemy as sq
 from GUI.epg_popup import EpgGUI
 from GUI.regCodes_popup import RegCodesGUI
 from modules.initial_processing import InitialProcessing
+from modules.utils import input_df
 
 """
 Demo refactories data settings
@@ -28,31 +24,6 @@ reg code 63SSSSS
 dont forget that the results get loaded into pre-existing templates!
 """
 
-
-def to_bool(val):
-    return str(val).lower() == "true"
-
-
-config = configparser.RawConfigParser()
-config.read("config.txt")
-date = str(datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S"))
-
-settings = config["Settings"]
-src_cat_name = f"{settings['source_category_name']}{date}"
-new_emission_abbr = to_bool(settings["create_new_emission_abbr"])
-only_category_records = to_bool(settings["only_category_records"])
-emission_type = settings["emission_type"]
-create_src_ids = to_bool(settings["create_new_src_ids"])
-
-# fetch input access table, TODO - is there a cleaner option?
-input_fp = config["Inputs"]["file"]
-input_table = config["Inputs"]["table"]
-conn = pypyodbc.connect(
-    r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_fp + ";"
-)
-input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
-
-static_df = pd.read_excel(config["Static"]["static_files"])
 
 """
 7b
