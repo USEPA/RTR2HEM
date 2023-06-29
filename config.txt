@@ -17,7 +17,7 @@ create_new_src_ids=True
 
 
 [Inputs]
-file=C:\Users\55586\Desktop\Access tool\Python Tool\Old Refractories Run\Input\Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb
+file=C:\Users\55586\Desktop\tools\Access tool\access-tool-migration\Old Refractories Run\Input\Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb
 
 table=Refractories_WholeFacil_ATAGFormat_20200904(edited)
 
