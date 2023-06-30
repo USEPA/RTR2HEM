@@ -12,9 +12,9 @@
         "createNewSourceIds": true
     },
     "columns": {
-        "epg": "emission_process_group",
-        "regCode": "regulatory_code",
-        "a": "state_county_fips",
-        "b": "sppd_facility_identifier"
+        "emission_process_group": "",
+        "regulatory_code": "",
+        "state_county_fips": "",
+        "sppd_facility_identifier": ""
     }
 }

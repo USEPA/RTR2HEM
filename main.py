@@ -24,6 +24,11 @@ reg code 63SSSSS
 dont forget that the results get loaded into pre-existing templates!
 """
 
+# preprocessing
+for column in input_df.columns:
+    if column != "regulatory_code" and column != "emission_process_group":
+        input_df[column].fillna(0, inplace=True)
+
 
 """
 7b
@@ -56,7 +61,7 @@ reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()
 
 input_df = input_df.replace(np.nan, "")
-processed_df = InitialProcessing(input_df, reg_codes).run()
+processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 
 
 print("!")

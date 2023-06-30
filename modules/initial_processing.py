@@ -13,8 +13,9 @@ uses:
 
 
 class InitialProcessing:
-    def __init__(self, df, reg_codes=None):
+    def __init__(self, df, epgs, reg_codes=None):
         self.df = df
+        self.epg_abbr_map = epgs
         self.reg_codes = reg_codes
 
     def set_column(self, column_name, func):
@@ -27,8 +28,8 @@ class InitialProcessing:
         )  # todo probably rename column
         self.set_column(
             "EMISSIONS_TPY", self.set_selected_emission_type
-        )  # can probably skip this eventually ? or just remove the others
-
+        )
+        self.set_column("ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
         return self.df
 
     def set_icf_facility_id(self, row):
@@ -46,4 +47,10 @@ class InitialProcessing:
             emissions_col = emissions_df.columns[0]
             return row[emissions_col]
         except:
-            raise KeyError("Invalid emissions column name supplied. Rename through config.")
+            raise KeyError(
+                "Invalid emissions column name supplied. Rename through config."
+            )
+
+    def set_epg_abbreviations(self, row):
+        emissions_group = row["emission_process_group"]
+        return self.epg_abbr_map.get(emissions_group, "")

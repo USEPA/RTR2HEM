@@ -7,6 +7,7 @@ import pypyodbc
 def to_bool(val):
     return str(val).lower() == "true"
 
+
 config = configparser.RawConfigParser()
 config.read("config.txt")
 date = str(datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S"))
