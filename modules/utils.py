@@ -27,4 +27,4 @@ conn = pypyodbc.connect(
 )
 input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
-static_df = pd.read_excel(config["Static"]["static_files"])
+static_xls = pd.ExcelFile(config["Static"]["static_files"])

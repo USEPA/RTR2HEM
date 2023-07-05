@@ -63,5 +63,4 @@ reg_codes = RegCodesGUI(reg_codes).get_response()
 input_df = input_df.replace(np.nan, "")
 processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 
-
 print("!")
