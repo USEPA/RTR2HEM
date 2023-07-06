@@ -1,19 +1,9 @@
 import pandas as pd
-from .utils import emission_type, static_xls
+from .utils import emission_type, static_xls, postprocessing_columns
+
 
 """
-Next steps:
-''ADD SOME NEW FIELDS TO THE EMISSION INVENTORY, IDENTIFY THE DESIRED EMISSIONS FIELD,
-''POPULATE EPGROUP ABBREVIATIONS, CONVERT TO METRIC, IDENTIFY AERMOD SOURCE TYPES,
-''CREATE STATE GROUPS AS NEEDED FOR FILE SIZE CONSTRAINTS -
-''CREATE CROSSWALK FILE
-
-uses:
-    table "input_EmissionInventory_withICFWork"
-"""
-
-"""
-Would it be possible to get an example input that actually uses this? 
+Would it be possible to get an example input that actually uses this? or make your own
 Everything in refractories is "P" so this will be a little tough to 100% test
 
 
@@ -24,6 +14,9 @@ Everything in refractories is "P" so this will be a little tough to 100% test
 ''SOURCES THAT ARE NOT AREA, LINE, OR VOLUME DO NOT RECEIVE FUGITIVE WIDTHS,
 ''SOURCES THAT ARE NOT AREA DO NOT RECEIVE FUGITIVE ANGLES.
 
+
+
+        ------------THE ONLY FIELDS OF INTEREST------------
 "SELECT input_EmissionInventory_withICFWork.StateGroup, 
         input_EmissionInventory_withICFWork.ICFFacilityID, 
         input_EmissionInventory_withICFWork.SPPD_FACILITY_IDENTIFIER, 
@@ -34,7 +27,7 @@ Everything in refractories is "P" so this will be a little tough to 100% test
         input_EmissionInventory_withICFWork.HAP_CATEGORY_NAME, 
 
         input_EmissionInventory_withICFWork.EMISSIONS_TPY, 
-        ([Emissions_TPY]*[Metal_Speciation_Factor]) AS ICFModelEmissionTPY, '' AS blank, " _
+        ([Emissions_TPY]*[Metal_Speciation_Factor]) AS ICFModelEmissionTPY, '' AS blank, " _        --> metal speciation is in static_crosswalk
         
         static_PollutantCrosswalk_andMetalSpeciations.HEM3_Chemical_Name, 
         static_PollutantCrosswalk_andMetalSpeciations.[Chem Name For Tier 2 Tool], 
@@ -107,6 +100,12 @@ Everything in refractories is "P" so this will be a little tough to 100% test
         input_EmissionInventory_withICFWork.POLLUTANT_CODE=static_PollutantCrosswalk_andMetalSpeciations.Pollutant_Code;"
 """
 
+"""
+NOTE
+    "StateGroup" column is not created as that step is currently skipped
+    "ICFSourceID" not yet created
+    "blank", "blank2", "blank3", "blank4" not yet created
+"""
 
 class InitialProcessing:
     ft_per_meter = 3.2808399
@@ -120,22 +119,42 @@ class InitialProcessing:
     def set_column(self, column_name, func):
         self.df[column_name] = self.df.apply(lambda row: func(row), axis=1)
 
+    # TODO -- instead of dropping duplicate columns, i think there are only two columns youre interested in
     # excel has a cap on max sheet name length
     # temp replace 'static_PollutantCrosswalk_andMetalSpeciations' with 'static_PollutantCrosswalk_andMe'
     def join_static_PollutantCrosswalk_andMetalSpeciations(self):
-        static_pollutantCrosswalk = pd.read_excel(static_xls, "static_PollutantCrosswalk_andMe")
-        static_pollutantCrosswalk.columns = static_pollutantCrosswalk.columns.str.lower()
-        self.df = pd.merge(self.df, static_pollutantCrosswalk, on="pollutant_code", how="inner", suffixes=('', '_y'))
-        # drop duplicate columns
-        self.df.drop(self.df.filter(regex='_y$').columns, axis=1, inplace=True)
+        static_pollutantCrosswalk = pd.read_excel(
+            static_xls, "static_PollutantCrosswalk_andMe"
+        )
+        static_pollutantCrosswalk.columns = (
+            static_pollutantCrosswalk.columns.str.lower()
+        )
+        self.df = pd.merge(
+            self.df,
+            static_pollutantCrosswalk,
+            on="pollutant_code",
+            how="inner",
+            suffixes=("", "_y"),
+        )
+
+    def drop_unneeded_columns(self):
+        lower_preprocessed = [w.lower() for w in postprocessing_columns]
+        for c in self.df.columns:
+            if c.lower() not in lower_preprocessed:
+                self.df = self.df.drop(c, axis=1)
+
 
     def run(self):
+        self.join_static_PollutantCrosswalk_andMetalSpeciations()
+
         self.set_column("ICFFacilityID", self.set_icf_facility_id)
         self.set_column("ICFCatLevelModeling", self.is_selected_regulatory_code)
         self.set_column("EMISSIONS_TPY", self.set_selected_emission_type)
+        self.set_column("ICFModelEmissionTPY", self.set_model_emission_tpy)
         self.set_column("ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
         self.set_column("ICFSourceType", self.set_source_type)
         self.set_column("ICFAreaVolLineReleaseHeight", self.set_release_height)
+        self.set_column("ICFMetal_Speciation_Factor", self.set_metal_speciation_factor)
 
         # unit conversions
         # might not need to store
@@ -147,8 +166,8 @@ class InitialProcessing:
         self.set_column("ICFFugitiveWidth_m", self.fugitive_width_m)
         self.set_column("ICFAreaVolLineReleaseHeight_m", self.release_height_m)
 
-        self.join_static_PollutantCrosswalk_andMetalSpeciations()
-
+        self.drop_unneeded_columns()
+        self.df = self.df.fillna('')
         return self.df
 
     def set_icf_facility_id(self, row):
@@ -169,6 +188,9 @@ class InitialProcessing:
             raise KeyError(
                 "Invalid emissions column name supplied. Rename through config."
             )
+
+    def set_model_emission_tpy(self, row):
+        return float(row["EMISSIONS_TPY"]) * float(row["metal_speciation_factor"])
 
     def set_epg_abbreviations(self, row):
         emissions_group = row["emission_process_group"]
@@ -205,6 +227,9 @@ class InitialProcessing:
             return float(stack_height) / 2
         else:
             return ""
+
+    def set_metal_speciation_factor(self, row):
+        return row["metal_speciation_factor"]
 
     # unit conversions
     def stack_height_meter(self, row):

@@ -1,4 +1,5 @@
 import datetime
+import json
 import configparser
 import pandas as pd
 import pypyodbc
@@ -19,6 +20,7 @@ only_category_records = to_bool(settings["only_category_records"])
 emission_type = settings["emission_type"]
 create_src_ids = to_bool(settings["create_new_src_ids"])
 
+
 # fetch input access table, TODO - is there a cleaner option?
 input_fp = config["Inputs"]["file"]
 input_table = config["Inputs"]["table"]
@@ -28,3 +30,6 @@ conn = pypyodbc.connect(
 input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
 static_xls = pd.ExcelFile(config["Static"]["static_files"])
+
+with open(".\config.json") as fh:
+    postprocessing_columns = json.load(fh)["processing_columns"]["post"]
