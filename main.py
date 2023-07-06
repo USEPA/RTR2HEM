@@ -2,7 +2,7 @@ import numpy as np
 from GUI.epg_popup import EpgGUI
 from GUI.regCodes_popup import RegCodesGUI
 from modules.initial_processing import InitialProcessing
-from modules.utils import input_df
+from modules.utils import get_col, input_df, columns_map
 
 """
 Demo refactories data settings
@@ -21,12 +21,18 @@ has source category emissions of 4 of the 5 PB-HAPs (missing: dioxins)
 reg code 63SSSSS
 6 unique EPGs
 
-dont forget that the results get loaded into pre-existing templates!
+dont forget that the results get loaded into pre-existing templates
 """
+
+for name in columns_map:
+    if columns_map[name]:
+        print(f"Column {name} is set with override {columns_map[name]}")
 
 # preprocessing
 for column in input_df.columns:
-    if column != "regulatory_code" and column != "emission_process_group":
+    if column != get_col("regulatory_code") and column != get_col(
+        "emission_process_group"
+    ):
         input_df[column].fillna(0, inplace=True)
 
 
@@ -40,7 +46,7 @@ uses:
 
 TODO - add import option
 """
-epgs = input_df["emission_process_group"]
+epgs = get_col("emission_process_group", input_df)
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
 epgs = EpgGUI(epgs).get_response()
@@ -55,7 +61,7 @@ uses:
     module “03 Initial Processing” 
     form "Form_frmRegSelections"
 """
-reg_codes = input_df["regulatory_code"]
+reg_codes = get_col("regulatory_code", input_df)
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()

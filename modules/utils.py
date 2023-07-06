@@ -1,6 +1,5 @@
 import datetime
 import json
-import configparser
 import pandas as pd
 import pypyodbc
 
@@ -9,27 +8,50 @@ def to_bool(val):
     return str(val).lower() == "true"
 
 
-config = configparser.RawConfigParser()
-config.read("config.txt")
-date = str(datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S"))
+def get_col(name, df=None):
+    """Gets mapped column name and attempts case insensitive lookup"""
+    response = columns_map.get(name.lower(), None)
+    if response == None:
+        raise KeyError(f"{name} could not be found in mapping")
+    elif response == "":
+        response = name.lower()
+    response = response if response else name
 
-settings = config["Settings"]
-src_cat_name = f"{settings['source_category_name']}{date}"
-new_emission_abbr = to_bool(settings["create_new_emission_abbr"])
-only_category_records = to_bool(settings["only_category_records"])
+    if df is None:
+        return response
+    else:
+        try:
+            if response in df:
+                return df[response]
+            return df[response.lower()]
+        except:
+            raise Exception(
+                f'Column "{response}" could not be found in the provided dataframe'
+            )
+
+
+def get_xls_sheet(sheet_name):
+    return pd.read_excel(static_xls, sheet_name)
+
+
+with open(".\config.json") as fh:
+    config = json.load(fh)
+
+settings = config["settings"]
+timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S"))
+src_cat_name = f"{settings['source_category_name']}{timestamp}"
 emission_type = settings["emission_type"]
-create_src_ids = to_bool(settings["create_new_src_ids"])
 
+columns_map = config["processing_columns"]["pre"]
+columns_map = {k.lower(): v for k, v in columns_map.items()}
+postprocessing_columns = config["processing_columns"]["post"]
 
-# fetch input access table, TODO - is there a cleaner option?
-input_fp = config["Inputs"]["file"]
-input_table = config["Inputs"]["table"]
+# fetch input access table
+input_fp = config["inputs"]["input_file"]
+input_table = config["inputs"]["input_table"]
 conn = pypyodbc.connect(
     r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_fp + ";"
 )
 input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
-static_xls = pd.ExcelFile(config["Static"]["static_files"])
-
-with open(".\config.json") as fh:
-    postprocessing_columns = json.load(fh)["processing_columns"]["post"]
+static_xls = pd.ExcelFile(config["inputs"]["static"])

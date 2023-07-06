@@ -1,6 +1,11 @@
 import pandas as pd
 import numpy as np
-from .utils import emission_type, static_xls, postprocessing_columns
+from .utils import (
+    get_xls_sheet,
+    get_col,
+    emission_type,
+    postprocessing_columns,
+)
 
 
 """
@@ -94,6 +99,7 @@ NOTE
     "StateGroup" is not created as that step is currently skipped
     "ICFSourceID" not yet created
     "blank", "blank2", "blank3", "blank4" not yet created
+
 """
 
 
@@ -109,13 +115,10 @@ class InitialProcessing:
     def set_column(self, column_name, func):
         self.df[column_name] = self.df.apply(lambda row: func(row), axis=1)
 
-    # TODO -- instead of dropping duplicate columns, i think there are only two columns youre interested in
     # excel has a cap on max sheet name length
     # temp replace 'static_PollutantCrosswalk_andMetalSpeciations' with 'static_PollutantCrosswalk_andMe'
     def join_static_PollutantCrosswalk_andMetalSpeciations(self):
-        static_pollutantCrosswalk = pd.read_excel(
-            static_xls, "static_PollutantCrosswalk_andMe"
-        )
+        static_pollutantCrosswalk = get_xls_sheet("static_PollutantCrosswalk_andMe")
         static_pollutantCrosswalk.columns = (
             static_pollutantCrosswalk.columns.str.lower()
         )
@@ -135,15 +138,15 @@ class InitialProcessing:
 
     def update_by_emission_release_point_type(self):
         """Some columns should be empty based on emission release point type"""
-        erp_val = self.df["emission_release_point_type"]
+        erp_val = self.df[get_col("emission_release_point_type")]
 
         update_columns = ["ICFAreaVolLineReleaseHeight_m", "ICFFugitiveWidth_m"]
         self.df.loc[
             (erp_val != "1") & (erp_val != "7") & (erp_val != "9") & (erp_val != "10"),
             update_columns,
         ] = ""
-
-        update_columns = ["ICFFugitiveLength_m", "FUGITIVE_ANGLE_DEGREES"]
+        
+        update_columns = ["ICFFugitiveLength_m", get_col("fugitive_angle_degrees")]
         self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
 
         update_columns = [
@@ -185,10 +188,12 @@ class InitialProcessing:
         return self.df
 
     def set_icf_facility_id(self, row):
-        return row["state_county_fips"] + row["sppd_facility_identifier"]
+        return get_col("state_county_fips", row) + get_col(
+            "sppd_facility_identifier", row
+        )
 
     def is_selected_regulatory_code(self, row):
-        code = row["regulatory_code"]
+        code = get_col("regulatory_code", row)
         if self.reg_codes == None:
             return True
         return self.reg_codes.get(code, False) == 1
@@ -204,18 +209,20 @@ class InitialProcessing:
             )
 
     def set_model_emission_tpy(self, row):
-        return float(row["EMISSIONS_TPY"]) * float(row["metal_speciation_factor"])
+        return float(row["EMISSIONS_TPY"]) * float(
+            get_col("metal_speciation_factor", row)
+        )
 
     def set_epg_abbreviations(self, row):
-        emissions_group = row["emission_process_group"]
+        emissions_group = get_col("emission_process_group", row)
         return self.epg_abbr_map.get(emissions_group, "")
 
     def set_source_type(self, row):
         """
         TODO -- double check, although everything in this example run should be "P"
         """
-        length = int(row["fugitive_length_sigmax_ft"])
-        width = int(row["fugitive_width_sigmay_ft"])
+        length = int(get_col("fugitive_length_sigmax_ft", row))
+        width = int(get_col("fugitive_width_sigmay_ft", row))
         erp_type_map = {
             "1": "A" if length > 0 and width > 0 else "P",  # area
             "2": "P",
@@ -228,12 +235,12 @@ class InitialProcessing:
             "9": "N",  # line
             "10": "V",  # volume
         }
-        erp_type = row["emission_release_point_type"]
+        erp_type = get_col("emission_release_point_type", row)
         return erp_type_map.get(erp_type, "P")
 
     def set_release_height(self, row):
-        stack_height = row["stack_height (ft)"]
-        erp_type = row["emission_release_point_type"]
+        stack_height = get_col("stack_height (ft)", row)
+        erp_type = get_col("emission_release_point_type", row)
 
         if erp_type == "1" or erp_type == "7" or erp_type == "9":
             return float(stack_height)
@@ -243,36 +250,36 @@ class InitialProcessing:
             return ""
 
     def set_metal_speciation_factor(self, row):
-        return row["metal_speciation_factor"]
+        return get_col("metal_speciation_factor", row)
 
     # unit conversions
     def stack_height_meter(self, row):
-        stack_height_ft = float(row["stack_height (ft)"])
+        stack_height_ft = float(get_col("stack_height (ft)", row))
         return stack_height_ft / self.ft_per_meter
 
     def stack_diameter_meter(self, row):
-        stack_diameter_ft = float(row["stack_diameter (ft)"])
+        stack_diameter_ft = float(get_col("stack_diameter (ft)", row))
         return stack_diameter_ft / self.ft_per_meter
 
     def gas_velocity_mps(self, row):
-        gas_velocity_fts = float(row["exit_gas_velocity (ft/sec)"])
+        gas_velocity_fts = float(get_col("exit_gas_velocity (ft/sec)", row))
         return gas_velocity_fts / self.ft_per_meter
 
     def gas_temperature_k(self, row):
-        gas_temperature_f = float(row["exit_gas_temperature (f)"])
+        gas_temperature_f = float(get_col("exit_gas_temperature (f)", row))
         return self.fahrenheit_to_kelvin(gas_temperature_f)
 
     def fugitive_length_m(self, row):
-        fugitive_length_f = float(row["fugitive_length_sigmax_ft"])
+        fugitive_length_f = float(get_col("fugitive_length_sigmax_ft", row))
         return fugitive_length_f / self.ft_per_meter
 
     def fugitive_width_m(self, row):
-        fugitive_width_f = float(row["fugitive_width_sigmay_ft"])
+        fugitive_width_f = float(get_col("fugitive_width_sigmay_ft", row))
         return fugitive_width_f / self.ft_per_meter
 
     def release_height_m(self, row):
         try:
-            release_height_ft = float(row["ICFAreaVolLineReleaseHeight"])
+            release_height_ft = float(get_col("ICFAreaVolLineReleaseHeight", row))
             return release_height_ft / self.ft_per_meter
         except:
             return ""

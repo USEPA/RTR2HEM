@@ -1,15 +1,17 @@
 {
     "inputs": {
-        "inputFile": "./Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
-        "inputTable": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
+        "input_file": "./Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
+        "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
+        "existing_epg_abbreviations": "",
+        "existing_source_ids": "",
         "static": "./static_tables.xlsx"
     },
     "settings": {
-        "sourceCategoryName": "Refractories",
-        "createNewEmissionAbbreviations": true,
-        "onlyCategoryRecords": false,
-        "emissionType": "Actual emissions",
-        "createNewSourceIds": true
+        "source_category_name": "Refractories",
+        "import_existing_emission_abbreviations": false,
+        "only_category_records": false,
+        "emission_type": "Actual emissions",
+        "import_existing_source_ids": false
     },
     "processing_columns": {
         "pre": {
@@ -17,12 +19,14 @@
             "regulatory_code": "",
             "state_county_fips": "",
             "sppd_facility_identifier": "",
+            "fugitive_angle_degrees": "",
             "fugitive_length_sigmax_ft": "",
             "fugitive_width_sigmay_ft": "",
             "emission_release_point_type": "",
             "stack_height (ft)": "",
             "stack_diameter (ft)": "",
             "exit_gas_temperature (f)": "",
+            "exit_gas_velocity (ft/sec)": "",
             "metal_speciation_factor": ""
         },
         "post": [
