@@ -1,22 +1,9 @@
 import pandas as pd
+import numpy as np
 from .utils import emission_type, static_xls, postprocessing_columns
 
 
 """
-Would it be possible to get an example input that actually uses this? or make your own
-Everything in refractories is "P" so this will be a little tough to 100% test
-
-
-''WANT TO LEAVE CERTAIN FIELDS AS NULL IF THEY DO NOT APPLY TO THAT PARTICULAR SOURCE TYPE:
-''SOURCES THAT ARE NOT AREA, LINE, OR VOLUME DO NOT RECEIVE FUGITIVERELEASEHEIGHT,
-''SOURCES THAT ARE NOT POINTS DO NOT RECEIVE STACK HEIGHTS, TEMPERATURES, DIAMETERS, OR VELOCITIES,
-''SOURCES THAT ARE NOT AREA DO NOT RECEIVE FUGITIVE LENGTHS,
-''SOURCES THAT ARE NOT AREA, LINE, OR VOLUME DO NOT RECEIVE FUGITIVE WIDTHS,
-''SOURCES THAT ARE NOT AREA DO NOT RECEIVE FUGITIVE ANGLES.
-
-
-
-        ------------THE ONLY FIELDS OF INTEREST------------
 "SELECT input_EmissionInventory_withICFWork.StateGroup, 
         input_EmissionInventory_withICFWork.ICFFacilityID, 
         input_EmissionInventory_withICFWork.SPPD_FACILITY_IDENTIFIER, 
@@ -52,7 +39,7 @@ Everything in refractories is "P" so this will be a little tough to 100% test
         input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT2_X_COORDINATE, 
         input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT2_Y_COORDINATE, " _
 
-        ------------ACTUAL LOGIC STARTS HERE------------
+        ------------LOGIC STARTS HERE------------
 
         & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
         [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7' And 
@@ -90,6 +77,8 @@ Everything in refractories is "P" so this will be a little tough to 100% test
         & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
         [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7',Null,[input_EmissionInventory_withICFWork]![FUGITIVE_ANGLE_DEGREES]) AS FUGITIVE_ANGLE_DEGREES, " _
 
+        ------------LOGIC ENDS HERE------------
+
         & "'' AS blank3, static_PollutantCrosswalk_andMetalSpeciations.Metal_Speciation_Factor AS ICFMetal_Speciation_Factor, " _
         & "'' AS blank4, input_EmissionInventory_withICFWork.FACILITY_NAME, input_EmissionInventory_withICFWork.LOCATION_ADDRESS, input_EmissionInventory_withICFWork.CITY, " _
         & "input_EmissionInventory_withICFWork.COUNTY_NAME, input_EmissionInventory_withICFWork.STATE_ABBR, input_EmissionInventory_withICFWork.ZIPCODE " _
@@ -102,10 +91,11 @@ Everything in refractories is "P" so this will be a little tough to 100% test
 
 """
 NOTE
-    "StateGroup" column is not created as that step is currently skipped
+    "StateGroup" is not created as that step is currently skipped
     "ICFSourceID" not yet created
     "blank", "blank2", "blank3", "blank4" not yet created
 """
+
 
 class InitialProcessing:
     ft_per_meter = 3.2808399
@@ -143,6 +133,29 @@ class InitialProcessing:
             if c.lower() not in lower_preprocessed:
                 self.df = self.df.drop(c, axis=1)
 
+    def update_by_emission_release_point_type(self):
+        """Some columns should be empty based on emission release point type"""
+        erp_val = self.df["emission_release_point_type"]
+
+        update_columns = ["ICFAreaVolLineReleaseHeight_m", "ICFFugitiveWidth_m"]
+        self.df.loc[
+            (erp_val != "1") & (erp_val != "7") & (erp_val != "9") & (erp_val != "10"),
+            update_columns,
+        ] = ""
+
+        update_columns = ["ICFFugitiveLength_m", "FUGITIVE_ANGLE_DEGREES"]
+        self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
+
+        update_columns = [
+            "ICFStackHeight_m",
+            "ICFExitGasTemperature_K",
+            "ICFStackDiameter_m",
+            "ICFExitGasVelocity_mps",
+        ]
+        self.df.loc[
+            (erp_val == "1") | (erp_val == "7") | (erp_val == "9") | (erp_val == "10"),
+            update_columns,
+        ] = ""
 
     def run(self):
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
@@ -166,8 +179,9 @@ class InitialProcessing:
         self.set_column("ICFFugitiveWidth_m", self.fugitive_width_m)
         self.set_column("ICFAreaVolLineReleaseHeight_m", self.release_height_m)
 
+        self.update_by_emission_release_point_type()
         self.drop_unneeded_columns()
-        self.df = self.df.fillna('')
+        self.df = self.df.fillna("")
         return self.df
 
     def set_icf_facility_id(self, row):
