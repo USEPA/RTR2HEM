@@ -53,7 +53,6 @@ epgs = EpgGUI(epgs).get_response()
 
 """
 7c
-selecting a regulatory code, always include an empty option?
 these names are taken from the "REGULATORY_CODE" column
 this GUI does only shows up if "category and non-category records" is selected
 
@@ -66,7 +65,6 @@ reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()
 
-input_df = input_df.replace(np.nan, "")
 processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 
 print("!")

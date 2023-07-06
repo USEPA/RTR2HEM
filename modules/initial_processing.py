@@ -115,51 +115,6 @@ class InitialProcessing:
     def set_column(self, column_name, func):
         self.df[column_name] = self.df.apply(lambda row: func(row), axis=1)
 
-    # excel has a cap on max sheet name length
-    # temp replace 'static_PollutantCrosswalk_andMetalSpeciations' with 'static_PollutantCrosswalk_andMe'
-    def join_static_PollutantCrosswalk_andMetalSpeciations(self):
-        static_pollutantCrosswalk = get_xls_sheet("static_PollutantCrosswalk_andMe")
-        static_pollutantCrosswalk.columns = (
-            static_pollutantCrosswalk.columns.str.lower()
-        )
-        self.df = pd.merge(
-            self.df,
-            static_pollutantCrosswalk,
-            on="pollutant_code",
-            how="inner",
-            suffixes=("", "_y"),
-        )
-
-    def drop_unneeded_columns(self):
-        lower_preprocessed = [w.lower() for w in postprocessing_columns]
-        for c in self.df.columns:
-            if c.lower() not in lower_preprocessed:
-                self.df = self.df.drop(c, axis=1)
-
-    def update_by_emission_release_point_type(self):
-        """Some columns should be empty based on emission release point type"""
-        erp_val = self.df[get_col("emission_release_point_type")]
-
-        update_columns = ["ICFAreaVolLineReleaseHeight_m", "ICFFugitiveWidth_m"]
-        self.df.loc[
-            (erp_val != "1") & (erp_val != "7") & (erp_val != "9") & (erp_val != "10"),
-            update_columns,
-        ] = ""
-        
-        update_columns = ["ICFFugitiveLength_m", get_col("fugitive_angle_degrees")]
-        self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
-
-        update_columns = [
-            "ICFStackHeight_m",
-            "ICFExitGasTemperature_K",
-            "ICFStackDiameter_m",
-            "ICFExitGasVelocity_mps",
-        ]
-        self.df.loc[
-            (erp_val == "1") | (erp_val == "7") | (erp_val == "9") | (erp_val == "10"),
-            update_columns,
-        ] = ""
-
     def run(self):
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
 
@@ -186,6 +141,52 @@ class InitialProcessing:
         self.drop_unneeded_columns()
         self.df = self.df.fillna("")
         return self.df
+
+    # excel has a cap on max sheet name length
+    # temp replace 'PollutantCrosswalk_andMetalSpeciations' with 'PollutantCrosswalk_andMe'
+    def join_static_PollutantCrosswalk_andMetalSpeciations(self):
+        static_pollutantCrosswalk = get_xls_sheet("PollutantCrosswalk_andMe")
+        static_pollutantCrosswalk.columns = (
+            static_pollutantCrosswalk.columns.str.lower()
+        )
+        self.df = pd.merge(
+            self.df,
+            static_pollutantCrosswalk,
+            on="pollutant_code",
+            how="inner",
+            suffixes=("", "_y"),
+        )
+
+    def drop_unneeded_columns(self):
+        """Drops any columns not in configs/processing_columns/post section"""
+        lower_preprocessed = [w.lower() for w in postprocessing_columns]
+        for c in self.df.columns:
+            if c.lower() not in lower_preprocessed:
+                self.df = self.df.drop(c, axis=1)
+
+    def update_by_emission_release_point_type(self):
+        """Some columns should be empty based on emission release point type"""
+        erp_val = get_col("emission_release_point_type", self.df)
+
+        update_columns = ["ICFAreaVolLineReleaseHeight_m", "ICFFugitiveWidth_m"]
+        self.df.loc[
+            (erp_val != "1") & (erp_val != "7") & (erp_val != "9") & (erp_val != "10"),
+            update_columns,
+        ] = ""
+
+        update_columns = ["ICFFugitiveLength_m", get_col("fugitive_angle_degrees")]
+        self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
+
+        update_columns = [
+            "ICFStackHeight_m",
+            "ICFExitGasTemperature_K",
+            "ICFStackDiameter_m",
+            "ICFExitGasVelocity_mps",
+        ]
+        self.df.loc[
+            (erp_val == "1") | (erp_val == "7") | (erp_val == "9") | (erp_val == "10"),
+            update_columns,
+        ] = ""
 
     def set_icf_facility_id(self, row):
         return get_col("state_county_fips", row) + get_col(
