@@ -8,100 +8,6 @@ from .utils import (
 )
 
 
-"""
-"SELECT input_EmissionInventory_withICFWork.StateGroup, 
-        input_EmissionInventory_withICFWork.ICFFacilityID, 
-        input_EmissionInventory_withICFWork.SPPD_FACILITY_IDENTIFIER, 
-        input_EmissionInventory_withICFWork.ICFSourceID, 
-        input_EmissionInventory_withICFWork.ICFSourceType, 
-        input_EmissionInventory_withICFWork.POLLUTANT_CODE, 
-        input_EmissionInventory_withICFWork.POLLUTANT_DESCRIPTION,
-        input_EmissionInventory_withICFWork.HAP_CATEGORY_NAME, 
-
-        input_EmissionInventory_withICFWork.EMISSIONS_TPY, 
-        ([Emissions_TPY]*[Metal_Speciation_Factor]) AS ICFModelEmissionTPY, '' AS blank, " _        --> metal speciation is in static_crosswalk
-        
-        static_PollutantCrosswalk_andMetalSpeciations.HEM3_Chemical_Name, 
-        static_PollutantCrosswalk_andMetalSpeciations.[Chem Name For Tier 2 Tool], 
-
-        & "input_EmissionInventory_withICFWork.REGULATORY_CODE , 
-        input_EmissionInventory_withICFWork.ICFCatLevelModeling, 
-        input_EmissionInventory_withICFWork.EMISSION_PROCESS_GROUP, 
-        input_EmissionInventory_withICFWork.ICFEmissionProcessGroupAbbr, " _
-
-        & "input_EmissionInventory_withICFWork.EMISSION_UNIT_ID, 
-        input_EmissionInventory_withICFWork.PROCESS_ID, 
-        input_EmissionInventory_withICFWork.EMISSION_RELEASE_POINT_ID, 
-        input_EmissionInventory_withICFWork.EMISSION_RELEASE_POINT_TYPE, 
-        input_EmissionInventory_withICFWork.SCC, 
-        input_EmissionInventory_withICFWork.NAICS_PRIMARY, 
-        '' AS blank2, 
-        input_EmissionInventory_withICFWork.Y_COORDINATE, 
-        input_EmissionInventory_withICFWork.X_COORDINATE, " _
-
-        & "input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT1_X_COORDINATE, 
-        input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT1_Y_COORDINATE, 
-        input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT2_X_COORDINATE, 
-        input_EmissionInventory_withICFWork.FUGITIVE_2D_MIDPOINT2_Y_COORDINATE, " _
-
-        ------------LOGIC STARTS HERE------------
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'9' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'10',Null,[input_EmissionInventory_withICFWork]![ICFAreaVolLineReleaseHeight_m]) AS ICFAreaVolLineReleaseHeight_m, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='1' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='7' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='9' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[input_EmissionInventory_withICFWork]![ICFStackHeight_m]) AS ICFStackHeight_m, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='1' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='7' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='9' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[input_EmissionInventory_withICFWork]![ICFExitGasTemperature_K]) AS ICFExitGasTemperature_K, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='1' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='7' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='9' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[input_EmissionInventory_withICFWork]![ICFStackDiameter_m]) AS ICFStackDiameter_m, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='1' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='7' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='9' Or 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[input_EmissionInventory_withICFWork]![ICFExitGasVelocity_mps]) AS ICFExitGasVelocity_mps, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7',Null,[input_EmissionInventory_withICFWork]![ICFFugitiveLength_m]) AS ICFFugitiveLength_m, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'9' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'10',Null,[input_EmissionInventory_withICFWork]![ICFFugitiveWidth_m]) AS ICFFugitiveWidth_m, " _
-
-        & "IIf([input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'1' And 
-        [input_EmissionInventory_withICFWork]![EMISSION_RELEASE_POINT_TYPE]<>'7',Null,[input_EmissionInventory_withICFWork]![FUGITIVE_ANGLE_DEGREES]) AS FUGITIVE_ANGLE_DEGREES, " _
-
-        ------------LOGIC ENDS HERE------------
-
-        & "'' AS blank3, static_PollutantCrosswalk_andMetalSpeciations.Metal_Speciation_Factor AS ICFMetal_Speciation_Factor, " _
-        & "'' AS blank4, input_EmissionInventory_withICFWork.FACILITY_NAME, input_EmissionInventory_withICFWork.LOCATION_ADDRESS, input_EmissionInventory_withICFWork.CITY, " _
-        & "input_EmissionInventory_withICFWork.COUNTY_NAME, input_EmissionInventory_withICFWork.STATE_ABBR, input_EmissionInventory_withICFWork.ZIPCODE " _
-        & "INTO working_CrosswalkEmissionInventory " _
-        
-        & "FROM input_EmissionInventory_withICFWork INNER JOIN 
-        static_PollutantCrosswalk_andMetalSpeciations ON 
-        input_EmissionInventory_withICFWork.POLLUTANT_CODE=static_PollutantCrosswalk_andMetalSpeciations.Pollutant_Code;"
-"""
-
-"""
-NOTE
-    "StateGroup" is not created as that step is currently skipped
-    "blank", "blank2", "blank3", "blank4" not yet created
-
-"""
-
-
 class InitialProcessing:
     ft_per_meter = 3.2808399
     fahrenheit_to_kelvin = lambda self, f_temp: ((f_temp - 32) * 0.5555) + 273.15
@@ -121,7 +27,9 @@ class InitialProcessing:
         set_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
         set_column(self.df, "ICFSourceType", self.set_source_type)
         set_column(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height)
-        set_column(self.df, "ICFMetal_Speciation_Factor", self.set_metal_speciation_factor)
+        set_column(
+            self.df, "ICFMetal_Speciation_Factor", self.set_metal_speciation_factor
+        )
 
         # unit conversions
         # might not need to store

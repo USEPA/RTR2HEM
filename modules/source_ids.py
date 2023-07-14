@@ -1,52 +1,5 @@
-import pandas as pd
-from .utils import (
-    set_column,
-    get_xls_sheet,
-    get_col,
-    emission_type,
-    postprocessing_columns,
-)
+from .utils import set_column
 
-"""
-initial query for working_sourceList
-
-CurrentDb.Execute "
-SELECT working_CrosswalkEmissionInventory.ICFFacilityID, 
-working_CrosswalkEmissionInventory.ICFSourceID, 
-working_CrosswalkEmissionInventory.EMISSION_UNIT_ID, " _
-working_CrosswalkEmissionInventory.PROCESS_ID, 
-working_CrosswalkEmissionInventory.EMISSION_RELEASE_POINT_ID, 
-working_CrosswalkEmissionInventory.EMISSION_RELEASE_POINT_TYPE, 
-working_CrosswalkEmissionInventory.SCC, 
-working_CrosswalkEmissionInventory.REGULATORY_CODE, " _
-working_CrosswalkEmissionInventory.ICFCatLevelModeling, 
-working_CrosswalkEmissionInventory.EMISSION_PROCESS_GROUP, 
-working_CrosswalkEmissionInventory.ICFEmissionProcessGroupAbbr INTO working_sourceList " _
-
-FROM working_CrosswalkEmissionInventory " _
-GROUP BY working_CrosswalkEmissionInventory.ICFFacilityID, 
-working_CrosswalkEmissionInventory.ICFSourceID, 
-working_CrosswalkEmissionInventory.EMISSION_UNIT_ID, " _
-working_CrosswalkEmissionInventory.PROCESS_ID, 
-working_CrosswalkEmissionInventory.EMISSION_RELEASE_POINT_ID, 
-working_CrosswalkEmissionInventory.EMISSION_RELEASE_POINT_TYPE, 
-working_CrosswalkEmissionInventory.SCC, 
-working_CrosswalkEmissionInventory.REGULATORY_CODE, " _
-working_CrosswalkEmissionInventory.ICFCatLevelModeling,
-working_CrosswalkEmissionInventory.EMISSION_PROCESS_GROUP, 
-working_CrosswalkEmissionInventory.ICFEmissionProcessGroupAbbr " _
-
-ORDER BY working_CrosswalkEmissionInventory.ICFFacilityID, 
-working_CrosswalkEmissionInventory.EMISSION_UNIT_ID, 
-working_CrosswalkEmissionInventory.PROCESS_ID, " _
-working_CrosswalkEmissionInventory.EMISSION_RELEASE_POINT_ID;"
-"""
-
-"""
-Uses:
-    module "04 Src IDs"
-    table "working_sourceList"
-"""
 
 class SourceIDs:
     facilty_counter = {}
@@ -56,9 +9,9 @@ class SourceIDs:
         self.df["ICFSourceID"] = ""
 
     def str_counter(self, counter):
-        zero_count = '0' * (4-len(f'{counter}'))
-        if len(f'{counter}') > 4:
-            raise ValueError('Exceeded range of acceptible counter values')
+        zero_count = "0" * (4 - len(f"{counter}"))
+        if len(f"{counter}") > 4:
+            raise ValueError("Exceeded range of acceptible counter values")
         return f"{zero_count}{counter}"
 
     def run(self):
@@ -78,12 +31,20 @@ class SourceIDs:
             if not row["emission_process_group"]:
                 source_id = "C_" + erp_type + self.str_counter(counter)
             else:
-                source_id = "CE" + row["ICFEmissionProcessGroupAbbr"] + self.str_counter(counter)
+                source_id = (
+                    "CE"
+                    + row["ICFEmissionProcessGroupAbbr"]
+                    + self.str_counter(counter)
+                )
         else:
-           if row["ICFEmissionProcessGroupAbbr"]:
-               source_id = "NE" + row["ICFEmissionProcessGroupAbbr"] + self.str_counter(counter)
-           else:
-               source_id = "N_" + erp_type + self.str_counter(counter)
+            if row["ICFEmissionProcessGroupAbbr"]:
+                source_id = (
+                    "NE"
+                    + row["ICFEmissionProcessGroupAbbr"]
+                    + self.str_counter(counter)
+                )
+            else:
+                source_id = "N_" + erp_type + self.str_counter(counter)
 
         assert len(source_id) == 8
         return source_id
