@@ -2,6 +2,7 @@ import numpy as np
 from GUI.epg_popup import EpgGUI
 from GUI.regCodes_popup import RegCodesGUI
 from modules.initial_processing import InitialProcessing
+from modules.source_ids import SourceIDs
 from modules.utils import get_col, input_df, columns_map
 
 """
@@ -66,5 +67,6 @@ reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()
 
 processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
+processed_df = SourceIDs(processed_df).run()
 
 print("!")

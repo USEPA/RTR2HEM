@@ -1,6 +1,6 @@
 import pandas as pd
-import numpy as np
 from .utils import (
+    set_column,
     get_xls_sheet,
     get_col,
     emission_type,
@@ -97,7 +97,6 @@ from .utils import (
 """
 NOTE
     "StateGroup" is not created as that step is currently skipped
-    "ICFSourceID" not yet created
     "blank", "blank2", "blank3", "blank4" not yet created
 
 """
@@ -112,30 +111,27 @@ class InitialProcessing:
         self.epg_abbr_map = epgs
         self.reg_codes = reg_codes
 
-    def set_column(self, column_name, func):
-        self.df[column_name] = self.df.apply(lambda row: func(row), axis=1)
-
     def run(self):
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
 
-        self.set_column("ICFFacilityID", self.set_icf_facility_id)
-        self.set_column("ICFCatLevelModeling", self.is_selected_regulatory_code)
-        self.set_column("EMISSIONS_TPY", self.set_selected_emission_type)
-        self.set_column("ICFModelEmissionTPY", self.set_model_emission_tpy)
-        self.set_column("ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
-        self.set_column("ICFSourceType", self.set_source_type)
-        self.set_column("ICFAreaVolLineReleaseHeight", self.set_release_height)
-        self.set_column("ICFMetal_Speciation_Factor", self.set_metal_speciation_factor)
+        set_column(self.df, "ICFFacilityID", self.set_icf_facility_id)
+        set_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code)
+        set_column(self.df, "EMISSIONS_TPY", self.set_selected_emission_type)
+        set_column(self.df, "ICFModelEmissionTPY", self.set_model_emission_tpy)
+        set_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
+        set_column(self.df, "ICFSourceType", self.set_source_type)
+        set_column(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height)
+        set_column(self.df, "ICFMetal_Speciation_Factor", self.set_metal_speciation_factor)
 
         # unit conversions
         # might not need to store
-        self.set_column("ICFStackHeight_m", self.stack_height_meter)
-        self.set_column("ICFStackDiameter_m", self.stack_diameter_meter)
-        self.set_column("ICFExitGasVelocity_mps", self.gas_velocity_mps)
-        self.set_column("ICFExitGasTemperature_K", self.gas_temperature_k)
-        self.set_column("ICFFugitiveLength_m", self.fugitive_length_m)
-        self.set_column("ICFFugitiveWidth_m", self.fugitive_width_m)
-        self.set_column("ICFAreaVolLineReleaseHeight_m", self.release_height_m)
+        set_column(self.df, "ICFStackHeight_m", self.stack_height_meter)
+        set_column(self.df, "ICFStackDiameter_m", self.stack_diameter_meter)
+        set_column(self.df, "ICFExitGasVelocity_mps", self.gas_velocity_mps)
+        set_column(self.df, "ICFExitGasTemperature_K", self.gas_temperature_k)
+        set_column(self.df, "ICFFugitiveLength_m", self.fugitive_length_m)
+        set_column(self.df, "ICFFugitiveWidth_m", self.fugitive_width_m)
+        set_column(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m)
 
         self.update_by_emission_release_point_type()
         self.drop_unneeded_columns()
@@ -219,9 +215,6 @@ class InitialProcessing:
         return self.epg_abbr_map.get(emissions_group, "")
 
     def set_source_type(self, row):
-        """
-        TODO -- double check, although everything in this example run should be "P"
-        """
         length = int(get_col("fugitive_length_sigmax_ft", row))
         width = int(get_col("fugitive_width_sigmay_ft", row))
         erp_type_map = {

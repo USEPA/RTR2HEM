@@ -7,6 +7,8 @@ import pypyodbc
 def to_bool(val):
     return str(val).lower() == "true"
 
+def set_column(df, column_name, func):
+    df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 def get_col(name, df=None):
     """Gets mapped column name and attempts case insensitive lookup"""
