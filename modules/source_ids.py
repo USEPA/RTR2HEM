@@ -1,5 +1,5 @@
 import pandas as pd
-from .utils import set_column
+from .utils import set_column, source_id_columns
 
 """
 ------Create sourceList START------
@@ -56,25 +56,6 @@ SET working_CrosswalkEmissionInventory.ICFSourceID = [working_sourceList].[ICFso
 
 class SourceIDs:
     facilty_counter = {}
-    group_columns = [
-        "ICFFacilityID",
-        "ICFSourceID",
-        "emission_unit_id",
-        "process_id",
-        "emission_release_point_id",
-        "emission_release_point_type",
-        "scc",
-        "regulatory_code",
-        "ICFCatLevelModeling",
-        "emission_process_group",
-        "ICFEmissionProcessGroupAbbr",
-    ]
-    idx_columns = [
-        "ICFFacilityID",
-        "emission_unit_id",
-        "process_id",
-        "emission_release_point_id",
-    ]
 
     def __init__(self, df):
         self.df = df
@@ -87,22 +68,11 @@ class SourceIDs:
         return f"{zero_count}{counter}"
 
     def run(self):
-        # alt
-        # source_list_df = self.df.drop_duplicates(self.idx_columns)
-        # source_list_df = source_list_df.sort_values(self.idx_columns)
-        # set_column(source_list_df, "ICFSourceID", self.create_source_id)
+        source_list_df = self.df.drop_duplicates(source_id_columns)
+        source_list_df = source_list_df.sort_values(source_id_columns)
+        set_column(source_list_df, "ICFSourceID", self.create_source_id)
 
-        source_list_df = self.df[self.group_columns]
-        source_list_df = source_list_df.groupby(self.group_columns)
-
-        result_df_frames = []
-        for name, group in source_list_df:
-            group["ICFSourceID"] = self.create_source_id(group.iloc[0])
-            result_df_frames.append(group)
-        source_list_df = pd.concat(result_df_frames)
-        source_list_df = source_list_df.drop_duplicates()
-
-        self.set_src_id(self.df, source_list_df)
+        self.remerge_src_ids(self.df, source_list_df)
         return self.df
 
     def create_source_id(self, row):
@@ -136,7 +106,7 @@ class SourceIDs:
         assert len(source_id) == 8
         return source_id
 
-    def set_src_id(self, df, source_list):
+    def remerge_src_ids(self, df, source_list):
         df = pd.merge(
             self.df,
             source_list,

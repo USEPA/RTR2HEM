@@ -73,5 +73,11 @@
             "STATE_ABBR",
             "ZIPCODE"
         ]
-    }
+    },
+    "source_id_columns": [
+        "ICFFacilityID",
+        "emission_unit_id",
+        "process_id",
+        "emission_release_point_id"
+    ]
 }
