@@ -100,8 +100,10 @@ class InitialProcessing:
     def is_selected_regulatory_code(self, row):
         code = get_col("regulatory_code", row)
         if self.reg_codes == None:
-            return True
-        return self.reg_codes.get(code, False) == 1
+            return "Yes"
+        if self.reg_codes.get(code) == 1:
+            return "Yes"
+        return "No"
 
     def set_selected_emission_type(self, row):
         try:
