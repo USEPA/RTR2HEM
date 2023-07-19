@@ -3,6 +3,7 @@ from GUI.epg_popup import EpgGUI
 from GUI.regCodes_popup import RegCodesGUI
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
+from modules.write_outputs import WriteOuputs
 from modules.utils import get_col, input_df, columns_map
 
 """
@@ -67,6 +68,12 @@ reg_codes.sort()
 reg_codes = RegCodesGUI(reg_codes).get_response()
 
 processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
+
+# 7d
 processed_df = SourceIDs(processed_df).run()
+
+# 7f
+outputs = WriteOuputs(processed_df)
+outputs.emission_loc()
 
 print("!")
