@@ -39,7 +39,7 @@
             "HAP_CATEGORY_NAME",
             "EMISSIONS_TPY",
             "ICFModelEmissionTPY",
-            "HEM3_Chemical_Name",
+            "hem3_chemical_name",
             "Chem Name For Tier 2 Tool",
             "regulatory_code",
             "ICFCatLevelModeling",

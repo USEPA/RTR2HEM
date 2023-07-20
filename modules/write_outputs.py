@@ -1,7 +1,9 @@
 import os, shutil
 import pandas as pd
-from modules.outputs_writer.emiss_loc import EmissionLoc
+from modules.outputs_writer.emissions_loc import EmissionLoc
 from modules.outputs_writer.fac_address import FacilityAddress
+from modules.outputs_writer.fac_list import FacilityList
+from modules.outputs_writer.hap_emissions import HapEmissions
 from modules.utils import src_cat_name, timestamp
 
 """
@@ -34,6 +36,17 @@ class WriteOuputs:
         self.write_to_template(
             "HEM4_Fac_Address_ICF", "Facility_Address", cat_fac_address, 1
         )
+
+        cat_fac_list, whole_fac_list = FacilityList(self.df).create()
+        self.write_to_template(
+            "HEM4_Facility_List_Options_ICF", "Facility List Options", cat_fac_list, 2
+        )
+
+        cat_hap_emissions, whole_hap_emissions = HapEmissions(self.df).create()
+        self.write_to_template(
+            "HEM4_HAP_Emiss_ICF", "Hap emissions", cat_hap_emissions, 1
+        )
+
 
     def write_to_template(self, template_name, sheetname, df, row):
         template_src = os.path.join(self.templates_fp, f"{template_name}.xlsx")
