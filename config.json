@@ -66,12 +66,12 @@
             "ICFFugitiveWidth_m",
             "fugitive_angle_degrees",
             "ICFMetal_Speciation_Factor",
-            "FACILITY_NAME",
-            "LOCATION_ADDRESS",
-            "CITY",
-            "COUNTY_NAME",
-            "STATE_ABBR",
-            "ZIPCODE"
+            "facility_name",
+            "location_address",
+            "city",
+            "county_name",
+            "state_abbr",
+            "zipcode"
         ]
     },
     "source_id_columns": [

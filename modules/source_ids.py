@@ -63,4 +63,6 @@ class SourceIDs:
         )
         for c in df.columns:
             if "tmp" in c:
-                self.df = df.drop(c, axis=1)
+                df = df.drop(c, axis=1)
+
+        self.df = df

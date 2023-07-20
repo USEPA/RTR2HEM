@@ -2,42 +2,43 @@ from modules.utils import set_column
 
 
 class EmissionLoc:
+    sort_by = ["ICFFacilityID", "ICFSourceID"]
+
+    columns = [
+        "ICFFacilityID",
+        "ICFSourceID",
+        "locationType",
+        "Longitude",
+        "Latitude",
+        "UTMzone",
+        "ICFSourceType",
+        "Lengthx",
+        "Lengthy",
+        "fugitive_angle_degrees",
+        "HorzDim",
+        "VertDim",
+        "ICFAreaVolLineReleaseHeight_m",
+        "ICFStackHeight_m",
+        "ICFStackDiameter_m",
+        "ICFExitGasVelocity_mps",
+        "ICFExitGasTemperature_K",
+        "Elevation_m",
+        "X2",
+        "Y2",
+    ]
+
     def __init__(self, df):
         self.df = df
 
     def create(self):
-        sort_by = ["ICFFacilityID", "ICFSourceID"]
         emiss_loc_df = self.df
-        emiss_loc_df = emiss_loc_df.sort_values(sort_by)
+        emiss_loc_df = emiss_loc_df.sort_values(self.sort_by)
 
-        columns = [
-            "ICFFacilityID",
-            "ICFSourceID",
-            "locationType",
-            "Longitude",
-            "Latitude",
-            "UTMzone",
-            "ICFSourceType",
-            "Lengthx",
-            "Lengthy",
-            "fugitive_angle_degrees",
-            "HorzDim",
-            "VertDim",
-            "ICFAreaVolLineReleaseHeight_m",
-            "ICFStackHeight_m",
-            "ICFStackDiameter_m",
-            "ICFExitGasVelocity_mps",
-            "ICFExitGasTemperature_K",
-            "Elevation_m",
-            "X2",
-            "Y2",
-        ]
-
-        for c in columns:
+        for c in self.columns:
             if c not in self.df:
                 emiss_loc_df[c] = ""
 
-        emiss_loc_df = emiss_loc_df.drop_duplicates(columns)
+        emiss_loc_df = emiss_loc_df.drop_duplicates(self.columns)
 
         set_column(emiss_loc_df, "locationType", self.set_locationType)
         set_column(emiss_loc_df, "Longitude", self.set_Longitude)
@@ -52,8 +53,8 @@ class EmissionLoc:
         cat_only_df = emiss_loc_df.loc[emiss_loc_df["ICFCatLevelModeling"] == "Yes"]
 
         # drop unneeded columns
-        emiss_loc_df = emiss_loc_df[columns]
-        cat_only_df = cat_only_df[columns]
+        emiss_loc_df = emiss_loc_df[self.columns]
+        cat_only_df = cat_only_df[self.columns]
 
         return cat_only_df, emiss_loc_df
 

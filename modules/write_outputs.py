@@ -1,6 +1,7 @@
 import os, shutil
 import pandas as pd
 from modules.outputs_writer.emiss_loc import EmissionLoc
+from modules.outputs_writer.fac_address import FacilityAddress
 from modules.utils import src_cat_name, timestamp
 
 """
@@ -24,9 +25,14 @@ class WriteOuputs:
             os.mkdir(self.out_fp)
 
     def run(self):
-        cat_emis_loc, emis_loc = EmissionLoc(self.df).create()
+        cat_emis_loc, whole_emis_loc = EmissionLoc(self.df).create()
         self.write_to_template(
             "HEM4_Emiss_Loc_ICF", "Emissions_Location", cat_emis_loc, 2
+        )
+
+        cat_fac_address, whole_fac_address = FacilityAddress(self.df).create()
+        self.write_to_template(
+            "HEM4_Fac_Address_ICF", "Facility_Address", cat_fac_address, 1
         )
 
     def write_to_template(self, template_name, sheetname, df, row):
