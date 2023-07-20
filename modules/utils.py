@@ -43,7 +43,7 @@ with open(".\config.json") as fh:
 
 settings = config["settings"]
 timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d"))
-src_cat_name = settings['source_category_name']
+src_cat_name = settings["source_category_name"]
 emission_type = settings["emission_type"]
 
 columns_map = config["processing_columns"]["pre"]

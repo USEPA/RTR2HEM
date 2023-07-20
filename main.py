@@ -73,7 +73,6 @@ processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 processed_df = SourceIDs(processed_df).run()
 
 # 7f
-outputs = WriteOuputs(processed_df)
-outputs.emission_loc()
+WriteOuputs(processed_df).run()
 
 print("!")
