@@ -31,7 +31,7 @@ class EmissionLoc:
         self.df = df
 
     def create(self):
-        emiss_loc_df = self.df
+        emiss_loc_df = self.df.copy()
         emiss_loc_df = emiss_loc_df.sort_values(self.sort_by)
 
         for c in self.columns:
@@ -50,13 +50,15 @@ class EmissionLoc:
         set_column(emiss_loc_df, "X2", self.set_X2)
         set_column(emiss_loc_df, "Y2", self.set_Y2)
 
-        cat_only_df = emiss_loc_df.loc[emiss_loc_df["ICFCatLevelModeling"] == "Yes"]
+        cat_emiss_loc_df = emiss_loc_df.loc[
+            emiss_loc_df["ICFCatLevelModeling"] == "Yes"
+        ]
 
         # drop unneeded columns
         emiss_loc_df = emiss_loc_df[self.columns]
-        cat_only_df = cat_only_df[self.columns]
+        cat_emiss_loc_df = cat_emiss_loc_df[self.columns]
 
-        return cat_only_df, emiss_loc_df
+        return cat_emiss_loc_df, emiss_loc_df
 
     def set_locationType(self, row):
         return "L"

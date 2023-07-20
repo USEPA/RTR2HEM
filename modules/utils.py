@@ -50,8 +50,6 @@ columns_map = config["processing_columns"]["pre"]
 columns_map = {k.lower(): v for k, v in columns_map.items()}
 postprocessing_columns = config["processing_columns"]["post"]
 
-source_id_columns = config["source_id_columns"]
-
 # fetch input access table
 input_fp = config["inputs"]["input_file"]
 input_table = config["inputs"]["input_table"]

@@ -47,7 +47,6 @@ class WriteOuputs:
             "HEM4_HAP_Emiss_ICF", "Hap emissions", cat_hap_emissions, 1
         )
 
-
     def write_to_template(self, template_name, sheetname, df, row):
         template_src = os.path.join(self.templates_fp, f"{template_name}.xlsx")
         output_dst = os.path.join(self.out_fp, f"{template_name}.xlsx")

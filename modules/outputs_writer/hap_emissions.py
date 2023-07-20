@@ -1,5 +1,6 @@
 from modules.utils import set_column
 
+
 class HapEmissions:
     sort_by = ["ICFFacilityID", "ICFSourceID", "hem3_chemical_name"]
 
@@ -7,20 +8,18 @@ class HapEmissions:
         "ICFFacilityID",
         "ICFSourceID",
         "hem3_chemical_name",
-        "SumEmissionTPY",
+        "ICFModelEmissionTPY",
     ]
 
     def __init__(self, df):
         self.df = df
 
     def create(self):
-        hap_emiss_df = self.df
+        hap_emiss_df = self.df.copy()
         hap_emiss_df = hap_emiss_df.sort_values(self.sort_by)
-        hap_emiss_df['SumEmissionTPY'] = ''
-
         hap_emiss_df = hap_emiss_df.drop_duplicates(self.columns)
 
-        set_column(hap_emiss_df, 'SumEmissionTPY', self.set_SumEmissionTPY)
+        set_column(hap_emiss_df, 'ICFModelEmissionTPY', self.set_SumEmissionTPY)
 
         cat_hap_emiss_df = hap_emiss_df.loc[
             hap_emiss_df["ICFCatLevelModeling"] == "Yes"
@@ -30,9 +29,12 @@ class HapEmissions:
         cat_hap_emiss_df = cat_hap_emiss_df[self.columns]
 
         return cat_hap_emiss_df, hap_emiss_df
-    
+
+    # TODO -- complete implementation, what is getting summed + add float checks
     def set_SumEmissionTPY(self, row):
-        return ""
+        return float(row["ICFModelEmissionTPY"])
+
+
 """
 SELECT working_CrosswalkEmissionInventory.ICFFacilityID AS FacilityID, 
 working_CrosswalkEmissionInventory.ICFSourceID AS SourceID, 

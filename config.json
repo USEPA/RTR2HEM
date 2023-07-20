@@ -73,11 +73,5 @@
             "state_abbr",
             "zipcode"
         ]
-    },
-    "source_id_columns": [
-        "ICFFacilityID",
-        "emission_unit_id",
-        "process_id",
-        "emission_release_point_id"
-    ]
+    }
 }

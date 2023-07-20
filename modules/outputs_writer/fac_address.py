@@ -15,7 +15,7 @@ class FacilityAddress:
         self.df = df
 
     def create(self):
-        fac_address_df = self.df
+        fac_address_df = self.df.copy()
         fac_address_df = fac_address_df.sort_values(self.sort_by)
         fac_address_df = fac_address_df.drop_duplicates(self.columns)
 
@@ -27,6 +27,7 @@ class FacilityAddress:
         cat_fac_address_df = cat_fac_address_df[self.columns]
 
         return cat_fac_address_df, fac_address_df
+
 
 """
         CurrentDb.Execute "

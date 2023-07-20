@@ -1,13 +1,19 @@
-import pandas as pd
-from .utils import set_column, source_id_columns
+from .utils import set_column
 
 
 class SourceIDs:
     facilty_counter = {}
 
+    source_id_columns = [
+        "ICFFacilityID",
+        "emission_unit_id",
+        "process_id",
+        "emission_release_point_id",
+    ]
+
     def __init__(self, df):
         self.df = df
-        self.df["ICFSourceID"] = ""
+        self.src_list_df = self.df.copy()
 
     def str_counter(self, counter):
         zero_count = "0" * (4 - len(f"{counter}"))
@@ -16,11 +22,11 @@ class SourceIDs:
         return f"{zero_count}{counter}"
 
     def run(self):
-        source_list_df = self.df.drop_duplicates(source_id_columns)
-        source_list_df = source_list_df.sort_values(source_id_columns)
-        set_column(source_list_df, "ICFSourceID", self.create_source_id)
+        self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
+        self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)
 
-        self.remerge_src_ids(self.df, source_list_df)
+        set_column(self.src_list_df, "ICFSourceID", self.create_source_id)
+        set_column(self.df, "ICFSourceID", self.remerge_src_ids)
         return self.df
 
     def create_source_id(self, row):
@@ -54,15 +60,13 @@ class SourceIDs:
         assert len(source_id) == 8
         return source_id
 
-    def remerge_src_ids(self, df, source_list):
-        df = pd.merge(
-            self.df,
-            source_list,
-            on=source_id_columns,
-            suffixes=("tmp", ""),
-        )
-        for c in df.columns:
-            if "tmp" in c:
-                df = df.drop(c, axis=1)
-
-        self.df = df
+    def remerge_src_ids(self, row):
+        src = self.src_list_df
+        result = self.src_list_df.loc[
+            (src["ICFFacilityID"] == row["ICFFacilityID"])
+            & (src["emission_unit_id"] == row["emission_unit_id"])
+            & (src["process_id"] == row["process_id"])
+            & (src["emission_release_point_id"] == row["emission_release_point_id"])
+        ]
+        assert len(result) == 1
+        return result.iloc[0]["ICFSourceID"]
