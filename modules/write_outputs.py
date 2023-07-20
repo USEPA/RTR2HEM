@@ -29,27 +29,47 @@ class WriteOuputs:
     def run(self):
         cat_emis_loc, whole_emis_loc = EmissionLoc(self.df).create()
         self.write_to_template(
-            "HEM4_Emiss_Loc_ICF", "Emissions_Location", cat_emis_loc, 2
+            "cat", "HEM4_Emiss_Loc_ICF", "Emissions_Location", cat_emis_loc, 2
+        )
+        self.write_to_template(
+            "whole", "HEM4_Emiss_Loc_ICF", "Emissions_Location", whole_emis_loc, 2
         )
 
         cat_fac_address, whole_fac_address = FacilityAddress(self.df).create()
         self.write_to_template(
-            "HEM4_Fac_Address_ICF", "Facility_Address", cat_fac_address, 1
+            "cat", "HEM4_Fac_Address_ICF", "Facility_Address", cat_fac_address, 1
+        )
+        self.write_to_template(
+            "whole", "HEM4_Fac_Address_ICF", "Facility_Address", whole_fac_address, 1
         )
 
         cat_fac_list, whole_fac_list = FacilityList(self.df).create()
         self.write_to_template(
-            "HEM4_Facility_List_Options_ICF", "Facility List Options", cat_fac_list, 2
+            "cat",
+            "HEM4_Facility_List_Options_ICF",
+            "Facility List Options",
+            cat_fac_list,
+            2,
+        )
+        self.write_to_template(
+            "whole",
+            "HEM4_Facility_List_Options_ICF",
+            "Facility List Options",
+            whole_fac_list,
+            2,
         )
 
         cat_hap_emissions, whole_hap_emissions = HapEmissions(self.df).create()
         self.write_to_template(
-            "HEM4_HAP_Emiss_ICF", "Hap emissions", cat_hap_emissions, 1
+            "cat", "HEM4_HAP_Emiss_ICF", "Hap emissions", cat_hap_emissions, 1
+        )
+        self.write_to_template(
+            "whole", "HEM4_HAP_Emiss_ICF", "Hap emissions", whole_hap_emissions, 1
         )
 
-    def write_to_template(self, template_name, sheetname, df, row):
+    def write_to_template(self, filename, template_name, sheetname, df, row):
         template_src = os.path.join(self.templates_fp, f"{template_name}.xlsx")
-        output_dst = os.path.join(self.out_fp, f"{template_name}.xlsx")
+        output_dst = os.path.join(self.out_fp, f"{template_name}_{filename}.xlsx")
         shutil.copyfile(template_src, output_dst)
 
         writer = pd.ExcelWriter(
@@ -64,8 +84,3 @@ class WriteOuputs:
             startrow=row,
         )
         writer.close()
-
-
-"""
-
-"""
