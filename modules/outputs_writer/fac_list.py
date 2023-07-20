@@ -1,7 +1,7 @@
 class FacilityList:
     sort_by = ["ICFFacilityID"]
 
-    columns = ["ICFFacilityID"]
+    columns = ["ICFFacilityID", "ICFCatLevelModeling"]
 
     def __init__(self, df):
         self.df = df
@@ -9,11 +9,18 @@ class FacilityList:
     def create(self):
         fac_list_df = self.df.copy()
         fac_list_df = fac_list_df.sort_values(self.sort_by)
-        fac_list_df = fac_list_df.drop_duplicates(self.columns)
 
-        cat_fac_list_df = fac_list_df.loc[fac_list_df["ICFCatLevelModeling"] == "Yes"]
+        # Category only
+        cat_fac_list_df = fac_list_df.drop_duplicates(self.columns)
+        cat_fac_list_df = cat_fac_list_df.loc[
+            cat_fac_list_df["ICFCatLevelModeling"] == "Yes"
+        ]
 
-        fac_list_df = fac_list_df[self.columns]
+        self.columns.pop() # remove ICFCatLevelModeling
         cat_fac_list_df = cat_fac_list_df[self.columns]
+
+        # Wholesale
+        fac_list_df = fac_list_df.drop_duplicates(self.columns)
+        fac_list_df = fac_list_df[self.columns]
 
         return cat_fac_list_df, fac_list_df

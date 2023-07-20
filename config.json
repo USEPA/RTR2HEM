@@ -1,6 +1,6 @@
 {
     "inputs": {
-        "input_file": "./Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
+        "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
         "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
         "existing_epg_abbreviations": "",
         "existing_source_ids": "",
