@@ -3,6 +3,7 @@ class FacilityList:
 
     columns = ["ICFFacilityID", "ICFCatLevelModeling"]
 
+    filename = "FacList"
     template_name = "HEM4_Facility_List_Options_ICF"
     sheet_name = "Facility List Options"
     rowstart = 2

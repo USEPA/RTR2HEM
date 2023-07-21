@@ -9,6 +9,7 @@ openpyxl = "*"
 sqlalchemy = "*"
 pypyodbc = "*"
 xlsxwriter = "*"
+msaccessdb = "*"
 
 [dev-packages]
 

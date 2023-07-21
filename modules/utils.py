@@ -42,7 +42,7 @@ with open(".\config.json") as fh:
     config = json.load(fh)
 
 settings = config["settings"]
-timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+timestamp = str(datetime.datetime.now().strftime("%Y%m%d"))
 src_cat_name = settings["source_category_name"]
 emission_type = settings["emission_type"]
 only_category = settings["only_category_records"]
@@ -54,9 +54,9 @@ postprocessing_columns = config["processing_columns"]["post"]
 # fetch input access table
 input_fp = config["inputs"]["input_file"]
 input_table = config["inputs"]["input_table"]
-conn = pypyodbc.connect(
-    r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_fp + ";"
-)
+
+odbc_string = r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_fp + ";"
+conn = pypyodbc.connect(odbc_string)
 input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
 static_xls = pd.ExcelFile(config["inputs"]["static"])

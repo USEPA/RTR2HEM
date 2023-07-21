@@ -12,6 +12,7 @@ class HapEmissions:
         "ICFCatLevelModeling",
     ]
 
+    filename = "HAPEmis"
     template_name = "HEM4_HAP_Emiss_ICF"
     sheet_name = "Hap emissions"
     rowstart = 1

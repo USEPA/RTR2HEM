@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "08868a1b7652d38c221d192f184161d2023b77fbc501ab6ee58958e3d2cc6e71"
+            "sha256": "7d291cad9b6c931778be5ed45afa5cde29d470c617aa124d5e558d1416df485c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -89,6 +89,14 @@
             ],
             "markers": "platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))",
             "version": "==2.0.2"
+        },
+        "msaccessdb": {
+            "hashes": [
+                "sha256:760a510c6f14b4a40105fe65171fd5e8717bf30a447dcb9b76f340a303c3475a",
+                "sha256:9d3e42c30756afad484755bc84732bcffab42632d42ea93dd446ac0b5609b563"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0"
         },
         "numpy": {
             "hashes": [

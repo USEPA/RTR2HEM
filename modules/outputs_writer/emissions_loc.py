@@ -28,6 +28,7 @@ class EmissionLoc:
         "ICFCatLevelModeling",
     ]
 
+    filename = "EmisLoc"
     template_name = "HEM4_Emiss_Loc_ICF"
     sheet_name = "Emissions_Location"
     rowstart = 2
