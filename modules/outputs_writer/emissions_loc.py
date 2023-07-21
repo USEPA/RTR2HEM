@@ -25,7 +25,12 @@ class EmissionLoc:
         "Elevation_m",
         "X2",
         "Y2",
+        "ICFCatLevelModeling",
     ]
+
+    template_name = "HEM4_Emiss_Loc_ICF"
+    sheet_name = "Emissions_Location"
+    rowstart = 2
 
     def __init__(self, df):
         self.df = df
@@ -38,8 +43,6 @@ class EmissionLoc:
             if c not in self.df:
                 emiss_loc_df[c] = ""
 
-        emiss_loc_df = emiss_loc_df.drop_duplicates(self.columns)
-
         set_column(emiss_loc_df, "locationType", self.set_locationType)
         set_column(emiss_loc_df, "Longitude", self.set_Longitude)
         set_column(emiss_loc_df, "Latitude", self.set_Latitude)
@@ -50,15 +53,18 @@ class EmissionLoc:
         set_column(emiss_loc_df, "X2", self.set_X2)
         set_column(emiss_loc_df, "Y2", self.set_Y2)
 
+        emiss_loc_df = emiss_loc_df.drop_duplicates(self.columns)  # groupby
+
         cat_emiss_loc_df = emiss_loc_df.loc[
             emiss_loc_df["ICFCatLevelModeling"] == "Yes"
         ]
 
         # drop unneeded columns
-        emiss_loc_df = emiss_loc_df[self.columns]
-        cat_emiss_loc_df = cat_emiss_loc_df[self.columns]
+        self.columns.pop()  # remove ICFCatLevelModeling
+        self.whole_df = emiss_loc_df[self.columns]
+        self.cat_df = cat_emiss_loc_df[self.columns]
 
-        return cat_emiss_loc_df, emiss_loc_df
+        return self
 
     def set_locationType(self, row):
         return "L"

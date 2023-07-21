@@ -9,8 +9,12 @@ class FacilityAddress:
         "state_abbr",
         "zipcode",
         "county_name",
-        "ICFCatLevelModeling"
+        "ICFCatLevelModeling",
     ]
+
+    template_name = "HEM4_Fac_Address_ICF"
+    sheet_name = "Facility_Address"
+    rowstart = 1
 
     def __init__(self, df):
         self.df = df
@@ -24,15 +28,15 @@ class FacilityAddress:
         cat_fac_address_df = cat_fac_address_df.loc[
             cat_fac_address_df["ICFCatLevelModeling"] == "Yes"
         ]
-        
-        self.columns.pop() # remove ICFCatLevelModeling
-        cat_fac_address_df = cat_fac_address_df[self.columns]
+
+        self.columns.pop()  # remove ICFCatLevelModeling
+        self.cat_df = cat_fac_address_df[self.columns]
 
         # Wholesale
         fac_address_df = fac_address_df.drop_duplicates(self.columns)
-        fac_address_df = fac_address_df[self.columns]
+        self.whole_df = fac_address_df[self.columns]
 
-        return cat_fac_address_df, fac_address_df
+        return self
 
 
 """

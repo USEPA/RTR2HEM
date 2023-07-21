@@ -45,6 +45,7 @@ settings = config["settings"]
 timestamp = str(datetime.datetime.now().strftime("%Y-%m-%d"))
 src_cat_name = settings["source_category_name"]
 emission_type = settings["emission_type"]
+only_category = settings["only_category_records"]
 
 columns_map = config["processing_columns"]["pre"]
 columns_map = {k.lower(): v for k, v in columns_map.items()}
