@@ -6,11 +6,8 @@ from modules.outputs_writer.emissions_loc import EmissionLoc
 from modules.outputs_writer.fac_address import FacilityAddress
 from modules.outputs_writer.fac_list import FacilityList
 from modules.outputs_writer.hap_emissions import HapEmissions
+from modules.outputs_writer.write_accdb import AccdbWriter
 from modules.utils import src_cat_name, timestamp, emission_type, only_category
-
-"""
-If both category and wholesale selected then need to produce two sets of files for each template
-"""
 
 
 class WriteOuputs:
@@ -27,6 +24,7 @@ class WriteOuputs:
         self.odbc_conn_str = ""
 
         self.create_folder()
+        self.create_accdb()
 
     def create_folder(self):
         if not os.path.exists("outputs"):
@@ -37,11 +35,12 @@ class WriteOuputs:
 
     def create_accdb(self):
         msaccessdb.create(self.accdb_fp)
-        self.odbc_conn_str = (
+        odbc_conn_str = (
             r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="
             + self.accdb_fp
             + ";"
         )
+        self.conn = pypyodbc.connect(odbc_conn_str)
 
     def run(self):
         emis_loc = EmissionLoc(self.df).create()
@@ -56,21 +55,8 @@ class WriteOuputs:
         hap_emissions = HapEmissions(self.df).create()
         self.write_to_template(hap_emissions)
 
-        self.write_access_history()
-
-    def write_access_history(self):
-        self.create_accdb()
-        conn = pypyodbc.connect(self.odbc_conn_str)
-
-        accdb = conn.cursor()
-        accdb.execute(
-            """CREATE TABLE Table1 (
-                        ID autoincrement,
-                        Col1 varchar(50),
-                        Col2 double,
-                        Col3 datetime);"""
-        )
-        accdb.commit()
+        accdb_writer = AccdbWriter(self.conn)
+        accdb_writer.write(self.df, "04 - Final RTR-HEM Emiss Inventory Xwalk")
 
     def write_to_template(self, result):
         template_name = result.template_name
