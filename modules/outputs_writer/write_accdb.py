@@ -1,14 +1,27 @@
+import msaccessdb, pypyodbc
+
+
 class AccdbWriter:
-    def __init__(self, conn):
+    def __init__(self, fp):
+        self.create_accdb(fp)
+
+    def create_accdb(self, fp):
+        msaccessdb.create(fp)
+        odbc_conn_str = (
+            r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + fp + ";"
+        )
+        conn = pypyodbc.connect(odbc_conn_str)
+
+        self.accdb_fp = fp
         self.accdb = conn.cursor()
 
-    def write(self, df, name):
+    def write(self, table_name, df):
         df = df.astype(str)
         columns = df.columns.to_list()
         columns = "] text(255), [".join(columns)
         columns = f"([{columns}] text(255))"
 
-        accdb_query = f"CREATE TABLE [{name}]"
+        accdb_query = f"CREATE TABLE [{table_name}]"
         accdb_query = f"{accdb_query} {columns};"
         self.execute(accdb_query)
 
@@ -17,7 +30,7 @@ class AccdbWriter:
             row = "', '".join(row)
             row = f"('{row}')"
 
-            accdb_query = f"INSERT INTO [{name}] VALUES"
+            accdb_query = f"INSERT INTO [{table_name}] VALUES"
             accdb_query = f"{accdb_query} {row};"
             self.execute(accdb_query)
 

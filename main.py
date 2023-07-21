@@ -1,6 +1,6 @@
 import numpy as np
-from GUI.epg_popup import EpgGUI
-from GUI.regCodes_popup import RegCodesGUI
+from modules.GUI.epg_popup import EpgGUI
+from modules.GUI.regCodes_popup import RegCodesGUI
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.write_outputs import WriteOuputs
@@ -25,6 +25,8 @@ reg code 63SSSSS
 
 dont forget that the results get loaded into pre-existing templates
 """
+output_handler = WriteOuputs()
+
 
 for name in columns_map:
     if columns_map[name]:
@@ -73,6 +75,8 @@ processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 processed_df = SourceIDs(processed_df).run()
 
 # 7f
-WriteOuputs(processed_df).run()
+output_handler.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
+output_handler.run(processed_df)
+
 
 print("Done!")

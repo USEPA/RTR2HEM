@@ -1,5 +1,4 @@
 import os, shutil
-import msaccessdb, pypyodbc
 import pandas as pd
 from openpyxl import load_workbook
 from modules.outputs_writer.emissions_loc import EmissionLoc
@@ -14,17 +13,14 @@ class WriteOuputs:
     templates_fp = "templates"
     filename_base = f"{src_cat_name}{timestamp}_{emission_type.split(' ')[0]}"
 
-    def __init__(self, df):
-        self.df = df
-
+    def __init__(self):
         self.out_fp = os.path.join(
             "outputs", f"{self.filename_base}_HEMInputsAndXWalks"
         )
-        self.accdb_fp = os.path.join(self.out_fp, f"{self.filename_base}_XWalks.accdb")
-        self.odbc_conn_str = ""
-
         self.create_folder()
-        self.create_accdb()
+
+        accdb_fp = os.path.join(self.out_fp, f"{self.filename_base}_XWalks.accdb")
+        self.accdb = AccdbWriter(accdb_fp)
 
     def create_folder(self):
         if not os.path.exists("outputs"):
@@ -33,16 +29,8 @@ class WriteOuputs:
             shutil.rmtree(self.out_fp)
         os.mkdir(self.out_fp)
 
-    def create_accdb(self):
-        msaccessdb.create(self.accdb_fp)
-        odbc_conn_str = (
-            r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="
-            + self.accdb_fp
-            + ";"
-        )
-        self.conn = pypyodbc.connect(odbc_conn_str)
-
-    def run(self):
+    def run(self, df):
+        self.df = df
         emis_loc = EmissionLoc(self.df).create()
         self.write_to_template(emis_loc)
 
@@ -55,51 +43,38 @@ class WriteOuputs:
         hap_emissions = HapEmissions(self.df).create()
         self.write_to_template(hap_emissions)
 
-        accdb_writer = AccdbWriter(self.conn)
-        accdb_writer.write(self.df, "04 - Final RTR-HEM Emiss Inventory Xwalk")
-
     def write_to_template(self, result):
-        template_name = result.template_name
-        sheetname = result.sheet_name
-        row = result.rowstart
-
-        template_src = os.path.join(self.templates_fp, f"{template_name}.xlsx")
+        template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
         filename = f"{self.filename_base}_{result.filename}_Cat"
-        output_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
+        out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
 
         # Write category records
-        shutil.copyfile(template_src, output_dst)
-
-        writer = pd.ExcelWriter(
-            output_dst, engine="openpyxl", mode="a", if_sheet_exists="overlay"
+        shutil.copyfile(template_src, out_dst)
+        self.write_excel_sheet(
+            out_dst, result.cat_df, result.sheet_name, result.rowstart
         )
-        result.cat_df.to_excel(
+
+        # Write whole records
+        if not only_category:
+            filename = f"{self.filename_base}_{result.filename}_Whole"
+            out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
+            shutil.copyfile(template_src, out_dst)
+            self.write_excel_sheet(
+                out_dst, result.whole_df, result.sheet_name, result.rowstart
+            )
+
+    def write_excel_sheet(self, fp, df, sheet, row):
+        writer = pd.ExcelWriter(
+            fp, engine="openpyxl", mode="a", if_sheet_exists="overlay"
+        )
+        df.to_excel(
             writer,
-            sheet_name=sheetname,
+            sheet_name=sheet,
             header=False,
             index=False,
             startrow=row,
         )
         writer.close()
-        # self.insert_notes(template_src, output_dst)
-
-        # Write whole records
-        if not only_category:
-            filename = f"{self.filename_base}_{result.filename}_Whole"
-            output_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
-            shutil.copyfile(template_src, output_dst)
-
-            writer = pd.ExcelWriter(
-                output_dst, engine="openpyxl", mode="a", if_sheet_exists="overlay"
-            )
-            result.whole_df.to_excel(
-                writer,
-                sheet_name=sheetname,
-                header=False,
-                index=False,
-                startrow=row,
-            )
-            writer.close()
 
     def insert_notes(self, src_fp, dst_fp):
         template_wb = load_workbook(src_fp)
