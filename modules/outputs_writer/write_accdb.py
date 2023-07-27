@@ -21,8 +21,7 @@ class AccdbWriter:
         columns = "] text(255), [".join(columns)
         columns = f"([{columns}] text(255))"
 
-        accdb_query = f"CREATE TABLE [{table_name}]"
-        accdb_query = f"{accdb_query} {columns};"
+        accdb_query = f"CREATE TABLE [{table_name}] {columns};"
         self.execute(accdb_query)
 
         values = df.to_numpy().tolist()
@@ -30,8 +29,7 @@ class AccdbWriter:
             row = "', '".join(row)
             row = f"('{row}')"
 
-            accdb_query = f"INSERT INTO [{table_name}] VALUES"
-            accdb_query = f"{accdb_query} {row};"
+            accdb_query = f"INSERT INTO [{table_name}] VALUES {row};"
             self.execute(accdb_query)
 
     def execute(self, q):

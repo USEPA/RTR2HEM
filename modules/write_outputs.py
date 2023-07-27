@@ -1,6 +1,5 @@
 import os, shutil
 import pandas as pd
-from openpyxl import load_workbook
 from modules.outputs_writer.emissions_loc import EmissionLoc
 from modules.outputs_writer.fac_address import FacilityAddress
 from modules.outputs_writer.fac_list import FacilityList
@@ -11,7 +10,7 @@ from modules.utils import src_cat_name, timestamp, emission_type, only_category
 
 class WriteOuputs:
     templates_fp = "templates"
-    filename_base = f"{src_cat_name}{timestamp}_{emission_type.split(' ')[0]}"
+    filename_base = f"{src_cat_name}_{emission_type.split(' ')[0]}"
 
     def __init__(self):
         self.out_fp = os.path.join(
@@ -19,7 +18,7 @@ class WriteOuputs:
         )
         self.create_folder()
 
-        accdb_fp = os.path.join(self.out_fp, f"{self.filename_base}_XWalks.accdb")
+        accdb_fp = os.path.join(self.out_fp, f"{self.filename_base}_XWalks_{timestamp}.accdb")
         self.accdb = AccdbWriter(accdb_fp)
 
     def create_folder(self):
@@ -45,7 +44,7 @@ class WriteOuputs:
 
     def write_to_template(self, result):
         template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
-        filename = f"{self.filename_base}_{result.filename}_Cat"
+        filename = f"{self.filename_base}_{result.filename}_Cat_{timestamp}"
         out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
 
         # Write category records
@@ -56,8 +55,9 @@ class WriteOuputs:
 
         # Write whole records
         if not only_category:
-            filename = f"{self.filename_base}_{result.filename}_Whole"
+            filename = f"{self.filename_base}_{result.filename}_Whole_{timestamp}"
             out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
+            
             shutil.copyfile(template_src, out_dst)
             self.write_excel_sheet(
                 out_dst, result.whole_df, result.sheet_name, result.rowstart
@@ -75,21 +75,3 @@ class WriteOuputs:
             startrow=row,
         )
         writer.close()
-
-    def insert_notes(self, src_fp, dst_fp):
-        template_wb = load_workbook(src_fp)
-        template_ws = template_wb.active
-
-        out_wb = load_workbook(dst_fp)
-        out_ws = out_wb.active
-
-        for i, row in enumerate(template_ws):
-            if i > 2:
-                break
-            for cell in row:
-                if cell.comment:
-                    out_ws[cell.coordinate].comment = cell.comment
-
-        out_wb.save(dst_fp)
-        out_wb.close()
-        template_wb.close()
