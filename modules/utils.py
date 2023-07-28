@@ -1,3 +1,4 @@
+import os
 import datetime
 import json
 import pandas as pd
@@ -34,8 +35,10 @@ def get_col(name, df=None):
             )
 
 
-def get_xls_sheet(sheet_name):
-    return pd.read_excel(static_xls, sheet_name)
+def get_static(filename):
+    static_fp = os.path.join(static_dir, f"{filename}.xlsx")
+    df = pd.read_excel(static_fp, "static")
+    return df.fillna("")
 
 
 ################################
@@ -61,4 +64,4 @@ odbc_string = r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_
 conn = pypyodbc.connect(odbc_string)
 input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
 
-static_xls = pd.ExcelFile(config["inputs"]["static"])
+static_dir = config["inputs"]["static"]

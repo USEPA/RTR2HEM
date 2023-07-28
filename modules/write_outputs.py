@@ -18,7 +18,9 @@ class WriteOuputs:
         )
         self.create_folder()
 
-        accdb_fp = os.path.join(self.out_fp, f"{self.filename_base}_XWalks_{timestamp}.accdb")
+        accdb_fp = os.path.join(
+            self.out_fp, f"{self.filename_base}_XWalks_{timestamp}.accdb"
+        )
         self.accdb = AccdbWriter(accdb_fp)
 
     def create_folder(self):
@@ -57,7 +59,7 @@ class WriteOuputs:
         if not only_category:
             filename = f"{self.filename_base}_{result.filename}_Whole_{timestamp}"
             out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
-            
+
             shutil.copyfile(template_src, out_dst)
             self.write_excel_sheet(
                 out_dst, result.whole_df, result.sheet_name, result.rowstart

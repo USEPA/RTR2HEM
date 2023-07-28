@@ -4,7 +4,7 @@
         "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
         "existing_epg_abbreviations": "",
         "existing_source_ids": "",
-        "static": "./static_tables.xlsx"
+        "static": "./static"
     },
     "settings": {
         "source_category_name": "Refractories",

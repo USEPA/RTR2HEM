@@ -1,7 +1,7 @@
 import pandas as pd
 from .utils import (
     set_column,
-    get_xls_sheet,
+    get_static,
     get_col,
     emission_type,
     postprocessing_columns,
@@ -46,10 +46,10 @@ class InitialProcessing:
         self.df = self.df.fillna("")
         return self.df
 
-    # excel has a cap on max sheet name length
-    # temp replace 'PollutantCrosswalk_andMetalSpeciations' with 'PollutantCrosswalk_andMe'
     def join_static_PollutantCrosswalk_andMetalSpeciations(self):
-        static_pollutantCrosswalk = get_xls_sheet("PollutantCrosswalk_andMe")
+        static_pollutantCrosswalk = get_static(
+            "static_PollutantCrosswalk_andMetalSpeciations"
+        )
         static_pollutantCrosswalk.columns = (
             static_pollutantCrosswalk.columns.str.lower()
         )
