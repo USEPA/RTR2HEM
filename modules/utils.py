@@ -38,6 +38,7 @@ def get_col(name, df=None):
 def get_static(filename):
     static_fp = os.path.join(static_dir, f"{filename}.xlsx")
     df = pd.read_excel(static_fp, "static")
+    df.columns = df.columns.str.lower()
     return df.fillna("")
 
 
