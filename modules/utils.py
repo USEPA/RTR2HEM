@@ -35,12 +35,12 @@ def get_col(name, df=None):
             )
 
 
-def calc_mean(df, group_by, on_mean, rename_mean=None):
+def calc_agg(df, group_by, agg, on_column, rename_column=None):
     tmp = df.copy()
     tmp = tmp.groupby(group_by, as_index=False)
-    avg_result = tmp[on_mean].mean()
-    if rename_mean:
-        avg_result = avg_result.rename(columns={on_mean: rename_mean})
+    avg_result = tmp[on_column].agg(agg)
+    if rename_column:
+        avg_result = avg_result.rename(columns={on_column: rename_column})
     return avg_result
 
 

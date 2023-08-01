@@ -1,4 +1,4 @@
-from modules.utils import get_static, calc_mean, cross_product
+from modules.utils import calc_agg, cross_product, get_static, set_column
 import pandas as pd
 
 """
@@ -8,6 +8,8 @@ TODO
     - latitudes/longitudes
     - HH
     - Eco
+
+"createshell" creates that template of every facility + every chem. then downstream queries populate it with numbers, for the specific chems emitted by the specific facilities
 
 ONLY run this on actual/allowable emissions, NOT acute
 
@@ -23,11 +25,17 @@ class MultiPathwayProcessing:
     def run(self):
         self.qryMP00aEco_DuplicateCrosswalkInventory()
         self.qryMP00bEco_AddDivalentMercury()
+
         self.qryMP03a_SourceLatLons_CatLevel()
         self.qryMP03aa_LineLatLons01()
         self.qryMP03aa_LineLatLons02()
-        self.qryMP03ab_AppendLineLatLongs()  # not implemented
+        self.qryMP03ab_AppendLineLatLongs()
+
         self.qryMP04aHH_CreateShellForChemSVs()
+        self.qryMP04bHH_CalcChemSums()
+        self.qryMP04cHH_PopulateChemSVs()
+
+        self.qryMP04dEco_CreateShellForChemSVs()
         return self.df
 
     # working_CrosswalkEmissionInventory_Eco
@@ -92,6 +100,7 @@ class MultiPathwayProcessing:
         self.working_MPLatLongsLine = tmp.rename(columns=columns)
 
     # working_MPLatLongsLine
+    # TODO -- get working data for this
     def qryMP03aa_LineLatLons02(self):
         columns = {
             "ICFFacilityID": "Facility ID",
@@ -121,87 +130,54 @@ class MultiPathwayProcessing:
     # working_MPLatLongs
     # TODO -- get working data for this
     def qryMP03ab_AppendLineLatLongs(self):
-        """
-        Using the df working_MPLatLongsLine
-        Groups by facility id, sppd_facility_id, source id ... take the average of LineLatitude as latitude ... same with Longitude
-        in these groups, then concat into working_MPLatLongs
+        group_by = ["Facility ID", "sppd_facility_identifier", "Source ID"]
 
-        use 'calc_mean'
-        """
-        columns = {
-            "ICFFacilityID": "Facility ID",
-            "sppd_facility_identifier": "sppd_facility_identifier",
-            "ICFSourceID": "Source ID",
-            "y_coordinate": "Latitude",
-            "x_coordinate": "Longitude",
-        }
-        key_cols = list(columns.keys())
+        if not self.working_MPLatLongsLine.empty:
+            avg_lat = calc_agg(
+                self.working_MPLatLongsLine,
+                group_by,
+                "mean",
+                "LineLatitude",
+                "Latitude",
+            )
+            avg_long = calc_agg(
+                self.working_MPLatLongsLine,
+                group_by,
+                "mean",
+                "LineLongitude",
+                "Longitude",
+            )
+            result = pd.merge(avg_lat, avg_long, on=group_by)
+
+            self.working_MPLatLongs = pd.concat(
+                [self.working_MPLatLongs, result], ignore_index=True
+            )
 
     # working_MPLatLongs
     # helper method for qryMP04aHH
     def qryMP03b_Avg_SourceLatLons_CatLevel(self):
         group_by = ["Facility ID", "sppd_facility_identifier"]
 
-        avg_lat = calc_mean(self.working_MPLatLongs, group_by, "Latitude", "Avg Lat")
-        avg_long = calc_mean(self.working_MPLatLongs, group_by, "Longitude", "Avg Long")
+        avg_lat = calc_agg(
+            self.working_MPLatLongs, group_by, "mean", "Latitude", "Avg Lat"
+        )
+        avg_long = calc_agg(
+            self.working_MPLatLongs, group_by, "mean", "Longitude", "Avg Long"
+        )
 
         result = pd.merge(avg_lat, avg_long, on=group_by)
         return result
 
     # working_MP04HH_T1ChemResults
-    # TODO -- keep an eye out for capitalization errors
     def qryMP04aHH_CreateShellForChemSVs(self):
-        """
-        SELECT "" AS [Src Cat],
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Facility ID],
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Avg Lat] AS Lat,
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Avg Long] AS [Long],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[ShortPB-HAP/EcoHAPName] AS [PB-HAP Grp],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[Chem Name For Tier 2 Tool] AS Chem,
-        CDbl(0) AS [Emiss (TPY; chem)],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.TEF AS [TEF (chem)],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.EEF AS [EEF (chem)],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.REF AS [REF (chem)],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[Date PB-HAP REF Created] AS [Date REF Created],
-        CDbl(0) AS [Emiss*REF (TPY; chem)],
-        static_MP_HHScreeningThresholds.[Tier 1 Screening Threshold (TPY)] AS [Scrn Thresh (TPY; grp)],
-        static_MP_HHScreeningThresholds.[Date Threshold Created] AS [Date Scrn Thresh Created],
-        CDbl(0) AS [SV (chem)] INTO working_MP04HH_T1ChemResults
-
-        FROM qryMP03b_Avg_SourceLatLons_CatLevel,
-        static_MP_PBHAPChems_withHHEquivalencyFactors
-        INNER JOIN static_MP_HHScreeningThresholds
-        ON static_MP_PBHAPChems_withHHEquivalencyFactors.[ShortPB-HAP/EcoHAPName] = static_MP_HHScreeningThresholds.[ShortPB-HAPName]
-
-        GROUP BY "",
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Facility ID],
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Avg Lat],
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Avg Long],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[ShortPB-HAP/EcoHAPName],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[Chem Name For Tier 2 Tool],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.TEF,
-        static_MP_PBHAPChems_withHHEquivalencyFactors.EEF,
-        static_MP_PBHAPChems_withHHEquivalencyFactors.REF,
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[Date PB-HAP REF Created],
-        static_MP_HHScreeningThresholds.[Tier 1 Screening Threshold (TPY)],
-        static_MP_HHScreeningThresholds.[Date Threshold Created],
-        CDbl(0)
-
-        ORDER BY "",
-        qryMP03b_Avg_SourceLatLons_CatLevel.[Facility ID],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[ShortPB-HAP/EcoHAPName],
-        static_MP_PBHAPChems_withHHEquivalencyFactors.[Chem Name For Tier 2 Tool];
-        """
-        PBHAPChems_withHHEquivalencyFactors = get_static(
+        HHEquivalencyFactors = get_static(
             "static_MP_PBHAPChems_withHHEquivalencyFactors"
         )
-
         HHScreeningThresholds = get_static("static_MP_HHScreeningThresholds")
-
         avg_lat_long = self.qryMP03b_Avg_SourceLatLons_CatLevel()
 
         tmp = pd.merge(
-            left=PBHAPChems_withHHEquivalencyFactors,
+            left=HHEquivalencyFactors,
             right=HHScreeningThresholds,
             how="inner",
             left_on="shortpb-hap/ecohapname",
@@ -238,5 +214,68 @@ class MultiPathwayProcessing:
         tmp.insert(14, "SV (chem)", 0)
 
         tmp = tmp.rename(columns=group_by)
-
         self.working_MP04HH_T1ChemResults = tmp
+
+    # working_MPHH_ChemEmissSums
+    def qryMP04bHH_CalcChemSums(self):
+        group_by = ["ICFFacilityID", "chem name for tier 2 tool", "ICFCatLevelModeling"]
+
+        tmp = self.df.loc[
+            (self.df["chem name for tier 2 tool"] != "")
+            & (self.df["ICFCatLevelModeling"] == "Yes")
+        ]
+
+        tmp = calc_agg(
+            tmp, group_by, "sum", "ICFModelEmissionTPY", "SumOfICFModelEmissionTPY"
+        )
+
+        tmp = tmp.drop("ICFCatLevelModeling", axis=1)
+        self.working_MPHH_ChemEmissSums = tmp
+
+    # working_MP04HH_T1ChemResults
+    # TODO -- verify more closely that this is working as intended
+    def qryMP04cHH_PopulateChemSVs(self):
+        """
+        UPDATE working_MP04HH_T1ChemResults
+
+        INNER JOIN working_MPHH_ChemEmissSums ON
+        (working_MP04HH_T1ChemResults.Chem = working_MPHH_ChemEmissSums.[Chem Name For Tier 2 Tool])
+        AND (working_MP04HH_T1ChemResults.[Facility ID] = working_MPHH_ChemEmissSums.ICFFacilityID)
+
+        SET working_MP04HH_T1ChemResults.[Emiss (TPY; chem)] = [SumOfICFModelEmissionTPY],
+        working_MP04HH_T1ChemResults.[Emiss*REF (TPY; chem)] = [SumOfICFModelEmissionTPY]*[REF (chem)],
+        working_MP04HH_T1ChemResults.[SV (chem)] = [SumOfICFModelEmissionTPY]*[REF (chem)]/[Scrn Thresh (TPY; grp)];
+        """
+        self.working_MP04HH_T1ChemResults = pd.merge(
+            self.working_MP04HH_T1ChemResults,
+            self.working_MPHH_ChemEmissSums,
+            how="inner",
+            left_on=["Chem", "Facility ID"],
+            right_on=["chem name for tier 2 tool", "ICFFacilityID"],
+        )
+
+        def update_emiss(row):
+            return row["SumOfICFModelEmissionTPY"]
+
+        def update_emiss_ref(row):
+            return row["SumOfICFModelEmissionTPY"] * row["REF (chem)"]
+
+        def update_sv(row):
+            return (
+                row["SumOfICFModelEmissionTPY"]
+                * row["REF (chem)"]
+                / row["Scrn Thresh (TPY; grp)"]
+            )
+
+        set_column(self.working_MP04HH_T1ChemResults, "Emiss (TPY; chem)", update_emiss)
+        set_column(
+            self.working_MP04HH_T1ChemResults, "Emiss*REF (TPY; chem)", update_emiss_ref
+        )
+        set_column(self.working_MP04HH_T1ChemResults, "SV (chem)", update_sv)
+
+        self.working_MP04HH_T1ChemResults = self.working_MP04HH_T1ChemResults.drop(
+            self.working_MPHH_ChemEmissSums.columns, axis=1
+        )
+
+    def qryMP04dEco_CreateShellForChemSVs(self):
+        pass
