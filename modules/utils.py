@@ -35,6 +35,21 @@ def get_col(name, df=None):
             )
 
 
+def calc_mean(df, group_by, on_mean, rename_mean=None):
+    tmp = df.copy()
+    tmp = tmp.groupby(group_by, as_index=False)
+    avg_result = tmp[on_mean].mean()
+    if rename_mean:
+        avg_result = avg_result.rename(columns={on_mean: rename_mean})
+    return avg_result
+
+
+def cross_product(df1, df2):
+    df1["_key"] = 0
+    df2["_key"] = 0
+    return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
+
+
 def get_static(filename):
     static_fp = os.path.join(static_dir, f"{filename}.xlsx")
     df = pd.read_excel(static_fp, "static")
