@@ -71,8 +71,6 @@ class LatLons:
 
         self.working_MPLatLongsLine = tmp.rename(columns=columns)
 
-        # working_MPLatLongsLine
-
     # working_MPLatLongsLine
     # TODO -- get working data for this
     def qryMP03aa_LineLatLons02(self):

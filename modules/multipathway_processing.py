@@ -1,10 +1,8 @@
 from modules.mp_queries.latitudes_longitudes import LatLons
 from modules.mp_queries.HH.HH_template import Template as HH_Template
+from modules.mp_queries.Eco.Eco_template import Template as Eco_Template
 
 """
-TODO
-- move overrides out
-
 ONLY run this on actual/allowable emissions, NOT acute
 
 For each query: in the side menu right click > design view > right click the tab at the top select "sql view"
@@ -23,9 +21,11 @@ class MultiPathwayProcessing:
         self.qryMP00bEco_AddDivalentMercury()
 
         lats_longs = LatLons(self.df)
-
+        
         HH_obj = HH_Template(self.df, lats_longs)
+        Eco_obj = Eco_Template(self.df, lats_longs)
 
+    # TODO probably move these...
     # working_CrosswalkEmissionInventory_Eco
     def qryMP00aEco_DuplicateCrosswalkInventory(self):
         self.working_CrosswalkEmissionInventory_Eco = self.df.copy()
@@ -37,6 +37,3 @@ class MultiPathwayProcessing:
             tmp["chem name for tier 2 tool"] == "Methyl Mercury (Emitted as Divalent)"
         ]
         self.working_CrosswalkEmissionInventory_Eco = tmp
-
-    def qryMP04dEco_CreateShellForChemSVs(self):
-        pass

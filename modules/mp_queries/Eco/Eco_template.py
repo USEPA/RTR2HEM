@@ -18,9 +18,12 @@ class Template:
         self.df = df
         self.latlons = latlons
 
-        self.qryMP04aHH_CreateShellForChemSVs()
-        self.qryMP04bHH_CalcChemSums()
-        self.qryMP04cHH_PopulateChemSVs()
+        #self.qryMP04aHH_CreateShellForChemSVs()
+        #self.qryMP04bHH_CalcChemSums()
+        #self.qryMP04cHH_PopulateChemSVs()
+
+    def qryMP04dEco_CreateShellForChemSVs(self):
+        pass
 
     # working_MP04HH_T1ChemResults
     def qryMP04aHH_CreateShellForChemSVs(self):
