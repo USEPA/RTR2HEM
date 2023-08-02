@@ -90,16 +90,18 @@ class Template:
         result = pd.merge(
             self.working_MP04HH_T1ChemResults,
             self.working_MPHH_ChemEmissSums,
-            how="outer",
+            how="left",
             left_on=["Chem", "Facility ID"],
             right_on=["chem name for tier 2 tool", "ICFFacilityID"],
         )
         result = result.fillna(0)
 
         result["Emiss (TPY; chem)"] = result["SumOfICFModelEmissionTPY"]
+
         result["Emiss*REF (TPY; chem)"] = (
             result["SumOfICFModelEmissionTPY"] * result["REF (chem)"]
         )
+
         result["SV (chem)"] = (
             result["SumOfICFModelEmissionTPY"]
             * result["REF (chem)"]
