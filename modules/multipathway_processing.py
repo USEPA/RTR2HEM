@@ -1,13 +1,8 @@
 import pandas as pd
 from modules.mp_queries.latitudes_longitudes import LatLons
 
-from modules.mp_queries.HH import (
-    HH_Template,
-    HH_GrpResults,
-    HH_SummarySetup,
-    HH_SummaryGather,
-)
-from modules.mp_queries.Eco import Eco_Template
+from modules.mp_queries.HH import run_HH_module
+from modules.mp_queries.Eco import run_Eco_module
 
 
 """
@@ -29,15 +24,8 @@ class MultiPathwayProcessing:
         self.qryMP00bEco_AddDivalentMercury()
 
         lats_longs = LatLons(self.df)
-
-        HH_obj = HH_Template(self.df, lats_longs)
-        HH_GrpResults(HH_obj)
-        HH_SummarySetup(HH_obj)
-        HH_SummaryGather(HH_obj)
-
-        Eco_obj = Eco_Template(
-            self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs
-        )
+        HH_bbj = run_HH_module(self.df, lats_longs)
+        Eco_obj = run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
 
     # TODO probably move these...
     # working_CrosswalkEmissionInventory_Eco
