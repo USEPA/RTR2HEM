@@ -36,13 +36,16 @@ def get_col(name, df=None):
 
 
 def calc_agg(df, group_by, agg, on_column, rename_column=None):
-    tmp = df.copy()
+    """
+    returns a dataframe with group_by and resulting on_column columns
+    """
+    result = df.copy()
     if group_by:
-        tmp = tmp.groupby(group_by, as_index=False)
-    avg_result = tmp[on_column].agg(agg)
+        result = result.groupby(group_by, as_index=False)
+    result = result[on_column].agg(agg)
     if rename_column:
-        avg_result = avg_result.rename(columns={on_column: rename_column})
-    return avg_result
+        result = result.rename(columns={on_column: rename_column})
+    return result
 
 
 def cross_product(df1, df2):
@@ -51,16 +54,13 @@ def cross_product(df1, df2):
     return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
 
 
-def join(dfs, common_columns):
-    if len(dfs[0].index) != len(dfs[1].index):
-        print("Joining on a different number of rows!")
-    result = pd.merge(dfs[0], dfs[1], on=common_columns)
-    num_rows = len(result.index)
-
+def join(dfs, **kwargs):
+    result = pd.merge(left=dfs[0], right=dfs[1], suffixes=("", "_tmp"), **kwargs)
     for i in range(2, len(dfs)):
-        if len(dfs[1].index) != num_rows:
-            print("Joining on a different number of rows!")
-        result = pd.merge(result, dfs[i], on=common_columns)
+        result = pd.merge(left=result, right=dfs[i], suffixes=("", "_tmp"), **kwargs)
+    for column in result.columns:
+        if "_tmp" in column:
+            result = result.drop(column, axis=1)
     return result
 
 

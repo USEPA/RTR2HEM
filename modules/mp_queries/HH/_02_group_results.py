@@ -1,4 +1,3 @@
-import pandas as pd
 from modules.utils import calc_agg, join, set_column
 
 """
@@ -28,8 +27,8 @@ class GrpResults:
         FROM qryMP01a_ListSrcCatFacilities;
         """
         src_cat_facilities = self.qryMP01a_ListSrcCatFacilities()
-        num_src_cat_facilities = len(src_cat_facilities.index)
-        return num_src_cat_facilities
+        self.HH.num_src_cat_facilities = len(src_cat_facilities.index)
+        return self.HH.num_src_cat_facilities
 
     # working_MP05HH_T1GrpResults
     def qryMP05aHH_T1GrpResults(self):
@@ -58,7 +57,7 @@ class GrpResults:
         sv_grp = calc_agg(tmp, group_by, "sum", "SV (chem)", "SV (grp)")
 
         tmp = tmp[group_by].drop_duplicates()
-        tmp = join([tmp, emiss_grp, emiss_ref_grp, sv_grp], group_by)
+        tmp = join([tmp, emiss_grp, emiss_ref_grp, sv_grp], on=group_by)
         tmp = tmp.sort_values(group_by)
 
         set_column(tmp, "Exceedance?", self.exceed)

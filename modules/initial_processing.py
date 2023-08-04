@@ -22,7 +22,7 @@ class InitialProcessing:
 
         set_column(self.df, "ICFFacilityID", self.set_icf_facility_id)
         set_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code)
-        set_column(self.df, "EMISSIONS_TPY", self.set_selected_emission_type)
+        set_column(self.df, "emissions_tpy", self.set_selected_emission_type)
         set_column(self.df, "ICFModelEmissionTPY", self.set_model_emission_tpy)
         set_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
         set_column(self.df, "ICFSourceType", self.set_source_type)
@@ -116,7 +116,7 @@ class InitialProcessing:
             )
 
     def set_model_emission_tpy(self, row):
-        return float(row["EMISSIONS_TPY"]) * float(
+        return float(row["emissions_tpy"]) * float(
             get_col("metal_speciation_factor", row)
         )
 
