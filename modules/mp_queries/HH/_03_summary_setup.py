@@ -1,4 +1,3 @@
-import pandas as pd
 from modules.utils import join, get_static, calc_agg
 
 """
@@ -7,7 +6,7 @@ sheets:
 """
 
 
-class Summary:
+class SummarySetup:
     working_MP07HH_T1Summary = None
     def __init__(self, HH):
         self.HH = HH
@@ -54,8 +53,6 @@ class Summary:
     # working_MP07HH_T1Summary
     def qryMP07aHH_PrepareShellOfSummary(self):
         screen_thresholds = get_static("static_MP_HHScreeningThresholds")
-
-        self.HH.num_src_cat_facilities
         num_pbhap_facilities = self.qryMP02c_CountPBHAPEmittingFacilities()
 
         screen_thresholds["Num Facil in Src Cat"] = self.HH.num_src_cat_facilities
@@ -83,4 +80,5 @@ class Summary:
                 "tier 1 screening threshold (tpy)": "Tier 1 Scrn Thresh (TPY)",
             }
         )
-        self.working_MP07HH_T1Summary = screen_thresholds
+        
+        self.HH.working_MP07HH_T1Summary = screen_thresholds

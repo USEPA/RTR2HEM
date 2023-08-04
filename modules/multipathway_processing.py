@@ -3,7 +3,8 @@ from modules.mp_queries.latitudes_longitudes import LatLons
 
 from modules.mp_queries.HH._01_template import Template as HH_Template
 from modules.mp_queries.HH._02_group_results import GrpResults as HH_GrpResults
-from modules.mp_queries.HH._03_summary import Summary as HH_Summary
+from modules.mp_queries.HH._03_summary_setup import SummarySetup as HH_SummarySetup
+from modules.mp_queries.HH._04_summary_gather import SummaryGather as HH_SummaryGather
 
 from modules.mp_queries.Eco._01_template import Template as Eco_Template
 
@@ -29,7 +30,8 @@ class MultiPathwayProcessing:
 
         HH_obj = HH_Template(self.df, lats_longs)
         HH_GrpResults(HH_obj)
-        HH_Summary(HH_obj)
+        HH_SummarySetup(HH_obj)
+        HH_SummaryGather(HH_obj)
 
         Eco_obj = Eco_Template(
             self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs
