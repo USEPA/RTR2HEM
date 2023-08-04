@@ -8,6 +8,7 @@ sheets:
 
 class SummaryGather:
     working_MP07HH_T1Summary = None
+
     def __init__(self, HH):
         self.HH = HH
 

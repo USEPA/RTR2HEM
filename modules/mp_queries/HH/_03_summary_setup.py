@@ -8,6 +8,7 @@ sheets:
 
 class SummarySetup:
     working_MP07HH_T1Summary = None
+
     def __init__(self, HH):
         self.HH = HH
         self.qryMP07aHH_PrepareShellOfSummary()
@@ -80,5 +81,5 @@ class SummarySetup:
                 "tier 1 screening threshold (tpy)": "Tier 1 Scrn Thresh (TPY)",
             }
         )
-        
+
         self.HH.working_MP07HH_T1Summary = screen_thresholds

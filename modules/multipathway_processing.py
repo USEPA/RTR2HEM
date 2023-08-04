@@ -1,12 +1,14 @@
 import pandas as pd
 from modules.mp_queries.latitudes_longitudes import LatLons
 
-from modules.mp_queries.HH._01_template import Template as HH_Template
-from modules.mp_queries.HH._02_group_results import GrpResults as HH_GrpResults
-from modules.mp_queries.HH._03_summary_setup import SummarySetup as HH_SummarySetup
-from modules.mp_queries.HH._04_summary_gather import SummaryGather as HH_SummaryGather
+from modules.mp_queries.HH import (
+    HH_Template,
+    HH_GrpResults,
+    HH_SummarySetup,
+    HH_SummaryGather,
+)
+from modules.mp_queries.Eco import Eco_Template
 
-from modules.mp_queries.Eco._01_template import Template as Eco_Template
 
 """
 ONLY run this on actual/allowable emissions, NOT acute
