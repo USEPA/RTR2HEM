@@ -54,7 +54,7 @@ TODO - add import option
 epgs = get_col("emission_process_group", input_df)
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
-epgs = EpgGUI(epgs).get_response()
+# epgs = EpgGUI(epgs).get_response()
 
 """
 7c
@@ -68,7 +68,22 @@ uses:
 reg_codes = get_col("regulatory_code", input_df)
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
-reg_codes = RegCodesGUI(reg_codes).get_response()
+# reg_codes = RegCodesGUI(reg_codes).get_response()
+
+
+######## DEBUG ##########
+epgs = {
+    "Conveying system transfer point": "AA",
+    "Curing oven": "AB",
+    "Induction furnace": "AC",
+    "Lime Kiln and Cooler with common exhaust": "AD",
+    "Periodic kiln": "AE",
+    "Tunnel kiln": "AF",
+}
+
+reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
+#########################
+
 
 processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 

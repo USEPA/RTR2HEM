@@ -37,7 +37,8 @@ def get_col(name, df=None):
 
 def calc_agg(df, group_by, agg, on_column, rename_column=None):
     tmp = df.copy()
-    tmp = tmp.groupby(group_by, as_index=False)
+    if group_by:
+        tmp = tmp.groupby(group_by, as_index=False)
     avg_result = tmp[on_column].agg(agg)
     if rename_column:
         avg_result = avg_result.rename(columns={on_column: rename_column})
@@ -48,6 +49,19 @@ def cross_product(df1, df2):
     df1["_key"] = 0
     df2["_key"] = 0
     return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
+
+
+def join(dfs, common_columns):
+    if len(dfs[0].index) != len(dfs[1].index):
+        print("Joining on a different number of rows!")
+    result = pd.merge(dfs[0], dfs[1], on=common_columns)
+    num_rows = len(result.index)
+
+    for i in range(2, len(dfs)):
+        if len(dfs[1].index) != num_rows:
+            print("Joining on a different number of rows!")
+        result = pd.merge(result, dfs[i], on=common_columns)
+    return result
 
 
 def get_static(filename):

@@ -14,8 +14,8 @@ class Template:
     working_MP04HH_T1ChemResults = None
     working_MPHH_ChemEmissSums = None
 
-    def __init__(self, df, latlons):
-        self.df = df
+    def __init__(self, working_crosswalk, latlons):
+        self.working_crosswalk = working_crosswalk
         self.latlons = latlons
 
         self.qryMP04aHH_CreateShellForChemSVs()
@@ -73,9 +73,9 @@ class Template:
     def qryMP04bHH_CalcChemSums(self):
         group_by = ["ICFFacilityID", "chem name for tier 2 tool", "ICFCatLevelModeling"]
 
-        tmp = self.df.loc[
-            (self.df["chem name for tier 2 tool"] != "")
-            & (self.df["ICFCatLevelModeling"] == "Yes")
+        tmp = self.working_crosswalk.loc[
+            (self.working_crosswalk["chem name for tier 2 tool"] != "")
+            & (self.working_crosswalk["ICFCatLevelModeling"] == "Yes")
         ]
 
         tmp = calc_agg(
@@ -90,7 +90,7 @@ class Template:
         result = pd.merge(
             self.working_MP04HH_T1ChemResults,
             self.working_MPHH_ChemEmissSums,
-            how="left",
+            how="outer",
             left_on=["Chem", "Facility ID"],
             right_on=["chem name for tier 2 tool", "ICFFacilityID"],
         )

@@ -93,7 +93,7 @@ class Template:
     # working_MP04Eco_T1ChemResults
     def qryMP04cEco_PopulateChemSVs(self):
         """
-        TODO -- the number of rows != 0 is not accurate (should be about 700), it's only finding ~500
+        TODO -- the number of rows != 0 is not accurate (should be ~780), it's only finding ~690
 
         UPDATE working_MP04Eco_T1ChemResults
         INNER JOIN working_MPEco_ChemEmissSums ON (working_MP04Eco_T1ChemResults.Chem = working_MPEco_ChemEmissSums.[Chem Name For Tier 2 Tool])
