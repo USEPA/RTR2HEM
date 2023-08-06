@@ -3,6 +3,7 @@ from modules.mp_queries.HH._02_group_results import GrpResults
 from modules.mp_queries.HH._03_summary_setup import SummarySetup
 from modules.mp_queries.HH._04_summary_gather import SummaryGather
 
+
 def run_HH_module(working_crosswalk, latlons):
     HH_obj = Template(working_crosswalk, latlons)
     GrpResults(HH_obj)

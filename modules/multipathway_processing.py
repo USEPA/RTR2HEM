@@ -25,7 +25,9 @@ class MultiPathwayProcessing:
 
         lats_longs = LatLons(self.df)
         HH_bbj = run_HH_module(self.df, lats_longs)
-        Eco_obj = run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
+        Eco_obj = run_Eco_module(
+            self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs
+        )
 
     # TODO probably move these...
     # working_CrosswalkEmissionInventory_Eco
