@@ -16,18 +16,18 @@ self.df = working_crosswalk_emissions
 
 
 class MultiPathwayProcessing:
-    def __init__(self, df):
+    def __init__(self, df, accdb):
         self.df = df.copy()
+        self.accdb = accdb
 
     def run(self):
         self.qryMP00aEco_DuplicateCrosswalkInventory()
         self.qryMP00bEco_AddDivalentMercury()
 
         lats_longs = LatLons(self.df)
-        HH_bbj = run_HH_module(self.df, lats_longs)
-        Eco_obj = run_Eco_module(
-            self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs
-        )
+
+        run_HH_module(self.df, lats_longs, self.accdb)
+        run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
 
     # working_CrosswalkEmissionInventory_Eco
     def qryMP00aEco_DuplicateCrosswalkInventory(self):

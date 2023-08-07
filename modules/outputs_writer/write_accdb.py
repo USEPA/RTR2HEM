@@ -21,6 +21,9 @@ class AccdbWriter:
         columns = "] text(255), [".join(columns)
         columns = f"([{columns}] text(255))"
 
+        # question marks are reserved syntax!
+        columns = columns.replace("?", "")
+
         accdb_query = f"CREATE TABLE [{table_name}] {columns};"
         self.execute(accdb_query)
 

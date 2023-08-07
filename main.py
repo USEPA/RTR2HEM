@@ -89,13 +89,12 @@ processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
 
 # 7d
 processed_df = SourceIDs(processed_df).run()
+output_handler.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
 
 # 7e
-MultiPathwayProcessing(processed_df).run()
+MultiPathwayProcessing(processed_df, output_handler.accdb).run()
 
 # 7f
-output_handler.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
 output_handler.run(processed_df)
-
 
 print("Done!")

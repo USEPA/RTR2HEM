@@ -22,18 +22,12 @@ class GrpResults:
         return tmp
 
     def qryMP01b_CountSrcCatFacilities(self):
-        """
-        SELECT Count(qryMP01a_ListSrcCatFacilities.[Facility ID]) AS [Num Facil in Src Cat]
-        FROM qryMP01a_ListSrcCatFacilities;
-        """
         src_cat_facilities = self.qryMP01a_ListSrcCatFacilities()
         self.HH.num_src_cat_facilities = len(src_cat_facilities.index)
         return self.HH.num_src_cat_facilities
 
     # working_MP05HH_T1GrpResults
     def qryMP05aHH_T1GrpResults(self):
-        # working_MP04HH_T1ChemResults
-        # qryMP01b_CountSrcCatFacilities
         group_by = [
             "Src Cat",
             "Num Facil in Src Cat",
@@ -45,7 +39,7 @@ class GrpResults:
 
         num_src_cat_facilities = self.qryMP01b_CountSrcCatFacilities()
 
-        tmp = self.HH.working_MP04HH_T1ChemResults
+        tmp = self.HH.working_MP04HH_T1ChemResults.copy()
         tmp["Num Facil in Src Cat"] = num_src_cat_facilities
 
         emiss_grp = calc_agg(

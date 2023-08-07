@@ -141,7 +141,7 @@ class SummaryGather:
             "PB-HAP Grp": "PB-HAP Grp",
             "Max SV (grp)": "(1)Max SV",
             "Max Emiss*REF (TPY; grp)": "(2)Facil-Tot Emis*REF (TPY; facil represented by (1))",
-            "(3)Facil-Total Emis (TPY; facil represented by (1))":"(3)Facil-Total Emis (TPY; facil represented by (1))",
+            "(3)Facil-Total Emis (TPY; facil represented by (1))": "(3)Facil-Total Emis (TPY; facil represented by (1))",
             "Facil ID": "Max Facility",
             "Num Facil Emitting This PB-HAP": "Num Facil Emitting This PB-HAP",
             "Num Facil Exceeding": "Num Facil Exceeding",
@@ -152,4 +152,3 @@ class SummaryGather:
         tmp = tmp.rename(columns=group_by)
 
         self.HH.working_MP07bHH_GatherSummary = tmp
-        self.HH.working_MP07HH_T1Summary = tmp
