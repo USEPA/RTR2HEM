@@ -3,13 +3,12 @@ from modules.utils import join, get_static, calc_agg
 
 """
 sheets:
+    working_MP07HH_T1Summary
     working_MP07bHH_GatherSummary
 """
 
 
 class SummaryGather:
-    working_MP07bHH_GatherSummary = None
-
     def __init__(self, HH):
         self.HH = HH
         self.qryMP07bHH_GatherSummary()
@@ -57,7 +56,13 @@ class SummaryGather:
 
         res = res.sort_values("Facility ID")
         res = res[group_by + ["Facility ID"]].drop_duplicates(group_by)
-        res = res.rename(columns={"Emiss*REF (TPY; grp)":"Max Emiss*REF (TPY; grp)", "SV (grp)":"Max SV (grp)","Facility ID": "Facil ID"})
+        res = res.rename(
+            columns={
+                "Emiss*REF (TPY; grp)": "Max Emiss*REF (TPY; grp)",
+                "SV (grp)": "Max SV (grp)",
+                "Facility ID": "Facil ID",
+            }
+        )
         return res
 
     def qryMP06cHH_ListFailingFacilities_PerPBHAP(self):
@@ -100,52 +105,13 @@ class SummaryGather:
         )
         return res
 
-    # working_MP07bHH_GatherSummary
+    # working_MP07HH_T1Summary, working_MP07bHH_GatherSummary
     def qryMP07bHH_GatherSummary(self):
-        """
-        NOTE -- https://support.microsoft.com/en-au/office/nz-function-8ef85549-cc9c-438b-860a-7fd9f4c69b6c
-
-        SELECT working_MP07HH_T1Summary.[Src Cat],
-        working_MP07HH_T1Summary.[PB-HAP Grp],
-        qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP.[Num Facil Emitting This PB-HAP],
-        qryMP06bHH_EmissOfMaxSV.[Max Emiss*REF (TPY; grp)] AS [(2)Facil-Tot Emis*REF (TPY; facil represented by (1))],
-        qryMP06bHH_EmissOfMaxSV.[Max Emiss*REF (TPY; grp)] AS [(3)Facil-Total Emis (TPY; facil represented by (1))],
-        qryMP06bHH_EmissOfMaxSV.[Max SV (grp)] AS [(1)Max SV],
-        qryMP06bHH_EmissOfMaxSV.[Facil ID] AS [Max Facility],
-        Nz([qryMP06dHH_CountFailingFacilities_PerPBHAP].[Num Facil Exceeding],0) AS [Num Facil Exceeding],
-        Nz([qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP].[Num Facil Exceeding by x10],0) AS [Num Facil Exceeding by x10],
-        Nz([qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP].[Num Facil Exceeding by x100],0) AS [Num Facil Exceeding by x100]
-        INTO working_MP07bHH_GatherSummary
-
-        FROM ((((working_MP07HH_T1Summary
-        INNER JOIN qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP
-        ON working_MP07HH_T1Summary.[PB-HAP Grp] = qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP.[PB-HAP Grp])
-        LEFT JOIN qryMP06dHH_CountFailingFacilities_PerPBHAP
-        ON working_MP07HH_T1Summary.[PB-HAP Grp] = qryMP06dHH_CountFailingFacilities_PerPBHAP.[PB-HAP Grp])
-        LEFT JOIN qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP
-        ON working_MP07HH_T1Summary.[PB-HAP Grp] = qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP.[PB-HAP Grp])
-        LEFT JOIN qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP
-        ON working_MP07HH_T1Summary.[PB-HAP Grp] = qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP.[PB-HAP Grp])
-        LEFT JOIN qryMP06bHH_EmissOfMaxSV ON working_MP07HH_T1Summary.[PB-HAP Grp] = qryMP06bHH_EmissOfMaxSV.[PB-HAP Grp]
-
-        GROUP BY working_MP07HH_T1Summary.[Src Cat],
-        working_MP07HH_T1Summary.[PB-HAP Grp],
-        qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP.[Num Facil Emitting This PB-HAP],
-        qryMP06bHH_EmissOfMaxSV.[Max Emiss*REF (TPY; grp)], 
-        qryMP06bHH_EmissOfMaxSV.[Max SV (grp)],
-        qryMP06bHH_EmissOfMaxSV.[Facil ID], 
-        Nz([qryMP06dHH_CountFailingFacilities_PerPBHAP].[Num Facil Exceeding],0),
-        Nz([qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP].[Num Facil Exceeding by x10],0),
-        Nz([qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP].[Num Facil Exceeding by x100],0),
-        qryMP06bHH_EmissOfMaxSV.[Max Emiss*REF (TPY; grp)];
-        """
         num_pbhap_facil = self.qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP()
         max_sv_emiss = self.qryMP06bHH_EmissOfMaxSV()
         count_failing_facil = self.qryMP06dHH_CountFailingFacilities_PerPBHAP()
         count_failing_facil_10x = self.qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP()
-        count_failing_facil_100x = (
-            self.qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP()
-        )  # empty
+        count_failing_facil_100x = self.qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP()
 
         tmp = join(
             [self.HH.working_MP07HH_T1Summary, num_pbhap_facil],
@@ -166,20 +132,24 @@ class SummaryGather:
             on="PB-HAP Grp",
         )
 
+        tmp["(3)Facil-Total Emis (TPY; facil represented by (1))"] = tmp[
+            "Max Emiss*REF (TPY; grp)"
+        ]
+
         group_by = {
-            "Src Cat":"Src Cat",
-            "PB-HAP Grp":"PB-HAP Grp",
-            "Num Facil Emitting This PB-HAP":"Num Facil Emitting This PB-HAP",
-            "Max SV (grp)":"(1)Max SV",
-            "Facil ID":"Max Facility",
-            "Num Facil Exceeding":"Num Facil Exceeding",
-            "Num Facil Exceeding by x10":"Num Facil Exceeding by x10",
-            "Num Facil Exceeding by x100":"Num Facil Exceeding by x100",
-            "Max Emiss*REF (TPY; grp)":"(2)Facil-Tot Emis*REF (TPY; facil represented by (1))",
+            "Src Cat": "Src Cat",
+            "PB-HAP Grp": "PB-HAP Grp",
+            "Max SV (grp)": "(1)Max SV",
+            "Max Emiss*REF (TPY; grp)": "(2)Facil-Tot Emis*REF (TPY; facil represented by (1))",
+            "(3)Facil-Total Emis (TPY; facil represented by (1))":"(3)Facil-Total Emis (TPY; facil represented by (1))",
+            "Facil ID": "Max Facility",
+            "Num Facil Emitting This PB-HAP": "Num Facil Emitting This PB-HAP",
+            "Num Facil Exceeding": "Num Facil Exceeding",
+            "Num Facil Exceeding by x10": "Num Facil Exceeding by x10",
+            "Num Facil Exceeding by x100": "Num Facil Exceeding by x100",
         }
         tmp = tmp[list(group_by.keys())].fillna(0)
         tmp = tmp.rename(columns=group_by)
 
-        tmp["(3)Facil-Total Emis (TPY; facil represented by (1))"] = tmp["(2)Facil-Tot Emis*REF (TPY; facil represented by (1))"]
-
         self.HH.working_MP07bHH_GatherSummary = tmp
+        self.HH.working_MP07HH_T1Summary = tmp

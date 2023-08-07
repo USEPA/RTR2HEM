@@ -29,7 +29,6 @@ class MultiPathwayProcessing:
             self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs
         )
 
-    # TODO probably move these...
     # working_CrosswalkEmissionInventory_Eco
     def qryMP00aEco_DuplicateCrosswalkInventory(self):
         self.working_CrosswalkEmissionInventory_Eco = self.df.copy()
