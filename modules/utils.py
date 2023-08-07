@@ -55,9 +55,14 @@ def cross_product(df1, df2):
 
 
 def join(dfs, **kwargs):
-    result = pd.merge(left=dfs[0], right=dfs[1], suffixes=("", "_tmp"), **kwargs)
+    drop_dupe = kwargs.pop("drop_dupe", "right")
+    if drop_dupe == "right":
+        kwargs["suffixes"] = ("", "_tmp")
+    else:
+        kwargs["suffixes"] = ("_tmp", "")
+    result = pd.merge(left=dfs[0], right=dfs[1], **kwargs)
     for i in range(2, len(dfs)):
-        result = pd.merge(left=result, right=dfs[i], suffixes=("", "_tmp"), **kwargs)
+        result = pd.merge(left=result, right=dfs[i], **kwargs)
     for column in result.columns:
         if "_tmp" in column:
             result = result.drop(column, axis=1)

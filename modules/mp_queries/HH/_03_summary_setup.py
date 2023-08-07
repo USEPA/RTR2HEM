@@ -61,7 +61,7 @@ class SummarySetup:
             "Num Facil Emitting Any Assessed PB-HAP"
         ] = num_pbhap_facilities
 
-        blanks = [
+        blanks_zero = [
             "Num Facil Emitting This PB-HAP",
             "(1)Max SV",
             "(2)Facil-Tot Emis*REF (TPY; facil represented by (1))",
@@ -70,7 +70,8 @@ class SummarySetup:
             "Num Facil Exceeding by x10",
             "Num Facil Exceeding by x100",
         ]
-        screen_thresholds[blanks] = 0
+        screen_thresholds[blanks_zero] = 0
+        screen_thresholds["Src Cat"] = ""
         screen_thresholds["Max Facility"] = ""
 
         screen_thresholds = screen_thresholds.sort_values("shortpb-hapname")
