@@ -120,28 +120,16 @@ class Join:
         left_cpy = [f"{item}_cpy".lower() for item in left_on]
         right_cpy = [f"{item}_cpy".lower() for item in right_on]
 
-        if set(left_cpy) == set(right_cpy):
-            jmp = 1
-            l_iter = 0
-            r_iter = 0
-        else:
-            jmp = 2
-            l_iter = 0
-            r_iter = 1
-
         kwargs["left_on"] = left_cpy
-        for idx in range(0, len(dfs), jmp):
-            for i in range(len(left_cpy)):
-                dfs[idx + l_iter][left_cpy[i]] = (
-                    dfs[idx + l_iter][left_on[i]].astype(str).str.lower()
-                )
+        dfs[0][left_cpy] = dfs[0][left_on]
+        for cpy_col in left_cpy:
+            dfs[0][cpy_col] = dfs[0][cpy_col].astype(str).str.lower()
 
         kwargs["right_on"] = right_cpy
-        for idx in range(0, len(dfs), jmp):
-            for i in range(len(right_cpy)):
-                dfs[idx + r_iter][right_cpy[i]] = (
-                    dfs[idx + r_iter][right_on[i]].astype(str).str.lower()
-                )
+        for df in dfs[1:]:
+            df[right_cpy] = df[right_on]
+            for cpy_col in right_cpy:
+                df[cpy_col] = df[cpy_col].astype(str).str.lower()
         return dfs, kwargs
 
 
