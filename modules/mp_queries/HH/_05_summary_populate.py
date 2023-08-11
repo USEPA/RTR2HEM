@@ -1,4 +1,4 @@
-from modules.utils import Join, get_static, calc_agg
+from modules.utils import Join
 
 """
 sheets:
@@ -16,7 +16,7 @@ class SummaryPopulate:
         self.HH.working_MP07HH_T1Summary = Join().join(
             [self.HH.working_MP07HH_T1Summary, self.HH.working_MP07bHH_GatherSummary],
             on="PB-HAP Grp",
-            how='left'
+            how="left",
         )
         self.HH.working_MP07HH_T1Summary = self.HH.working_MP07HH_T1Summary.fillna(0)
 

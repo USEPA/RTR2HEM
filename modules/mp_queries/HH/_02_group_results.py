@@ -7,6 +7,21 @@ sheets:
 
 
 class GrpResults:
+    column_order = [
+        "Src Cat",
+        "Num Facil in Src Cat",
+        "Facility ID",
+        "PB-HAP Grp",
+        "Emiss (TPY; grp)",
+        "Emiss*REF (TPY; grp)",
+        "Scrn Thresh (TPY; grp)",
+        "Date Scrn Thresh Created",
+        "SV (grp)",
+        "Exceedance?",
+        "Exceedance by x10?",
+        "Exceedance by x100?",
+    ]
+
     def __init__(self, HH):
         self.HH = HH
         self.qryMP05aHH_T1GrpResults()
@@ -58,7 +73,7 @@ class GrpResults:
         set_column(tmp, "Exceedance by x10?", self.exceed_10)
         set_column(tmp, "Exceedance by x100?", self.exceed_100)
 
-        self.HH.working_MP05HH_T1GrpResults = tmp
+        self.HH.working_MP05HH_T1GrpResults = tmp[self.column_order]
 
     def exceed(self, row):
         try:

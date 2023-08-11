@@ -58,6 +58,13 @@ def calc_agg(df, group_by, agg, on_column, rename_column=None):
 class Join:
     """
     Custom dataframe joins
+
+    join
+        accepts a list of dataframes, normal pd.merge arguments,
+        and drop_dupe='left'|'right'
+
+        this custom join is case insensitive for both column names
+        and cell values
     """
 
     def cross_product(self, df1, df2):
@@ -65,7 +72,7 @@ class Join:
         df2["_key"] = 0
         return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
 
-    def join(self, dfs, **kwargs):
+    def join(self, dfs=None, **kwargs):
         def drop_tmp(df, also_drop_cpy=False):
             for column in df.columns:
                 try:
@@ -76,6 +83,11 @@ class Join:
                 except:
                     pass
             return df
+
+        if "left" in kwargs:
+            dfs = [kwargs.pop("left")]
+        if "right" in kwargs:
+            dfs += [kwargs.pop("right")]
 
         dfs, kwargs = self.setup_tmp_colums(dfs, **kwargs)
         drop_dupe = kwargs.pop("drop_dupe", "right")
@@ -93,23 +105,20 @@ class Join:
         return result
 
     def setup_tmp_colums(self, dfs, **kwargs):
+        """creates '_cpy' lowercase columns to be used for joining
+        so that the original columns are not modified"""
         tmp_dfs = [df.copy() for df in dfs]
         dfs = tmp_dfs
         to_list = lambda val: val if isinstance(val, list) else [val]
-
-        def cpy_list(lst):
-            cpy_lst = []
-            for i, val in enumerate(lst):
-                cpy_lst.append(f"{lst[i]}_cpy".lower())
-            return cpy_lst
 
         on_col = to_list(kwargs.pop("on", []))
         left_on = to_list(kwargs.get("left_on", on_col))
         right_on = to_list(kwargs.get("right_on", on_col))
         if not left_on or not right_on:
             raise Exception("Missing columns to join on")
-        left_cpy = cpy_list(left_on)
-        right_cpy = cpy_list(right_on)
+
+        left_cpy = [f"{item}_cpy".lower() for item in left_on]
+        right_cpy = [f"{item}_cpy".lower() for item in right_on]
 
         if set(left_cpy) == set(right_cpy):
             jmp = 1

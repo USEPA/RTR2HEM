@@ -29,7 +29,7 @@ class Template:
         )
         HHScreeningThresholds = get_static("static_MP_HHScreeningThresholds")
 
-        tmp = pd.merge(
+        tmp = Join().join(
             left=HHEquivalencyFactors,
             right=HHScreeningThresholds,
             how="inner",

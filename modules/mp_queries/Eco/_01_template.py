@@ -28,7 +28,7 @@ class Template:
         EcoEquivalencyFactors = get_static("static_MP_EcoEquivalencyFactors")
         EcoScreeningThresholds = get_static("static_MP_EcoScreeningThresholds")
 
-        tmp = pd.merge(
+        tmp = Join().join(
             left=EcoEquivalencyFactors,
             right=EcoScreeningThresholds,
             how="inner",
