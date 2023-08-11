@@ -1,4 +1,4 @@
-from modules.utils import join, get_static, calc_agg
+from modules.utils import Join, get_static, calc_agg
 
 """
 sheets:
@@ -13,11 +13,10 @@ class SummaryPopulate:
 
     # working_MP07HH_T1Summary
     def qryMP07cHH_PopulateSummary(self):
-        self.HH.working_MP07HH_T1Summary = join(
+        self.HH.working_MP07HH_T1Summary = Join().join(
             [self.HH.working_MP07HH_T1Summary, self.HH.working_MP07bHH_GatherSummary],
             on="PB-HAP Grp",
-            how="left",
-            drop_dupe="left",
+            how='left'
         )
         self.HH.working_MP07HH_T1Summary = self.HH.working_MP07HH_T1Summary.fillna(0)
 
@@ -35,6 +34,8 @@ class SummaryPopulate:
             "Max Facility",
             "Num Facil Exceeding",
             "Num Facil Exceeding by x10",
-            "Num Facil Exceeding by x100"
+            "Num Facil Exceeding by x100",
         ]
-        self.HH.working_MP07HH_T1Summary = self.HH.working_MP07HH_T1Summary[column_order]
+        self.HH.working_MP07HH_T1Summary = self.HH.working_MP07HH_T1Summary[
+            column_order
+        ]

@@ -6,6 +6,7 @@ from modules.mp_queries.HH._05_summary_populate import SummaryPopulate
 
 from modules.utils import src_cat_name, emission_type
 
+
 def run_HH_module(working_crosswalk, latlons, accdb):
     HH_obj = Template(working_crosswalk, latlons)
     GrpResults(HH_obj)

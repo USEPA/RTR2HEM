@@ -16,7 +16,7 @@ class AccdbWriter:
         self.accdb = conn.cursor()
 
     def write(self, table_name, df):
-        df = df.astype(str).replace('\.0+$', '', regex=True)
+        df = df.astype(str).replace("\.0+$", "", regex=True)
         columns = df.columns.to_list()
         columns = "] text(255), [".join(columns)
         columns = f"([{columns}] text(255))"

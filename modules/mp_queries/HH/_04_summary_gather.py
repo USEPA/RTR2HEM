@@ -1,5 +1,5 @@
 from modules.mp_queries.HH._03_summary_setup import SummarySetup
-from modules.utils import join, get_static, calc_agg
+from modules.utils import Join, get_static, calc_agg
 
 """
 sheets:
@@ -47,7 +47,7 @@ class SummaryGather:
             "SV (grp)",
         ]
         max_sv = self.qryMP06aHH_GetMaxSV()
-        res = join(
+        res = Join().join(
             [self.HH.working_MP05HH_T1GrpResults, max_sv],
             how="inner",
             left_on=["PB-HAP Grp", "SV (grp)"],
@@ -113,13 +113,13 @@ class SummaryGather:
         count_failing_facil_10x = self.qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP()
         count_failing_facil_100x = self.qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP()
 
-        tmp = join(
+        tmp = Join().join(
             [self.HH.working_MP07HH_T1Summary, num_pbhap_facil],
             drop_dupe="left",
             how="inner",
             on="PB-HAP Grp",
         )
-        tmp = join(
+        tmp = Join().join(
             [
                 tmp,
                 count_failing_facil,

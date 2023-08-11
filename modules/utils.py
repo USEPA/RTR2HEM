@@ -9,6 +9,13 @@ def to_bool(val):
     return str(val).lower() == "true"
 
 
+def get_static(filename):
+    static_fp = os.path.join(static_dir, f"{filename}.xlsx")
+    df = pd.read_excel(static_fp, "static")
+    df.columns = df.columns.str.lower()
+    return df.fillna("")
+
+
 def set_column(df, column_name, func):
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
@@ -48,32 +55,85 @@ def calc_agg(df, group_by, agg, on_column, rename_column=None):
     return result
 
 
-def cross_product(df1, df2):
-    df1["_key"] = 0
-    df2["_key"] = 0
-    return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
+class Join:
+    """
+    Custom dataframe joins
+    """
 
+    def cross_product(self, df1, df2):
+        df1["_key"] = 0
+        df2["_key"] = 0
+        return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
 
-def join(dfs, **kwargs):
-    drop_dupe = kwargs.pop("drop_dupe", "right")
-    if drop_dupe == "right":
-        kwargs["suffixes"] = ("", "_tmp")
-    else:
-        kwargs["suffixes"] = ("_tmp", "")
-    result = pd.merge(left=dfs[0], right=dfs[1], **kwargs)
-    for i in range(2, len(dfs)):
-        result = pd.merge(left=result, right=dfs[i], **kwargs)
-    for column in result.columns:
-        if "_tmp" in column:
-            result = result.drop(column, axis=1)
-    return result
+    def join(self, dfs, **kwargs):
+        def drop_tmp(df, also_drop_cpy=False):
+            for column in df.columns:
+                try:
+                    if "_tmp" in column:
+                        df = df.drop(column, axis=1)
+                    if also_drop_cpy and "_cpy" in column:
+                        df = df.drop(column, axis=1)
+                except:
+                    pass
+            return df
 
+        dfs, kwargs = self.setup_tmp_colums(dfs, **kwargs)
+        drop_dupe = kwargs.pop("drop_dupe", "right")
+        if drop_dupe == "right":
+            kwargs["suffixes"] = ("", "_tmp")
+        else:
+            kwargs["suffixes"] = ("_tmp", "")
 
-def get_static(filename):
-    static_fp = os.path.join(static_dir, f"{filename}.xlsx")
-    df = pd.read_excel(static_fp, "static")
-    df.columns = df.columns.str.lower()
-    return df.fillna("")
+        result = pd.merge(left=dfs[0], right=dfs[1], **kwargs)
+        result = drop_tmp(result)
+        for i in range(2, len(dfs)):
+            result = pd.merge(left=result, right=dfs[i], **kwargs)
+            result = drop_tmp(result)
+        result = drop_tmp(result, True)
+        return result
+
+    def setup_tmp_colums(self, dfs, **kwargs):
+        tmp_dfs = [df.copy() for df in dfs]
+        dfs = tmp_dfs
+        to_list = lambda val: val if isinstance(val, list) else [val]
+
+        def cpy_list(lst):
+            cpy_lst = []
+            for i, val in enumerate(lst):
+                cpy_lst.append(f"{lst[i]}_cpy".lower())
+            return cpy_lst
+
+        on_col = to_list(kwargs.pop("on", []))
+        left_on = to_list(kwargs.get("left_on", on_col))
+        right_on = to_list(kwargs.get("right_on", on_col))
+        if not left_on or not right_on:
+            raise Exception("Missing columns to join on")
+        left_cpy = cpy_list(left_on)
+        right_cpy = cpy_list(right_on)
+
+        if set(left_cpy) == set(right_cpy):
+            jmp = 1
+            l_iter = 0
+            r_iter = 0
+        else:
+            jmp = 2
+            l_iter = 0
+            r_iter = 1
+
+        kwargs["left_on"] = left_cpy
+        for idx in range(0, len(dfs), jmp):
+            for i in range(len(left_cpy)):
+                dfs[idx + l_iter][left_cpy[i]] = (
+                    dfs[idx + l_iter][left_on[i]].astype(str).str.lower()
+                )
+
+        kwargs["right_on"] = right_cpy
+        for idx in range(0, len(dfs), jmp):
+            for i in range(len(right_cpy)):
+                dfs[idx + r_iter][right_cpy[i]] = (
+                    dfs[idx + r_iter][right_on[i]].astype(str).str.lower()
+                )
+        return dfs, kwargs
 
 
 ################################

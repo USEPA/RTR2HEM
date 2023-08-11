@@ -1,5 +1,5 @@
 import pandas as pd
-from modules.utils import calc_agg, cross_product, get_static
+from modules.utils import Join, calc_agg, get_static
 
 """
 template of every facility + every chemical
@@ -36,7 +36,7 @@ class Template:
             left_on="shortpb-hap/ecohapname",
             right_on="shortpb-hapname",
         )
-        tmp = cross_product(self.latlons.avg_lat_longs, tmp)
+        tmp = Join().cross_product(self.latlons.avg_lat_longs, tmp)
 
         # column cleaning
         group_by = {

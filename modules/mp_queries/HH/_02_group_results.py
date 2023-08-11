@@ -1,4 +1,4 @@
-from modules.utils import calc_agg, join, set_column
+from modules.utils import Join, calc_agg, set_column
 
 """
 sheets:
@@ -51,7 +51,7 @@ class GrpResults:
         sv_grp = calc_agg(tmp, group_by, "sum", "SV (chem)", "SV (grp)")
 
         tmp = tmp[group_by].drop_duplicates()
-        tmp = join([tmp, emiss_grp, emiss_ref_grp, sv_grp], on=group_by)
+        tmp = Join().join([tmp, emiss_grp, emiss_ref_grp, sv_grp], on=group_by)
         tmp = tmp.sort_values(group_by)
 
         set_column(tmp, "Exceedance?", self.exceed)
