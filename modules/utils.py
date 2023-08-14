@@ -89,7 +89,7 @@ class Join:
         if "right" in kwargs:
             dfs += [kwargs.pop("right")]
 
-        dfs, kwargs = self.setup_tmp_colums(dfs, **kwargs)
+        dfs, kwargs = self.setup_tmp_columns(dfs, **kwargs)
         drop_dupe = kwargs.pop("drop_dupe", "right")
         if drop_dupe == "right":
             kwargs["suffixes"] = ("", "_tmp")
@@ -104,7 +104,7 @@ class Join:
         result = drop_tmp(result, True)
         return result
 
-    def setup_tmp_colums(self, dfs, **kwargs):
+    def setup_tmp_columns(self, dfs, **kwargs):
         """creates '_cpy' lowercase columns to be used for joining
         so that the original columns are not modified"""
         tmp_dfs = [df.copy() for df in dfs]

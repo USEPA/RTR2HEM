@@ -26,7 +26,7 @@ class MultiPathwayProcessing:
 
         lats_longs = LatLons(self.df)
 
-        run_HH_module(self.df, lats_longs, self.accdb)
+        # run_HH_module(self.df, lats_longs, self.accdb)
         run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
 
     # working_CrosswalkEmissionInventory_Eco
@@ -37,6 +37,7 @@ class MultiPathwayProcessing:
     def qryMP00bEco_AddDivalentMercury(self):
         tmp = self.working_CrosswalkEmissionInventory_Eco
         chem_col = "chem name for tier 2 tool"
+        tmp = tmp[tmp[chem_col] == "Methyl Mercury (Emitted as Divalent)"]
         tmp.loc[
             (tmp[chem_col] == "Methyl Mercury (Emitted as Divalent)"), chem_col
         ] = "Divalent Mercury"

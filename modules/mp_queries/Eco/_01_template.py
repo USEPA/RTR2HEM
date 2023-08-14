@@ -14,14 +14,14 @@ class Template:
     working_MP04HH_T1ChemResults = None
     working_MPHH_ChemEmissSums = None
 
-    def __init__(self, df, eco_crosswalk, latlons):
-        self.df = df
+    def __init__(self, working_crosswalk, eco_crosswalk, latlons):
+        self.working_crosswalk = working_crosswalk
         self.eco_crosswalk = eco_crosswalk
         self.latlons = latlons
 
         self.qryMP04dEco_CreateShellForChemSVs()
-        self.qryMP04bEco_CalcChemSums()
-        self.qryMP04cEco_PopulateChemSVs()
+        self.qryMP04eEco_CalcChemSums()
+        self.qryMP04fEco_PopulateChemSVs()
 
     # working_MP04Eco_T1ChemResults
     def qryMP04dEco_CreateShellForChemSVs(self):
@@ -72,10 +72,7 @@ class Template:
         self.working_MP04Eco_T1ChemResults = tmp
 
     # working_MPEco_ChemEmissSums
-    def qryMP04bEco_CalcChemSums(self):
-        """
-        TODO -- should be ~49
-        """
+    def qryMP04eEco_CalcChemSums(self):
         group_by = ["ICFFacilityID", "chem name for tier 2 tool", "ICFCatLevelModeling"]
 
         tmp = self.eco_crosswalk.loc[
@@ -91,25 +88,13 @@ class Template:
         self.working_MPEco_ChemEmissSums = tmp
 
     # working_MP04Eco_T1ChemResults
-    def qryMP04cEco_PopulateChemSVs(self):
-        """
-        TODO -- the number of rows != 0 is not accurate (should be ~780), it's only finding ~690
-
-        UPDATE working_MP04Eco_T1ChemResults
-        INNER JOIN working_MPEco_ChemEmissSums ON (working_MP04Eco_T1ChemResults.Chem = working_MPEco_ChemEmissSums.[Chem Name For Tier 2 Tool])
-        AND (working_MP04Eco_T1ChemResults.[Facility ID] = working_MPEco_ChemEmissSums.ICFFacilityID)
-
-        SET working_MP04Eco_T1ChemResults.[Emiss (TPY; chem)] = [SumOfICFModelEmissionTPY],
-        working_MP04Eco_T1ChemResults.[Emiss*EcoEEF (TPY; chem)] = [SumOfICFModelEmissionTPY]*[EcoEEF (chem)],
-        working_MP04Eco_T1ChemResults.[SV (chem)] = [SumOfICFModelEmissionTPY]*[EcoEEF (chem)]/[Scrn Thresh (TPY; grp)];
-
-        """
-        result = pd.merge(
-            self.working_MP04Eco_T1ChemResults,
-            self.working_MPEco_ChemEmissSums,
-            how="left",
-            left_on=["Chem", "Facility ID"],
-            right_on=["chem name for tier 2 tool", "ICFFacilityID"],
+    def qryMP04fEco_PopulateChemSVs(self):
+        result = Join().join(
+            left=self.working_MP04Eco_T1ChemResults,
+            right=self.working_MPEco_ChemEmissSums,
+            how="inner",
+            left_on=["Facility ID", "Chem"],
+            right_on=["ICFFacilityID", "chem name for tier 2 tool"],
         )
         result = result.fillna(0)
 
