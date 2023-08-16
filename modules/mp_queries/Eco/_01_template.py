@@ -11,8 +11,8 @@ sheets:
 
 
 class Template:
-    working_MP04HH_T1ChemResults = None
-    working_MPHH_ChemEmissSums = None
+    working_MP04Eco_T1ChemResults = None
+    working_MPEco_ChemEmissSums = None
 
     def __init__(self, working_crosswalk, eco_crosswalk, latlons):
         self.working_crosswalk = working_crosswalk
@@ -92,7 +92,7 @@ class Template:
         result = Join().join(
             left=self.working_MP04Eco_T1ChemResults,
             right=self.working_MPEco_ChemEmissSums,
-            how="inner",
+            how="left",
             left_on=["Facility ID", "Chem"],
             right_on=["ICFFacilityID", "chem name for tier 2 tool"],
         )

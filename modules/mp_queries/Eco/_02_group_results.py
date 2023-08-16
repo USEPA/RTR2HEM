@@ -47,40 +47,6 @@ class GrpResults:
 
     # working_MP05Eco_T1GrpResults
     def qryMP05bEco_T1GrpResults(self):
-        """
-        SELECT working_MP04Eco_T1ChemResults.[Src Cat], 
-        qryMP01b_CountSrcCatFacilities.[Num Facil in Src Cat], 
-        working_MP04Eco_T1ChemResults.[Facility ID], 
-        working_MP04Eco_T1ChemResults.[EcoHAP Grp], 
-        Sum(working_MP04Eco_T1ChemResults.[Emiss (TPY; chem)]) AS [Emiss (TPY; grp)], 
-        working_MP04Eco_T1ChemResults.[Assessment Endpoint], 
-        Sum(working_MP04Eco_T1ChemResults.[Emiss*EcoEEF (TPY; chem)]) AS [Emiss*EcoEEF (TPY; grp)], 
-        working_MP04Eco_T1ChemResults.[Benchmark Effects Level], 
-        working_MP04Eco_T1ChemResults.[Benchmark Value], 
-        working_MP04Eco_T1ChemResults.[Scrn Thresh (TPY; grp)], 
-        working_MP04Eco_T1ChemResults.[Date Scrn Thresh Created], 
-        Sum(working_MP04Eco_T1ChemResults.[SV (chem)]) AS [SV (grp)], 
-        IIf(Sum([SV (chem)])<1.5,"Screens Out",IIf(Sum([SV (chem)])>=1.5,"Yes","ERROR")) AS [Exceedance?], 
-        IIf(Sum([SV (chem)])<1.5,"Screens Out",IIf(Sum([SV (chem)])<10,"No",IIf(Sum([SV (chem)])>=10,"Yes","ERROR"))) AS [Exceedance by x10?], 
-        IIf(Sum([SV (chem)])<1.5,"Screens Out",IIf(Sum([SV (chem)])<100,"No",IIf(Sum([SV (chem)])>=100,"Yes","ERROR"))) AS [Exceedance by x100?] 
-        INTO working_MP05Eco_T1GrpResults
-
-        FROM working_MP04Eco_T1ChemResults, qryMP01b_CountSrcCatFacilities
-
-        GROUP BY working_MP04Eco_T1ChemResults.[Src Cat], 
-        qryMP01b_CountSrcCatFacilities.[Num Facil in Src Cat], 
-        working_MP04Eco_T1ChemResults.[Facility ID], 
-        working_MP04Eco_T1ChemResults.[EcoHAP Grp], 
-        working_MP04Eco_T1ChemResults.[Assessment Endpoint], 
-        working_MP04Eco_T1ChemResults.[Benchmark Effects Level], 
-        working_MP04Eco_T1ChemResults.[Benchmark Value], 
-        working_MP04Eco_T1ChemResults.[Scrn Thresh (TPY; grp)], 
-        working_MP04Eco_T1ChemResults.[Date Scrn Thresh Created]
-
-        ORDER BY working_MP04Eco_T1ChemResults.[Src Cat], 
-        working_MP04Eco_T1ChemResults.[Facility ID], 
-        working_MP04Eco_T1ChemResults.[EcoHAP Grp];
-        """
         group_by = [
             "Src Cat",
             "Num Facil in Src Cat",
@@ -106,7 +72,7 @@ class GrpResults:
         )
         sv_grp = calc_agg(tmp, group_by, "sum", "SV (chem)", "SV (grp)")
 
-        tmp = tmp[group_by].drop_duplicates(group_by)
+        tmp = tmp[group_by].drop_duplicates()
         tmp = Join().join([tmp, emiss_grp, emiss_eef_grp, sv_grp], on=group_by, how='left')
         tmp = tmp.sort_values(group_by)
 
