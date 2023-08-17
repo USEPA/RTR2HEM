@@ -1,4 +1,5 @@
-from modules.utils import Join, get_static, calc_agg
+from modules.mp_queries.shared_queries import qryMP01b_CountSrcCatFacilities, qryMP02c_CountPBHAPEmittingFacilities
+from modules.utils import get_static
 
 """
 sheets:
@@ -13,50 +14,12 @@ class SummarySetup:
         self.HH = HH
         self.qryMP07aHH_PrepareShellOfSummary()
 
-    def qryMP02a_ListPBHAPEmittingFacilities01(self):
-        group_by = [
-            "ICFFacilityID",
-            "sppd_facility_identifier",
-            "shortpb-hap/ecohapname",
-            "ICFCatLevelModeling",
-        ]
-
-        pollutant_crosswalk = get_static(
-            "static_PollutantCrosswalk_andMetalSpeciations"
-        )
-        tmp = Join().join(
-            [self.HH.working_crosswalk, pollutant_crosswalk], on="pollutant_code"
-        )
-
-        tmp = tmp.loc[
-            (tmp["shortpb-hap/ecohapname"] != "")
-            & (tmp["ICFCatLevelModeling"] == "Yes")
-        ]
-
-        tmp = calc_agg(tmp, group_by, "sum", "emissions_tpy", "SumOfEMISSIONS_TPY")
-        tmp = tmp.loc[tmp["SumOfEMISSIONS_TPY"] > 0]
-        tmp = tmp.drop_duplicates()
-
-        tmp = tmp.drop("ICFCatLevelModeling", axis=1)
-        return tmp
-
-    def qryMP02b_ListPBHAPEmittingFacilities02(self):
-        group_by = ["ICFFacilityID", "sppd_facility_identifier"]
-        pbhap_facilities = self.qryMP02a_ListPBHAPEmittingFacilities01()
-        res = pbhap_facilities[group_by].drop_duplicates(group_by)
-        return res
-
-    def qryMP02c_CountPBHAPEmittingFacilities(self):
-        num_pbhap_facilities = self.qryMP02b_ListPBHAPEmittingFacilities02()
-        self.HH.num_pbhap_facilities = len(num_pbhap_facilities.index)
-        return self.HH.num_pbhap_facilities
-
     # working_MP07HH_T1Summary
     def qryMP07aHH_PrepareShellOfSummary(self):
         screen_thresholds = get_static("static_MP_HHScreeningThresholds")
-        num_pbhap_facilities = self.qryMP02c_CountPBHAPEmittingFacilities()
+        num_pbhap_facilities = qryMP02c_CountPBHAPEmittingFacilities(self.HH)
 
-        screen_thresholds["Num Facil in Src Cat"] = self.HH.num_src_cat_facilities
+        screen_thresholds["Num Facil in Src Cat"] = qryMP01b_CountSrcCatFacilities(self.HH)
         screen_thresholds[
             "Num Facil Emitting Any Assessed PB-HAP"
         ] = num_pbhap_facilities

@@ -1,3 +1,4 @@
+from modules.mp_queries.shared_queries import qryMP01b_CountSrcCatFacilities
 from modules.utils import Join, calc_agg, set_column
 
 """
@@ -29,22 +30,6 @@ class GrpResults:
         self.eco = eco
         self.qryMP05bEco_T1GrpResults()
 
-    def qryMP01a_ListSrcCatFacilities(self):
-        group_by = ["ICFFacilityID", "sppd_facility_identifier", "ICFCatLevelModeling"]
-        tmp = self.eco.working_crosswalk
-        tmp = tmp.loc[tmp["ICFCatLevelModeling"] == "Yes"]
-
-        tmp = tmp.sort_values(group_by)
-        tmp = tmp[group_by].drop("ICFCatLevelModeling", axis=1)
-        tmp = tmp.drop_duplicates()
-        return tmp
-
-    # NOTE - this query is re-used in both HH and eco
-    def qryMP01b_CountSrcCatFacilities(self):
-        src_cat_facilities = self.qryMP01a_ListSrcCatFacilities()
-        self.eco.num_src_cat_facilities = len(src_cat_facilities.index)
-        return self.eco.num_src_cat_facilities
-
     # working_MP05Eco_T1GrpResults
     def qryMP05bEco_T1GrpResults(self):
         group_by = [
@@ -59,7 +44,7 @@ class GrpResults:
             "Date Scrn Thresh Created",
         ]
 
-        num_src_cat_facilities = self.qryMP01b_CountSrcCatFacilities()
+        num_src_cat_facilities = qryMP01b_CountSrcCatFacilities(self.eco)
 
         tmp = self.eco.working_MP04Eco_T1ChemResults.copy()
         tmp["Num Facil in Src Cat"] = num_src_cat_facilities
@@ -73,7 +58,9 @@ class GrpResults:
         sv_grp = calc_agg(tmp, group_by, "sum", "SV (chem)", "SV (grp)")
 
         tmp = tmp[group_by].drop_duplicates()
-        tmp = Join().join([tmp, emiss_grp, emiss_eef_grp, sv_grp], on=group_by, how='left')
+        tmp = Join().join(
+            [tmp, emiss_grp, emiss_eef_grp, sv_grp], on=group_by, how="left"
+        )
         tmp = tmp.sort_values(group_by)
 
         set_column(tmp, "Exceedance?", self.exceed)

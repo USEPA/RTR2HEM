@@ -1,3 +1,4 @@
+from modules.mp_queries.shared_queries import qryMP01b_CountSrcCatFacilities
 from modules.utils import Join, calc_agg, set_column
 
 """
@@ -26,21 +27,6 @@ class GrpResults:
         self.HH = HH
         self.qryMP05aHH_T1GrpResults()
 
-    def qryMP01a_ListSrcCatFacilities(self):
-        group_by = ["ICFFacilityID", "sppd_facility_identifier", "ICFCatLevelModeling"]
-        tmp = self.HH.working_crosswalk
-        tmp = tmp.loc[tmp["ICFCatLevelModeling"] == "Yes"]
-
-        tmp = tmp.sort_values(group_by)
-        tmp = tmp[group_by].drop("ICFCatLevelModeling", axis=1)
-        tmp = tmp.drop_duplicates()
-        return tmp
-
-    def qryMP01b_CountSrcCatFacilities(self):
-        src_cat_facilities = self.qryMP01a_ListSrcCatFacilities()
-        self.HH.num_src_cat_facilities = len(src_cat_facilities.index)
-        return self.HH.num_src_cat_facilities
-
     # working_MP05HH_T1GrpResults
     def qryMP05aHH_T1GrpResults(self):
         group_by = [
@@ -52,7 +38,7 @@ class GrpResults:
             "Date Scrn Thresh Created",
         ]
 
-        num_src_cat_facilities = self.qryMP01b_CountSrcCatFacilities()
+        num_src_cat_facilities = qryMP01b_CountSrcCatFacilities(self.HH)
 
         tmp = self.HH.working_MP04HH_T1ChemResults.copy()
         tmp["Num Facil in Src Cat"] = num_src_cat_facilities
