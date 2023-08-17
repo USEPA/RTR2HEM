@@ -1,4 +1,4 @@
-from modules.mp_queries.HH._03_summary_setup import SummarySetup
+from modules.mp_queries.shared_queries import qryMP02a_ListPBHAPEmittingFacilities01
 from modules.utils import Join, get_static, calc_agg
 
 """
@@ -15,9 +15,7 @@ class SummaryGather:
 
     def qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP(self):
         group_by = ["shortpb-hap/ecohapname"]
-        pbhap_facilities = SummarySetup(
-            self.HH
-        ).qryMP02a_ListPBHAPEmittingFacilities01()
+        pbhap_facilities = qryMP02a_ListPBHAPEmittingFacilities01(self.HH)
 
         num_pbhap_facilities = calc_agg(
             pbhap_facilities,

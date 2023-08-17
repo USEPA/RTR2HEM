@@ -1,4 +1,7 @@
-from modules.mp_queries.shared_queries import qryMP01b_CountSrcCatFacilities, qryMP02c_CountPBHAPEmittingFacilities
+from modules.mp_queries.shared_queries import (
+    qryMP01b_CountSrcCatFacilities,
+    qryMP02c_CountPBHAPEmittingFacilities,
+)
 from modules.utils import get_static
 
 """
@@ -17,15 +20,16 @@ class SummarySetup:
     # working_MP07HH_T1Summary
     def qryMP07aHH_PrepareShellOfSummary(self):
         screen_thresholds = get_static("static_MP_HHScreeningThresholds")
-        num_pbhap_facilities = qryMP02c_CountPBHAPEmittingFacilities(self.HH)
 
-        screen_thresholds["Num Facil in Src Cat"] = qryMP01b_CountSrcCatFacilities(self.HH)
+        screen_thresholds["Num Facil in Src Cat"] = qryMP01b_CountSrcCatFacilities(
+            self.HH
+        )
+
         screen_thresholds[
             "Num Facil Emitting Any Assessed PB-HAP"
-        ] = num_pbhap_facilities
+        ] = qryMP02c_CountPBHAPEmittingFacilities(self.HH)
 
         screen_thresholds["Src Cat"] = ""
-
         screen_thresholds = screen_thresholds.sort_values("shortpb-hapname")
 
         screen_thresholds = screen_thresholds.rename(
