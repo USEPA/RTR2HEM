@@ -89,6 +89,8 @@ class Join:
         if "right" in kwargs:
             dfs += [kwargs.pop("right")]
 
+        dfs = self.handle_empty_df(dfs)
+
         dfs, kwargs = self.setup_tmp_columns(dfs, **kwargs)
         drop_dupe = kwargs.pop("drop_dupe", "right")
         if drop_dupe == "right":
@@ -131,6 +133,25 @@ class Join:
             for cpy_col in right_cpy:
                 df[cpy_col] = df[cpy_col].astype(str).str.lower()
         return dfs, kwargs
+
+    def handle_empty_df(self, dfs):
+        """copy unique columns from empty df before removing from the merge"""
+        empty_dfs = []
+        existing_columns = []
+
+        for i, df in enumerate(dfs):
+            if df.empty:
+                empty_dfs.append(df)
+
+        dfs = list(filter(lambda df: not df.empty, dfs))
+        for df in dfs:
+            existing_columns += [f"{item}".lower() for item in df.columns]
+
+        for empty in empty_dfs:
+            for col in empty.columns:
+                if col.lower() not in existing_columns:
+                    dfs[0][col] = 0
+        return dfs
 
 
 ################################

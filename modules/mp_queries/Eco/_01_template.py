@@ -43,11 +43,11 @@ class Template:
             "Avg Long": "Long",  # END avg_lat_long_columns
             "shortpb-hap/ecohapname": "EcoHAP Grp",
             "chem name for tier 2 tool": "Chem",
-            "assessment endpoint": "Assessment Endpoint",
+            "assessment endpoint": "assessment endpoint",
             "ecoeef": "EcoEEF (chem)",
             "date of ecoeef creation": "Date EcoEEF Created",
-            "benchmark effects level": "Benchmark Effects Level",
-            "benchmark value": "Benchmark Value",
+            "benchmark effects level": "benchmark effects level",
+            "benchmark value": "benchmark value",
             "tier 1 eco screening threshold (tpy)": "Scrn Thresh (TPY; grp)",
             "date threshold created": "Date Scrn Thresh Created",
         }

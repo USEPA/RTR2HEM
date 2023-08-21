@@ -14,212 +14,189 @@ class SummaryGather:
         self.qryMP07eEco_GatherSummary()
 
     def qryMP02eEco_ListPBHAPEmittingFacilities01(self):
-        """
-        SELECT qryMP02a_ListPBHAPEmittingFacilities01.[Facility ID],
-        qryMP02a_ListPBHAPEmittingFacilities01.SPPD_FACILITY_IDENTIFIER,
-        IIf([qryMP02a_ListPBHAPEmittingFacilities01].[ShortPB-HAP/EcoHAPName]="Methyl Mercury (Hg2)","Mercury",
-        [qryMP02a_ListPBHAPEmittingFacilities01].[ShortPB-HAP/EcoHAPName]) AS [ShortPB-HAP/EcoHAPName]
+        pbhap_facil = qryMP02a_ListPBHAPEmittingFacilities01(self.eco)
+        on_column = "shortpb-hap/ecohapname"
+        chem_to_update = "Methyl Mercury (Hg2)"
 
-        FROM qryMP02a_ListPBHAPEmittingFacilities01;
-        """
-        pass
+        pbhap_facil.loc[pbhap_facil[on_column] == chem_to_update, on_column] = "Mercury"
+        pbhap_facil = pbhap_facil.rename(columns={"ICFFacilityID": "Facility ID"})
+        return pbhap_facil
 
     def qryMP02fEco_ListPBHAPEmittingFacilities02(self):
-        """
-        SELECT qryMP02eEco_ListPBHAPEmittingFacilities01.[Facility ID], qryMP02eEco_ListPBHAPEmittingFacilities01.SPPD_FACILITY_IDENTIFIER, static_MP_ListOfEcoHAPs.EcoHAP
+        group_by = ["Facility ID", "sppd_facility_identifier", "ecohap"]
+        list_of_ecohaps = get_static("static_MP_ListOfEcoHAPs")
+        pbhap_facil = self.qryMP02eEco_ListPBHAPEmittingFacilities01()
 
-        FROM qryMP02eEco_ListPBHAPEmittingFacilities01 INNER JOIN static_MP_ListOfEcoHAPs ON qryMP02eEco_ListPBHAPEmittingFacilities01.[ShortPB-HAP/EcoHAPName] = static_MP_ListOfEcoHAPs.EcoHAP_GroupMercury
-
-        GROUP BY qryMP02eEco_ListPBHAPEmittingFacilities01.[Facility ID], qryMP02eEco_ListPBHAPEmittingFacilities01.SPPD_FACILITY_IDENTIFIER, static_MP_ListOfEcoHAPs.EcoHAP;
-
-        """
-        pass
+        pbhap_facil = Join().join(
+            [pbhap_facil, list_of_ecohaps],
+            left_on="shortpb-hap/ecohapname",
+            right_on="ecohap_groupmercury",
+        )
+        pbhap_facil = pbhap_facil[group_by]
+        return pbhap_facil
 
     def qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP(self):
-        """
-        SELECT qryMP02fEco_ListPBHAPEmittingFacilities02.EcoHAP AS [EcoHAP Grp],
-        Count(qryMP02fEco_ListPBHAPEmittingFacilities02.[Facility ID]) AS [Number of EcoHAP-Emitting Facilities]
-
-        FROM qryMP02fEco_ListPBHAPEmittingFacilities02
-
-        GROUP BY qryMP02fEco_ListPBHAPEmittingFacilities02.EcoHAP;
-        """
-        group_by = ["shortpb-hap/ecohapname"]
+        group_by = ["ecohap"]
         pbhap_facilities = self.qryMP02fEco_ListPBHAPEmittingFacilities02()
 
         num_pbhap_facilities = calc_agg(
             pbhap_facilities,
             group_by,
             "count",
-            "ICFFacilityID",
-            "Num Facil Emitting This PB-HAP",
+            "Facility ID",
+            "Number of EcoHAP-Emitting Facilities",
         )
 
         num_pbhap_facilities = num_pbhap_facilities.rename(
-            columns={"shortpb-hap/ecohapname": "PB-HAP Grp"}
+            columns={"ecohap": "EcoHAP Grp"}
         )
         return num_pbhap_facilities
 
-    def qryMP06aeco_GetMaxSV(self):
-        group_by = ["PB-HAP Grp"]
+    def qryMP06iEco_GetMaxSV(self):
+        group_by = [
+            "EcoHAP Grp",
+            "assessment endpoint",
+            "benchmark effects level",
+            "benchmark value",
+        ]
         max_sv = calc_agg(
-            self.eco.working_MP05eco_T1GrpResults, group_by, "max", "SV (grp)", "Max SV"
+            self.eco.working_MP05Eco_T1GrpResults,
+            group_by,
+            "max",
+            "SV (grp)",
+            "Max SV (grp)",
         )
         return max_sv
 
-    def qryMP06beco_EmissOfMaxSV(self):
+    def qryMP06jEco_EmissOfMaxSV(self):
         group_by = [
-            "PB-HAP Grp",
+            "EcoHAP Grp",
+            "assessment endpoint",
+            "benchmark effects level",
+            "benchmark value",
             "Emiss (TPY; grp)",
-            "Emiss*REF (TPY; grp)",
+            "Emiss*EcoEEF (TPY; grp)",
             "SV (grp)",
         ]
-        max_sv = self.qryMP06aeco_GetMaxSV()
+        max_sv = self.qryMP06iEco_GetMaxSV()
         res = Join().join(
-            [self.eco.working_MP05eco_T1GrpResults, max_sv],
+            [self.eco.working_MP05Eco_T1GrpResults, max_sv],
             how="inner",
-            left_on=["PB-HAP Grp", "SV (grp)"],
-            right_on=["PB-HAP Grp", "Max SV"],
+            left_on=[
+                "benchmark effects level",
+                "SV (grp)",
+                "assessment endpoint",
+                "EcoHAP Grp",
+            ],
+            right_on=[
+                "benchmark effects level",
+                "Max SV (grp)",
+                "assessment endpoint",
+                "EcoHAP Grp",
+            ],
         )
 
         res = res.sort_values("Facility ID")
         res = res[group_by + ["Facility ID"]].drop_duplicates(group_by)
         res = res.rename(
             columns={
-                "Emiss*REF (TPY; grp)": "Max Emiss*REF (TPY; grp)",
+                "Emiss*EcoEEF (TPY; grp)": "Max Emiss*EcoEEF (TPY; grp)",
                 "SV (grp)": "Max SV (grp)",
                 "Facility ID": "Facil ID",
             }
         )
         return res
 
-    def qryMP06ceco_ListFailingFacilities_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance?"]
-        res = self.eco.working_MP05eco_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance?"] == "Yes"]
-        return res
+    def qryMP06lEco_CountFailingFacilities_PerPBHAP(self):
+        def qryMP06kEco_ListFailingFacilities_PerPBHAP():
+            group_by = [
+                "EcoHAP Grp",
+                "assessment endpoint",
+                "benchmark effects level",
+                "benchmark value",
+                "Facility ID",
+                "SV (grp)",
+                "Exceedance?",
+            ]
+            res = self.eco.working_MP05Eco_T1GrpResults[group_by]
+            res = res.loc[res["Exceedance?"] == "Yes"]
+            return res
 
-    def qryMP06deco_CountFailingFacilities_PerPBHAP(self):
-        group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06ceco_ListFailingFacilities_PerPBHAP()
+        group_by = [
+            "EcoHAP Grp",
+            "assessment endpoint",
+            "benchmark effects level",
+            "benchmark value",
+        ]
+        exceed = qryMP06kEco_ListFailingFacilities_PerPBHAP()
         res = calc_agg(exceed, group_by, "count", "Facility ID", "Num Facil Exceeding")
         return res
 
-    def qryMP06eeco_ListFailingFacilitiesx10_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x10?"]
-        res = self.eco.working_MP05eco_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance by x10?"] == "Yes"]
-        return res
+    def qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP(self):
+        def qryMP06mEco_ListFailingFacilitiesx10_PerPBHAP():
+            group_by = [
+                "EcoHAP Grp",
+                "assessment endpoint",
+                "benchmark effects level",
+                "benchmark value",
+                "Facility ID",
+                "SV (grp)",
+                "Exceedance by x10?",
+            ]
+            res = self.eco.working_MP05Eco_T1GrpResults[group_by]
+            res = res.loc[res["Exceedance by x10?"] == "Yes"]
+            return res
 
-    def qryMP06feco_CountFailingFacilitiesx10_PerPBHAP(self):
-        group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06eeco_ListFailingFacilitiesx10_PerPBHAP()
+        group_by = [
+            "EcoHAP Grp",
+            "assessment endpoint",
+            "benchmark effects level",
+            "benchmark value",
+        ]
+        exceed = qryMP06mEco_ListFailingFacilitiesx10_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x10"
         )
         return res
 
-    def qryMP06geco_ListFailingFacilitiesx100_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x100?"]
-        res = self.eco.working_MP05eco_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance by x100?"] == "Yes"]
-        return res
-
-    def qryMP06ecoH_CountFailingFacilitiesx100_PerPBHAP(self):
-        group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06geco_ListFailingFacilitiesx100_PerPBHAP()
-        res = calc_agg(
-            exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x100"
-        )
-        return res
-
     # working_MP07eco_T1Summary, working_MP07eEco_GatherSummary
     def qryMP07eEco_GatherSummary(self):
-        """
-        SELECT working_MP07Eco_T1Summary.[Src Cat],
-        working_MP07Eco_T1Summary.[EcoHAP Grp],
-        qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP.[Number of EcoHAP-Emitting Facilities] AS [Num Facil Emitting This PB-HAP],
-        working_MP07Eco_T1Summary.[Assessment Endpoint],
-        qryMP06jEco_EmissOfMaxSV.[Max Emiss*EcoEEF (TPY; grp)] AS [(2)Facil-Tot Emis*EcoEF (TPY; facil represented by (1))],
-        qryMP06jEco_EmissOfMaxSV.[Emiss (TPY; grp)] AS [(3)Facil-Total Emis (TPY; facil represented by (1))],
-        qryMP06jEco_EmissOfMaxSV.[Benchmark Effects Level],
-        qryMP06jEco_EmissOfMaxSV.[Benchmark Value],
-        qryMP06jEco_EmissOfMaxSV.[Max SV] AS [(1)Max SV],
-        qryMP06jEco_EmissOfMaxSV.[Facil ID],
-        Nz([qryMP06lEco_CountFailingFacilities_PerPBHAP].[Num Facil Exceeding],0) AS [Num Facil Exceeding],
-        Nz([qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP].[Num Facil Exceeding by x10],0) AS [Num Facil Exceeding by x10]
-        INTO working_MP07eEco_GatherSummary
-
-        FROM (((working_MP07Eco_T1Summary
-        INNER JOIN qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP
-        ON working_MP07Eco_T1Summary.[EcoHAP Grp] = qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP.[EcoHAP Grp])
-        LEFT JOIN qryMP06lEco_CountFailingFacilities_PerPBHAP
-        ON (working_MP07Eco_T1Summary.[Assessment Endpoint] = qryMP06lEco_CountFailingFacilities_PerPBHAP.[Assessment Endpoint])
-        AND (working_MP07Eco_T1Summary.[EcoHAP Grp] = qryMP06lEco_CountFailingFacilities_PerPBHAP.[EcoHAP Grp])
-        AND (working_MP07Eco_T1Summary.[Benchmark Effects Level] = qryMP06lEco_CountFailingFacilities_PerPBHAP.[Benchmark Effects Level]))
-        LEFT JOIN qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP
-        ON (working_MP07Eco_T1Summary.[Assessment Endpoint] = qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP.[Assessment Endpoint])
-        AND (working_MP07Eco_T1Summary.[EcoHAP Grp] = qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP.[EcoHAP Grp])
-        AND (working_MP07Eco_T1Summary.[Benchmark Effects Level] = qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP.[Benchmark Effects Level]))
-        LEFT JOIN qryMP06jEco_EmissOfMaxSV ON (working_MP07Eco_T1Summary.[EcoHAP Grp] = qryMP06jEco_EmissOfMaxSV.[EcoHAP Grp])
-        AND (working_MP07Eco_T1Summary.[Assessment Endpoint] = qryMP06jEco_EmissOfMaxSV.[Assessment Endpoint])
-        AND (working_MP07Eco_T1Summary.[Benchmark Effects Level] = qryMP06jEco_EmissOfMaxSV.[Benchmark Effects Level])
-
-        GROUP BY working_MP07Eco_T1Summary.[Src Cat],
-        working_MP07Eco_T1Summary.[EcoHAP Grp],
-        qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP.[Number of EcoHAP-Emitting Facilities],
-        working_MP07Eco_T1Summary.[Assessment Endpoint],
-        qryMP06jEco_EmissOfMaxSV.[Max Emiss*EcoEEF (TPY; grp)],
-        qryMP06jEco_EmissOfMaxSV.[Emiss (TPY; grp)],
-        qryMP06jEco_EmissOfMaxSV.[Benchmark Effects Level],
-        qryMP06jEco_EmissOfMaxSV.[Benchmark Value],
-        qryMP06jEco_EmissOfMaxSV.[Max SV],
-        qryMP06jEco_EmissOfMaxSV.[Facil ID],
-        Nz([qryMP06lEco_CountFailingFacilities_PerPBHAP].[Num Facil Exceeding],0),
-        Nz([qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP].[Num Facil Exceeding by x10],0);
-        """
         num_pbhap_facil = self.qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP()
-        max_sv_emiss = self.qryMP06beco_EmissOfMaxSV()
-        count_failing_facil = self.qryMP06deco_CountFailingFacilities_PerPBHAP()
-        count_failing_facil_10x = self.qryMP06feco_CountFailingFacilitiesx10_PerPBHAP()
-        count_failing_facil_100x = (
-            self.qryMP06ecoH_CountFailingFacilitiesx100_PerPBHAP()
-        )
+        max_sv_emiss = self.qryMP06jEco_EmissOfMaxSV()
+        count_failing_facil = self.qryMP06lEco_CountFailingFacilities_PerPBHAP()
+        count_failing_facil_10x = self.qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP()
 
         tmp = Join().join(
-            [self.eco.working_MP07eco_T1Summary, num_pbhap_facil],
+            [self.eco.working_MP07Eco_T1Summary, num_pbhap_facil],
             drop_dupe="left",
             how="inner",
-            on="PB-HAP Grp",
+            on="EcoHAP Grp",
         )
         tmp = Join().join(
             [
                 tmp,
                 count_failing_facil,
                 count_failing_facil_10x,
-                count_failing_facil_100x,
                 max_sv_emiss,
             ],
             drop_dupe="left",
             how="left",
-            on="PB-HAP Grp",
+            on=["assessment endpoint", "EcoHAP Grp", "benchmark effects level"],
         )
-
-        tmp["(3)Facil-Total Emis (TPY; facil represented by (1))"] = tmp[
-            "Max Emiss*REF (TPY; grp)"
-        ]
 
         group_by = {
             "Src Cat": "Src Cat",
-            "PB-HAP Grp": "PB-HAP Grp",
+            "EcoHAP Grp": "EcoHAP Grp",
+            "assessment endpoint": "assessment endpoint",
             "Max SV (grp)": "(1)Max SV",
-            "Max Emiss*REF (TPY; grp)": "(2)Facil-Tot Emis*REF (TPY; facil represented by (1))",
-            "(3)Facil-Total Emis (TPY; facil represented by (1))": "(3)Facil-Total Emis (TPY; facil represented by (1))",
-            "Facil ID": "Max Facility",
-            "Num Facil Emitting This PB-HAP": "Num Facil Emitting This PB-HAP",
+            "Max Emiss*EcoEEF (TPY; grp)": "(2)Facil-Tot Emis*EcoEF (TPY; facil represented by (1))",
+            "Emiss (TPY; grp)": "(3)Facil-Total Emis (TPY; facil represented by (1))",
+            "benchmark effects level": "benchmark effects level",
+            "benchmark value": "benchmark value",
+            "Facil ID": "Facil ID",
+            "Number of EcoHAP-Emitting Facilities": "Num Facil Emitting This PB-HAP",
             "Num Facil Exceeding": "Num Facil Exceeding",
             "Num Facil Exceeding by x10": "Num Facil Exceeding by x10",
-            "Num Facil Exceeding by x100": "Num Facil Exceeding by x100",
         }
         tmp = tmp[list(group_by.keys())].fillna(0)
         tmp = tmp.rename(columns=group_by)
