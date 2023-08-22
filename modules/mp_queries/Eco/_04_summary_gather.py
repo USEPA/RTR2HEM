@@ -1,4 +1,4 @@
-from modules.mp_queries.shared_queries import qryMP02a_ListPBHAPEmittingFacilities01
+from modules.mp_queries.shared_queries import qry_02a_ListPBHAPEmittingFacilities01
 from modules.utils import Join, get_static, calc_agg
 
 """
@@ -11,10 +11,10 @@ sheets:
 class SummaryGather:
     def __init__(self, eco):
         self.eco = eco
-        self.qryMP07eEco_GatherSummary()
+        self.qry_07eEco_GatherSummary()
 
-    def qryMP02eEco_ListPBHAPEmittingFacilities01(self):
-        pbhap_facil = qryMP02a_ListPBHAPEmittingFacilities01(self.eco)
+    def qry_02eEco_ListPBHAPEmittingFacilities01(self):
+        pbhap_facil = qry_02a_ListPBHAPEmittingFacilities01(self.eco)
         on_column = "shortpb-hap/ecohapname"
         chem_to_update = "Methyl Mercury (Hg2)"
 
@@ -22,10 +22,10 @@ class SummaryGather:
         pbhap_facil = pbhap_facil.rename(columns={"ICFFacilityID": "Facility ID"})
         return pbhap_facil
 
-    def qryMP02fEco_ListPBHAPEmittingFacilities02(self):
+    def qry_02fEco_ListPBHAPEmittingFacilities02(self):
         group_by = ["Facility ID", "sppd_facility_identifier", "ecohap"]
         list_of_ecohaps = get_static("static_MP_ListOfEcoHAPs")
-        pbhap_facil = self.qryMP02eEco_ListPBHAPEmittingFacilities01()
+        pbhap_facil = self.qry_02eEco_ListPBHAPEmittingFacilities01()
 
         pbhap_facil = Join().join(
             [pbhap_facil, list_of_ecohaps],
@@ -35,9 +35,9 @@ class SummaryGather:
         pbhap_facil = pbhap_facil[group_by]
         return pbhap_facil
 
-    def qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP(self):
+    def qry_02gEco_CountPBHAPEmittingFacilities_ByPBHAP(self):
         group_by = ["ecohap"]
-        pbhap_facilities = self.qryMP02fEco_ListPBHAPEmittingFacilities02()
+        pbhap_facilities = self.qry_02fEco_ListPBHAPEmittingFacilities02()
 
         num_pbhap_facilities = calc_agg(
             pbhap_facilities,
@@ -52,7 +52,7 @@ class SummaryGather:
         )
         return num_pbhap_facilities
 
-    def qryMP06iEco_GetMaxSV(self):
+    def qry_06iEco_GetMaxSV(self):
         group_by = [
             "EcoHAP Grp",
             "assessment endpoint",
@@ -68,7 +68,7 @@ class SummaryGather:
         )
         return max_sv
 
-    def qryMP06jEco_EmissOfMaxSV(self):
+    def qry_06jEco_EmissOfMaxSV(self):
         group_by = [
             "EcoHAP Grp",
             "assessment endpoint",
@@ -78,7 +78,7 @@ class SummaryGather:
             "Emiss*EcoEEF (TPY; grp)",
             "SV (grp)",
         ]
-        max_sv = self.qryMP06iEco_GetMaxSV()
+        max_sv = self.qry_06iEco_GetMaxSV()
         res = Join().join(
             [self.eco.working_MP05Eco_T1GrpResults, max_sv],
             how="inner",
@@ -107,8 +107,8 @@ class SummaryGather:
         )
         return res
 
-    def qryMP06lEco_CountFailingFacilities_PerPBHAP(self):
-        def qryMP06kEco_ListFailingFacilities_PerPBHAP():
+    def qry_06lEco_CountFailingFacilities_PerPBHAP(self):
+        def qry_06kEco_ListFailingFacilities_PerPBHAP():
             group_by = [
                 "EcoHAP Grp",
                 "assessment endpoint",
@@ -128,12 +128,12 @@ class SummaryGather:
             "benchmark effects level",
             "benchmark value",
         ]
-        exceed = qryMP06kEco_ListFailingFacilities_PerPBHAP()
+        exceed = qry_06kEco_ListFailingFacilities_PerPBHAP()
         res = calc_agg(exceed, group_by, "count", "Facility ID", "Num Facil Exceeding")
         return res
 
-    def qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP(self):
-        def qryMP06mEco_ListFailingFacilitiesx10_PerPBHAP():
+    def qry_06nEco_CountFailingFacilitiesx10_PerPBHAP(self):
+        def qry_06mEco_ListFailingFacilitiesx10_PerPBHAP():
             group_by = [
                 "EcoHAP Grp",
                 "assessment endpoint",
@@ -153,18 +153,18 @@ class SummaryGather:
             "benchmark effects level",
             "benchmark value",
         ]
-        exceed = qryMP06mEco_ListFailingFacilitiesx10_PerPBHAP()
+        exceed = qry_06mEco_ListFailingFacilitiesx10_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x10"
         )
         return res
 
     # working_MP07eco_T1Summary, working_MP07eEco_GatherSummary
-    def qryMP07eEco_GatherSummary(self):
-        num_pbhap_facil = self.qryMP02gEco_CountPBHAPEmittingFacilities_ByPBHAP()
-        max_sv_emiss = self.qryMP06jEco_EmissOfMaxSV()
-        count_failing_facil = self.qryMP06lEco_CountFailingFacilities_PerPBHAP()
-        count_failing_facil_10x = self.qryMP06nEco_CountFailingFacilitiesx10_PerPBHAP()
+    def qry_07eEco_GatherSummary(self):
+        num_pbhap_facil = self.qry_02gEco_CountPBHAPEmittingFacilities_ByPBHAP()
+        max_sv_emiss = self.qry_06jEco_EmissOfMaxSV()
+        count_failing_facil = self.qry_06lEco_CountFailingFacilities_PerPBHAP()
+        count_failing_facil_10x = self.qry_06nEco_CountFailingFacilitiesx10_PerPBHAP()
 
         tmp = Join().join(
             [self.eco.working_MP07Eco_T1Summary, num_pbhap_facil],

@@ -1,6 +1,5 @@
 import pandas as pd
 from modules.mp_queries.latitudes_longitudes import LatLons
-
 from modules.mp_queries.HH import run_HH_module
 from modules.mp_queries.Eco import run_Eco_module
 
@@ -21,8 +20,8 @@ class MultiPathwayProcessing:
         self.accdb = accdb
 
     def run(self):
-        self.qryMP00aEco_DuplicateCrosswalkInventory()
-        self.qryMP00bEco_AddDivalentMercury()
+        self.qry_00aEco_DuplicateCrosswalkInventory()
+        self.qry_00bEco_AddDivalentMercury()
 
         lats_longs = LatLons(self.df)
 
@@ -32,11 +31,11 @@ class MultiPathwayProcessing:
         )
 
     # working_CrosswalkEmissionInventory_Eco
-    def qryMP00aEco_DuplicateCrosswalkInventory(self):
+    def qry_00aEco_DuplicateCrosswalkInventory(self):
         self.working_CrosswalkEmissionInventory_Eco = self.df.copy()
 
     # working_CrosswalkEmissionInventory_Eco
-    def qryMP00bEco_AddDivalentMercury(self):
+    def qry_00bEco_AddDivalentMercury(self):
         tmp = self.working_CrosswalkEmissionInventory_Eco
         chem_col = "chem name for tier 2 tool"
         tmp = tmp[tmp[chem_col] == "Methyl Mercury (Emitted as Divalent)"]

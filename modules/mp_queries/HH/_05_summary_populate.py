@@ -9,10 +9,10 @@ sheets:
 class SummaryPopulate:
     def __init__(self, HH):
         self.HH = HH
-        self.qryMP07cHH_PopulateSummary()
+        self.qry_07cHH_PopulateSummary()
 
     # working_MP07HH_T1Summary
-    def qryMP07cHH_PopulateSummary(self):
+    def qry_07cHH_PopulateSummary(self):
         self.HH.working_MP07HH_T1Summary = Join().join(
             [self.HH.working_MP07HH_T1Summary, self.HH.working_MP07bHH_GatherSummary],
             on="PB-HAP Grp",

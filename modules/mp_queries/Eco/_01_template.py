@@ -19,12 +19,12 @@ class Template:
         self.eco_crosswalk = eco_crosswalk
         self.latlons = latlons
 
-        self.qryMP04dEco_CreateShellForChemSVs()
-        self.qryMP04eEco_CalcChemSums()
-        self.qryMP04fEco_PopulateChemSVs()
+        self.qry_04dEco_CreateShellForChemSVs()
+        self.qry_04eEco_CalcChemSums()
+        self.qry_04fEco_PopulateChemSVs()
 
     # working_MP04Eco_T1ChemResults
-    def qryMP04dEco_CreateShellForChemSVs(self):
+    def qry_04dEco_CreateShellForChemSVs(self):
         EcoEquivalencyFactors = get_static("static_MP_EcoEquivalencyFactors")
         EcoScreeningThresholds = get_static("static_MP_EcoScreeningThresholds")
 
@@ -72,7 +72,7 @@ class Template:
         self.working_MP04Eco_T1ChemResults = tmp
 
     # working_MPEco_ChemEmissSums
-    def qryMP04eEco_CalcChemSums(self):
+    def qry_04eEco_CalcChemSums(self):
         group_by = ["ICFFacilityID", "chem name for tier 2 tool", "ICFCatLevelModeling"]
 
         tmp = self.eco_crosswalk.loc[
@@ -88,7 +88,7 @@ class Template:
         self.working_MPEco_ChemEmissSums = tmp
 
     # working_MP04Eco_T1ChemResults
-    def qryMP04fEco_PopulateChemSVs(self):
+    def qry_04fEco_PopulateChemSVs(self):
         result = Join().join(
             left=self.working_MP04Eco_T1ChemResults,
             right=self.working_MPEco_ChemEmissSums,

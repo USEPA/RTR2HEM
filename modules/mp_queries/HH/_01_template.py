@@ -18,12 +18,12 @@ class Template:
         self.working_crosswalk = working_crosswalk
         self.latlons = latlons
 
-        self.qryMP04aHH_CreateShellForChemSVs()
-        self.qryMP04bHH_CalcChemSums()
-        self.qryMP04cHH_PopulateChemSVs()
+        self.qry_04aHH_CreateShellForChemSVs()
+        self.qry_04bHH_CalcChemSums()
+        self.qry_04cHH_PopulateChemSVs()
 
     # working_MP04HH_T1ChemResults
-    def qryMP04aHH_CreateShellForChemSVs(self):
+    def qry_04aHH_CreateShellForChemSVs(self):
         HHEquivalencyFactors = get_static(
             "static_MP_PBHAPChems_withHHEquivalencyFactors"
         )
@@ -70,7 +70,7 @@ class Template:
         self.working_MP04HH_T1ChemResults = tmp
 
     # working_MPHH_ChemEmissSums
-    def qryMP04bHH_CalcChemSums(self):
+    def qry_04bHH_CalcChemSums(self):
         group_by = ["ICFFacilityID", "chem name for tier 2 tool", "ICFCatLevelModeling"]
 
         tmp = self.working_crosswalk.loc[
@@ -86,7 +86,7 @@ class Template:
         self.working_MPHH_ChemEmissSums = tmp
 
     # working_MP04HH_T1ChemResults
-    def qryMP04cHH_PopulateChemSVs(self):
+    def qry_04cHH_PopulateChemSVs(self):
         result = pd.merge(
             self.working_MP04HH_T1ChemResults,
             self.working_MPHH_ChemEmissSums,

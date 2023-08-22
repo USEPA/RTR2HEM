@@ -1,4 +1,4 @@
-from modules.mp_queries.shared_queries import qryMP02a_ListPBHAPEmittingFacilities01
+from modules.mp_queries.shared_queries import qry_02a_ListPBHAPEmittingFacilities01
 from modules.utils import Join, get_static, calc_agg
 
 """
@@ -11,11 +11,11 @@ sheets:
 class SummaryGather:
     def __init__(self, HH):
         self.HH = HH
-        self.qryMP07bHH_GatherSummary()
+        self.qry_07bHH_GatherSummary()
 
-    def qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP(self):
+    def qry_02dHH_CountPBHAPEmittingFacilities_ByPBHAP(self):
         group_by = ["shortpb-hap/ecohapname"]
-        pbhap_facilities = qryMP02a_ListPBHAPEmittingFacilities01(self.HH)
+        pbhap_facilities = qry_02a_ListPBHAPEmittingFacilities01(self.HH)
 
         num_pbhap_facilities = calc_agg(
             pbhap_facilities,
@@ -30,21 +30,21 @@ class SummaryGather:
         )
         return num_pbhap_facilities
 
-    def qryMP06aHH_GetMaxSV(self):
+    def qry_06aHH_GetMaxSV(self):
         group_by = ["PB-HAP Grp"]
         max_sv = calc_agg(
             self.HH.working_MP05HH_T1GrpResults, group_by, "max", "SV (grp)", "Max SV"
         )
         return max_sv
 
-    def qryMP06bHH_EmissOfMaxSV(self):
+    def qry_06bHH_EmissOfMaxSV(self):
         group_by = [
             "PB-HAP Grp",
             "Emiss (TPY; grp)",
             "Emiss*REF (TPY; grp)",
             "SV (grp)",
         ]
-        max_sv = self.qryMP06aHH_GetMaxSV()
+        max_sv = self.qry_06aHH_GetMaxSV()
         res = Join().join(
             [self.HH.working_MP05HH_T1GrpResults, max_sv],
             how="inner",
@@ -63,53 +63,53 @@ class SummaryGather:
         )
         return res
 
-    def qryMP06dHH_CountFailingFacilities_PerPBHAP(self):
-        def qryMP06cHH_ListFailingFacilities_PerPBHAP():
+    def qry_06dHH_CountFailingFacilities_PerPBHAP(self):
+        def qry_06cHH_ListFailingFacilities_PerPBHAP():
             group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance?"]
             res = self.HH.working_MP05HH_T1GrpResults[group_by]
             res = res.loc[res["Exceedance?"] == "Yes"]
             return res
 
         group_by = ["PB-HAP Grp"]
-        exceed = qryMP06cHH_ListFailingFacilities_PerPBHAP()
+        exceed = qry_06cHH_ListFailingFacilities_PerPBHAP()
         res = calc_agg(exceed, group_by, "count", "Facility ID", "Num Facil Exceeding")
         return res
 
-    def qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP(self):
-        def qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP():
+    def qry_06fHH_CountFailingFacilitiesx10_PerPBHAP(self):
+        def qry_06eHH_ListFailingFacilitiesx10_PerPBHAP():
             group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x10?"]
             res = self.HH.working_MP05HH_T1GrpResults[group_by]
             res = res.loc[res["Exceedance by x10?"] == "Yes"]
             return res
 
         group_by = ["PB-HAP Grp"]
-        exceed = qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP()
+        exceed = qry_06eHH_ListFailingFacilitiesx10_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x10"
         )
         return res
 
-    def qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP(self):
-        def qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP():
+    def qry_06hHH_CountFailingFacilitiesx100_PerPBHAP(self):
+        def qry_06gHH_ListFailingFacilitiesx100_PerPBHAP():
             group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x100?"]
             res = self.HH.working_MP05HH_T1GrpResults[group_by]
             res = res.loc[res["Exceedance by x100?"] == "Yes"]
             return res
 
         group_by = ["PB-HAP Grp"]
-        exceed = qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP()
+        exceed = qry_06gHH_ListFailingFacilitiesx100_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x100"
         )
         return res
 
     # working_MP07HH_T1Summary, working_MP07bHH_GatherSummary
-    def qryMP07bHH_GatherSummary(self):
-        num_pbhap_facil = self.qryMP02dHH_CountPBHAPEmittingFacilities_ByPBHAP()
-        max_sv_emiss = self.qryMP06bHH_EmissOfMaxSV()
-        count_failing_facil = self.qryMP06dHH_CountFailingFacilities_PerPBHAP()
-        count_failing_facil_10x = self.qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP()
-        count_failing_facil_100x = self.qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP()
+    def qry_07bHH_GatherSummary(self):
+        num_pbhap_facil = self.qry_02dHH_CountPBHAPEmittingFacilities_ByPBHAP()
+        max_sv_emiss = self.qry_06bHH_EmissOfMaxSV()
+        count_failing_facil = self.qry_06dHH_CountFailingFacilities_PerPBHAP()
+        count_failing_facil_10x = self.qry_06fHH_CountFailingFacilitiesx10_PerPBHAP()
+        count_failing_facil_100x = self.qry_06hHH_CountFailingFacilitiesx100_PerPBHAP()
 
         tmp = Join().join(
             [self.HH.working_MP07HH_T1Summary, num_pbhap_facil],

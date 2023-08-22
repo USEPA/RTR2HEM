@@ -9,10 +9,10 @@ sheets:
 class SummaryPopulate:
     def __init__(self, eco):
         self.eco = eco
-        self.qryMP07fEco_PopulateSummary()
+        self.qry_07fEco_PopulateSummary()
 
     # working_MP07Eco_T1Summary
-    def qryMP07fEco_PopulateSummary(self):
+    def qry_07fEco_PopulateSummary(self):
         self.eco.working_MP07Eco_T1Summary = Join().join(
             [
                 self.eco.working_MP07Eco_T1Summary,

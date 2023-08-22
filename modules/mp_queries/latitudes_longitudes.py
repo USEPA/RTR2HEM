@@ -16,14 +16,14 @@ class LatLons:
     def __init__(self, df):
         self.df = df
 
-        self.qryMP03a_SourceLatLons_CatLevel()
-        self.qryMP03aa_LineLatLons01()
-        self.qryMP03aa_LineLatLons02()
+        self.qry_03a_SourceLatLons_CatLevel()
+        self.qry_03aa_LineLatLons01()
+        self.qry_03aa_LineLatLons02()
 
-        self.qryMP03b_Avg_SourceLatLons_CatLevel()
+        self.qry_03b_Avg_SourceLatLons_CatLevel()
 
     # working_MPLatLongs
-    def qryMP03a_SourceLatLons_CatLevel(self):
+    def qry_03a_SourceLatLons_CatLevel(self):
         columns = {
             "ICFFacilityID": "Facility ID",
             "sppd_facility_identifier": "sppd_facility_identifier",
@@ -48,7 +48,7 @@ class LatLons:
 
     # working_MPLatLongsLine
     # TODO -- get working data for this
-    def qryMP03aa_LineLatLons01(self):
+    def qry_03aa_LineLatLons01(self):
         columns = {
             "ICFFacilityID": "Facility ID",
             "sppd_facility_identifier": "sppd_facility_identifier",
@@ -73,7 +73,7 @@ class LatLons:
 
     # working_MPLatLongsLine
     # TODO -- get working data for this
-    def qryMP03aa_LineLatLons02(self):
+    def qry_03aa_LineLatLons02(self):
         columns = {
             "ICFFacilityID": "Facility ID",
             "sppd_facility_identifier": "sppd_facility_identifier",
@@ -101,7 +101,7 @@ class LatLons:
 
     # working_MPLatLongs
     # TODO -- get working data for this
-    def qryMP03ab_AppendLineLatLongs(self):
+    def qry_03ab_AppendLineLatLongs(self):
         group_by = ["Facility ID", "sppd_facility_identifier", "Source ID"]
 
         if not self.working_MPLatLongsLine.empty:
@@ -126,8 +126,8 @@ class LatLons:
             )
 
     # working_MPLatLongs
-    # helper method for qryMP04aHH
-    def qryMP03b_Avg_SourceLatLons_CatLevel(self):
+    # helper method for qry_04aHH
+    def qry_03b_Avg_SourceLatLons_CatLevel(self):
         group_by = ["Facility ID", "sppd_facility_identifier"]
 
         avg_lat = calc_agg(

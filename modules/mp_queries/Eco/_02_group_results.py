@@ -1,4 +1,4 @@
-from modules.mp_queries.shared_queries import qryMP01b_CountSrcCatFacilities
+from modules.mp_queries.shared_queries import qry_01b_CountSrcCatFacilities
 from modules.utils import Join, calc_agg, set_column
 
 """
@@ -28,10 +28,10 @@ class GrpResults:
 
     def __init__(self, eco):
         self.eco = eco
-        self.qryMP05bEco_T1GrpResults()
+        self.qry_05bEco_T1GrpResults()
 
     # working_MP05Eco_T1GrpResults
-    def qryMP05bEco_T1GrpResults(self):
+    def qry_05bEco_T1GrpResults(self):
         group_by = [
             "Src Cat",
             "Num Facil in Src Cat",
@@ -44,7 +44,7 @@ class GrpResults:
             "Date Scrn Thresh Created",
         ]
 
-        num_src_cat_facilities = qryMP01b_CountSrcCatFacilities(self.eco)
+        num_src_cat_facilities = qry_01b_CountSrcCatFacilities(self.eco)
 
         tmp = self.eco.working_MP04Eco_T1ChemResults.copy()
         tmp["Num Facil in Src Cat"] = num_src_cat_facilities
