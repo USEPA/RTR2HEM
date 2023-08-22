@@ -90,6 +90,8 @@ class Join:
             dfs += [kwargs.pop("right")]
 
         dfs = self.handle_empty_df(dfs)
+        if len(dfs) == 1:
+            return dfs[0]
 
         dfs, kwargs = self.setup_tmp_columns(dfs, **kwargs)
         drop_dupe = kwargs.pop("drop_dupe", "right")

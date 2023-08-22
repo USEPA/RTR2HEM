@@ -26,8 +26,10 @@ class MultiPathwayProcessing:
 
         lats_longs = LatLons(self.df)
 
-        # run_HH_module(self.df, lats_longs, self.accdb)
-        run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
+        run_HH_module(self.df, lats_longs, self.accdb)
+        run_Eco_module(
+            self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs, self.accdb
+        )
 
     # working_CrosswalkEmissionInventory_Eco
     def qryMP00aEco_DuplicateCrosswalkInventory(self):

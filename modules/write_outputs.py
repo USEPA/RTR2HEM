@@ -14,7 +14,7 @@ class WriteOuputs:
 
     def __init__(self):
         self.out_fp = os.path.join(
-            "outputs", f"{self.filename_base}_HEMInputsAndXWalks"
+            "outputs", f"{self.filename_base}_HEMInputsAndXWalks_{timestamp}"
         )
         self.create_folder()
 
