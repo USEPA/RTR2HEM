@@ -63,41 +63,41 @@ class SummaryGather:
         )
         return res
 
-    def qryMP06cHH_ListFailingFacilities_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance?"]
-        res = self.HH.working_MP05HH_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance?"] == "Yes"]
-        return res
-
     def qryMP06dHH_CountFailingFacilities_PerPBHAP(self):
+        def qryMP06cHH_ListFailingFacilities_PerPBHAP():
+            group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance?"]
+            res = self.HH.working_MP05HH_T1GrpResults[group_by]
+            res = res.loc[res["Exceedance?"] == "Yes"]
+            return res
+
         group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06cHH_ListFailingFacilities_PerPBHAP()
+        exceed = qryMP06cHH_ListFailingFacilities_PerPBHAP()
         res = calc_agg(exceed, group_by, "count", "Facility ID", "Num Facil Exceeding")
         return res
 
-    def qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x10?"]
-        res = self.HH.working_MP05HH_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance by x10?"] == "Yes"]
-        return res
-
     def qryMP06fHH_CountFailingFacilitiesx10_PerPBHAP(self):
+        def qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP():
+            group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x10?"]
+            res = self.HH.working_MP05HH_T1GrpResults[group_by]
+            res = res.loc[res["Exceedance by x10?"] == "Yes"]
+            return res
+
         group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP()
+        exceed = qryMP06eHH_ListFailingFacilitiesx10_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x10"
         )
         return res
 
-    def qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP(self):
-        group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x100?"]
-        res = self.HH.working_MP05HH_T1GrpResults[group_by]
-        res = res.loc[res["Exceedance by x100?"] == "Yes"]
-        return res
-
     def qryMP06hHH_CountFailingFacilitiesx100_PerPBHAP(self):
+        def qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP():
+            group_by = ["PB-HAP Grp", "Facility ID", "SV (grp)", "Exceedance by x100?"]
+            res = self.HH.working_MP05HH_T1GrpResults[group_by]
+            res = res.loc[res["Exceedance by x100?"] == "Yes"]
+            return res
+
         group_by = ["PB-HAP Grp"]
-        exceed = self.qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP()
+        exceed = qryMP06gHH_ListFailingFacilitiesx100_PerPBHAP()
         res = calc_agg(
             exceed, group_by, "count", "Facility ID", "Num Facil Exceeding by x100"
         )
