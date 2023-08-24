@@ -15,8 +15,6 @@ class SettingsGUI(GUI):
             self.error(e)
 
     def main(self):
-        regCode_button_list = []
-
         gen = self.row_generator()
 
         subroot = LabelFrame(
@@ -50,7 +48,7 @@ class SettingsGUI(GUI):
         src_cat_name_label.grid(row=next(gen), column=0, padx=(0, 0), sticky=W)
 
         src_cat_name_textbox = Entry(subroot, width=50)
-        src_cat_name_textbox.grid(row=self.current_gen, column=1, sticky=W)
+        src_cat_name_textbox.grid(row=self.current_gen, padx=(150, 0), sticky=W)
 
         ##############################################################
         # accdb and table select
@@ -65,30 +63,77 @@ class SettingsGUI(GUI):
             command=lambda: self.import_file(tables_menu, tables_var),
         )
         select_input_file_btn.grid(row=next(gen), sticky=W)
-        tables_menu.grid(row=next(gen), column=0, columnspan=10)
+        tables_menu.grid(row=next(gen), sticky=W, columnspan=10)
+
+        ##############################################################
+        # Import existing
+
+        epg_var = IntVar()
+        import_epg_btn = Checkbutton(
+            subroot,
+            text="Import previously generated emission process group abbreviations",
+            height=1,
+            onvalue=1,
+            offvalue=0,
+            variable=epg_var,
+            # command=lambda: self.select_all(select_all_var, regCode_button_list),
+        )
+        import_epg_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+
+        srcid_var = IntVar()
+        import_srcid_btn = Checkbutton(
+            subroot,
+            text="Import previously generated SourceIDs",
+            height=1,
+            onvalue=1,
+            offvalue=0,
+            variable=srcid_var,
+            # command=lambda: self.select_all(select_all_var, regCode_button_list),
+        )
+        import_srcid_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+
+        ##############################################################
+        # Emissions choice
+
+        emissions_subroot = LabelFrame(
+            subroot,
+            text="Emissions Type",
+            font=16,
+            borderwidth=2,
+            relief="groove",
+        )
+        emissions_subroot.grid(row=next(gen), sticky=W)
+        emiss_var = StringVar(value="Actual")
+
+        actual = Radiobutton(
+            emissions_subroot,
+            text="Actual Emissions",
+            variable=emiss_var,
+            value="Actual",
+        )
+        actual.grid(row=next(gen), sticky=W)
+
+        allowable = Radiobutton(
+            emissions_subroot,
+            text="Allowable Emissions",
+            variable=emiss_var,
+            value="Allowable",
+        )
+        allowable.grid(row=next(gen), sticky=W)
+
+        acute = Radiobutton(
+            emissions_subroot, text="Acute Emissions", variable=emiss_var, value="Acute"
+        )
+        acute.grid(row=next(gen), sticky=W)
 
         ##############################################################
 
-        select_all_var = IntVar()
-        select_all_btn = Checkbutton(
-            subroot,
-            text="Select all",
-            height=2,
-            onvalue=1,
-            offvalue=0,
-            variable=select_all_var,
-            command=lambda: self.select_all(select_all_var, regCode_button_list),
+        run_setup = Button(
+            self.root,
+            text="Run setup",
+            # command=lambda: self.run_setup(option_var, rename_args),
         )
-        select_all_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
-
-        clear_all_btn = Button(
-            subroot,
-            text="Clear all",
-            command=lambda: self.clear_all(select_all_var, regCode_button_list),
-        )
-        clear_all_btn.grid(
-            row=next(gen), column=0, pady=(0, 5), padx=(10, 10), sticky=W
-        )
+        run_setup.grid(row=next(gen), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
         super().main()
 
@@ -124,15 +169,3 @@ class SettingsGUI(GUI):
         for table in tables:
             menu.add_command(label=table, command=lambda name=table: var.set(name))
         var.set(tables[0])
-
-    def clear_all(self, is_checked, regCodes):
-        for regCode in regCodes:
-            regCode.set(0)
-        is_checked.set(0)
-
-    def select_all(self, is_checked, regCode_button_list):
-        for regCode in regCode_button_list:
-            if is_checked.get():
-                regCode.set(1)
-            else:
-                regCode.set(0)
