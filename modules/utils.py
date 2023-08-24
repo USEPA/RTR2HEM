@@ -2,7 +2,7 @@ import os
 import datetime
 import json
 import pandas as pd
-import pypyodbc
+from modules.handle_accdb import AccdbHandle
 
 
 def to_bool(val):
@@ -65,6 +65,9 @@ class Join:
 
         this custom join is case insensitive for both column names
         and cell values
+
+        empty dataframes will have unique columns moved to the first
+        non-empty dataframe with cells initialized to 0
     """
 
     def cross_product(self, df1, df2):
@@ -175,8 +178,7 @@ postprocessing_columns = config["processing_columns"]["post"]
 input_fp = config["inputs"]["input_file"]
 input_table = config["inputs"]["input_table"]
 
-odbc_string = r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + input_fp + ";"
-conn = pypyodbc.connect(odbc_string)
-input_df = pd.read_sql(f"SELECT * FROM [{input_table}]", conn)
+accdb_reader = AccdbHandle(input_fp, how="open")
+input_df = accdb_reader.accdb_to_df(input_table)
 
 static_dir = config["inputs"]["static"]

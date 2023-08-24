@@ -4,7 +4,7 @@ from modules.outputs_writer.emissions_loc import EmissionLoc
 from modules.outputs_writer.fac_address import FacilityAddress
 from modules.outputs_writer.fac_list import FacilityList
 from modules.outputs_writer.hap_emissions import HapEmissions
-from modules.outputs_writer.write_accdb import AccdbWriter
+from modules.handle_accdb import AccdbHandle
 from modules.utils import src_cat_name, timestamp, emission_type, only_category
 
 
@@ -21,7 +21,7 @@ class WriteOuputs:
         accdb_fp = os.path.join(
             self.out_fp, f"{self.filename_base}_XWalks_{timestamp}.accdb"
         )
-        self.accdb = AccdbWriter(accdb_fp)
+        self.accdb = AccdbHandle(accdb_fp)
 
     def create_folder(self):
         if not os.path.exists("outputs"):
