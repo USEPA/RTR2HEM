@@ -1,15 +1,16 @@
-import os, pathlib
 from tkinter import *
-from tkinter import filedialog
-from .generic_GUI import GUI
-
-from modules.handle_accdb import AccdbHandle
+from .generic_GUI import GUI, FileImport
 
 
 class SettingsGUI(GUI):
+    green = "#69c14c"
+    blue = "#00538b"
+    white = "#ffffff"
+
     def __init__(self):
         super().__init__(title="Settings")
         try:
+            self.root.configure(background=self.blue)
             self.main()
         except Exception as e:
             self.error(e)
@@ -17,20 +18,15 @@ class SettingsGUI(GUI):
     def main(self):
         gen = self.row_generator()
 
-        subroot = LabelFrame(
-            self.root,
-            text="Config options\n",
-            font=16,
-            borderwidth=2,
-            relief="groove",
-        )
-
         option_var = StringVar(self.root, "0")
         read_user_opts = Radiobutton(
             self.root,
             text="Run setup from input fields",
             variable=option_var,
             value=0,
+            fg=self.white,
+            selectcolor="black",
+            background=self.blue,
             command=lambda: self.enableChildren(subroot),
         )
         read_config = Radiobutton(
@@ -38,32 +34,48 @@ class SettingsGUI(GUI):
             text="Run setup from config.json",
             variable=option_var,
             value=1,
+            fg=self.white,
+            selectcolor="black",
+            background=self.blue,
             command=lambda: self.disableChildren(subroot),
         )
+
         read_user_opts.grid(row=next(gen), column=0, padx=(12, 0), sticky=W)
-        read_config.grid(row=self.current_gen, column=1, pady=(10), sticky=W)
-        subroot.grid(row=next(gen), column=0, columnspan=10, padx=10)
 
-        src_cat_name_label = Label(subroot, text="Source Catgeory name")
-        src_cat_name_label.grid(row=next(gen), column=0, padx=(0, 0), sticky=W)
+        config_padx_left = self.width(read_user_opts) + 20
+        read_config.grid(
+            row=self.current_gen, column=0, padx=(config_padx_left, 0), sticky=W
+        )
 
-        src_cat_name_textbox = Entry(subroot, width=50)
-        src_cat_name_textbox.grid(row=self.current_gen, padx=(150, 0), sticky=W)
+        ##############################################################
+
+        subroot = LabelFrame(
+            self.root,
+            text="Settings",
+            font=16,
+            borderwidth=2,
+            relief="groove",
+        )
+        subroot.grid(row=next(gen), columnspan=10, padx=10)
+
+        ##############################################################
+
+        src_cat_label = Label(subroot, text="Source Catgeory name")
+        src_cat_label.grid(row=next(gen), column=0, padx=(0, 0), sticky=W)
+
+        src_cat_textbox = Entry(subroot, width=40)
+        src_cat_padx_left = self.width(src_cat_label) + 10
+        src_cat_textbox.grid(
+            row=self.current_gen, padx=(src_cat_padx_left, 0), sticky=W
+        )
 
         ##############################################################
         # accdb and table select
+        import_btn, menu = FileImport(subroot).create()
+        import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
 
-        tables_var = StringVar(subroot)
-        tables_var.set("")  # default value
-        tables_menu = OptionMenu(subroot, tables_var, *[""])
-
-        select_input_file_btn = Button(
-            subroot,
-            text="Import File",
-            command=lambda: self.import_file(tables_menu, tables_var),
-        )
-        select_input_file_btn.grid(row=next(gen), sticky=W)
-        tables_menu.grid(row=next(gen), sticky=W, columnspan=10)
+        menu_padx_left = self.width(import_btn) + 10
+        menu.grid(row=self.current_gen, sticky=EW, padx=(menu_padx_left, 15))
 
         ##############################################################
         # Import existing
@@ -152,20 +164,3 @@ class SettingsGUI(GUI):
                 child.configure(state="normal")
             else:
                 self.enableChildren(child)
-
-    def import_file(self, dropdown, var):
-        menu = dropdown["menu"]
-        menu.delete(0, "end")
-
-        working_dir = os.getcwd()
-        ftypes = [("Microsoft Access Database", "*.accdb"), ("Excel files", ".xlsx")]
-        filepath = filedialog.askopenfilename(initialdir=working_dir, filetypes=ftypes)
-
-        # TODO add handling for an excel file + sheet name as well
-        # if pathlib.Path(filepath).suffix == ".accdb":
-
-        accdb_reader = AccdbHandle(filepath, how="open")
-        tables = accdb_reader.get_tables()
-        for table in tables:
-            menu.add_command(label=table, command=lambda name=table: var.set(name))
-        var.set(tables[0])
