@@ -82,6 +82,7 @@ class FileImport:
     working_dir = os.getcwd()
     ftypes = [("Microsoft Access Database", "*.accdb"), ("Excel files", ".xlsx")]
 
+    filepath = None
     table_var = None
 
     def __init__(self, root, init_list=None):
@@ -89,30 +90,32 @@ class FileImport:
         self.root = root
 
     def create(self, btn_name="Import File"):
-        import_btn = Button(
+        self.import_btn = Button(
             self.root,
             text=btn_name,
             command=lambda: self.import_file(),
         )
+        return self
 
-        return import_btn
-
-    def tables_popup(self, filepath):
-        popup_root= Toplevel(self.root)
-        popup_root.title("Table Select")
+    def tables_popup(self):
+        popup_root = Toplevel(self.root)
+        popup_root.title(f"{self.filename} - Table Select")
 
         tables = []
 
-        if pathlib.Path(filepath).suffix == ".accdb":
-            reader = AccdbHandle(filepath, how="open")
+        if pathlib.Path(self.filepath).suffix == ".accdb":
+            reader = AccdbHandle(self.filepath, how="open")
             tables = reader.get_tables()
-        elif pathlib.Path(filepath).suffix == ".xlsx":
-            reader = pd.ExcelFile(filepath)
+        elif pathlib.Path(self.filepath).suffix == ".xlsx":
+            reader = pd.ExcelFile(self.filepath)
             sheets = reader.book.worksheets
             for sheet in sheets:
                 if sheet.sheet_state == "visible":
                     tables.append(sheet.title)
         else:
+            return
+
+        if not tables:
             return
 
         sbf = ScrollbarFrame(popup_root)
@@ -121,13 +124,18 @@ class FileImport:
 
         self.table_var = StringVar(frame, tables[0])
         for table in tables:
-            Radiobutton(frame, text=table, variable=self.table_var, value=table).grid(sticky=W)
+            Radiobutton(frame, text=table, variable=self.table_var, value=table).grid(
+                sticky=W
+            )
 
     def import_file(self):
         filepath = filedialog.askopenfilename(
             initialdir=self.working_dir, filetypes=self.ftypes
         )
-        self.tables_popup(filepath)
+        if filepath:
+            self.filepath = filepath
+            self.filename = pathlib.Path(filepath).stem
+            self.tables_popup()
 
 
 class GUI(ErrorHandling):

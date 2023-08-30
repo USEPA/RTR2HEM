@@ -6,6 +6,7 @@ class SettingsGUI(GUI):
     green = "#69c14c"
     blue = "#00538b"
     white = "#ffffff"
+    grey = "#d0d0d0"
 
     def __init__(self):
         super().__init__(title="Settings")
@@ -48,11 +49,12 @@ class SettingsGUI(GUI):
         )
 
         ##############################################################
-
+        
         subroot = LabelFrame(
             self.root,
             text="Settings",
             font=16,
+            bg=self.grey,
             borderwidth=2,
             relief="groove",
         )
@@ -60,7 +62,7 @@ class SettingsGUI(GUI):
 
         ##############################################################
 
-        src_cat_label = Label(subroot, text="Source Catgeory name")
+        src_cat_label = Label(subroot, text="Source Catgeory name", bg=self.grey)
         src_cat_label.grid(row=next(gen), column=0, padx=(0, 0), sticky=W)
 
         src_cat_textbox = Entry(subroot, width=40)
@@ -71,11 +73,11 @@ class SettingsGUI(GUI):
 
         ##############################################################
         # accdb and table select
-        import_btn = FileImport(subroot).create()
-        import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
+        import_obj = FileImport(subroot).create()
+        import_obj.import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
 
         ##############################################################
-        # Import existing
+        # Import existing EPGs and Source IDs
         import_subroot = LabelFrame(
             subroot,
             text="Import",
@@ -83,39 +85,20 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        import_subroot.grid(row=next(gen), sticky=W)
+        import_subroot.grid(row=next(gen), pady=(5, 5), sticky=W)
 
-        import_btn = FileImport(import_subroot).create(btn_name="Import previously generated emission process group abbreviations")
-        import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
+        epgs = FileImport(import_subroot).create(
+            btn_name="Import previously generated emission process group abbreviations"
+        )
+        epgs.import_btn.grid(row=next(gen), padx=(5, 5), pady=(5, 5), sticky=W)
 
-        """
-        epg_var = IntVar()
-        import_epg_btn = Checkbutton(
-            subroot,
-            text="Import previously generated emission process group abbreviations",
-            height=1,
-            onvalue=1,
-            offvalue=0,
-            variable=epg_var,
-            # command=lambda: self.select_all(select_all_var, regCode_button_list),
+        srcid = FileImport(import_subroot).create(
+            btn_name="Import previously generated SourceIDs"
         )
-        import_epg_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
-        """
-        srcid_var = IntVar()
-        import_srcid_btn = Checkbutton(
-            subroot,
-            text="Import previously generated SourceIDs",
-            height=1,
-            onvalue=1,
-            offvalue=0,
-            variable=srcid_var,
-            # command=lambda: self.select_all(select_all_var, regCode_button_list),
-        )
-        import_srcid_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+        srcid.import_btn.grid(row=next(gen), padx=(5, 5), pady=(5, 5), sticky=W)
 
         ##############################################################
         # Emissions choice
-
         emissions_subroot = LabelFrame(
             subroot,
             text="Emissions Type",
@@ -143,16 +126,25 @@ class SettingsGUI(GUI):
         allowable.grid(row=next(gen), sticky=W)
 
         acute = Radiobutton(
-            emissions_subroot, text="Acute Emissions", variable=emiss_var, value="Acute"
+            emissions_subroot,
+            text="Acute Emissions",
+            variable=emiss_var,
+            value="Acute",
         )
         acute.grid(row=next(gen), sticky=W)
 
         ##############################################################
-
+        # Submit
         run_setup = Button(
             self.root,
             text="Run setup",
-            # command=lambda: self.run_setup(option_var, rename_args),
+            command=lambda: self.run_setup(
+                src_cat_textbox,
+                import_obj,
+                emiss_var,
+                epgs=epgs,
+                srcids=srcid,
+            ),
         )
         run_setup.grid(row=next(gen), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
@@ -173,3 +165,6 @@ class SettingsGUI(GUI):
                 child.configure(state="normal")
             else:
                 self.enableChildren(child)
+
+    def run_setup(self, src_cat_name, import_table, emiss_var, epgs=None, srcids=None):
+        print(src_cat_name.get())
