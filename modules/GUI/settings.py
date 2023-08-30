@@ -31,7 +31,7 @@ class SettingsGUI(GUI):
         )
         read_config = Radiobutton(
             self.root,
-            text="Run setup from config.json",
+            text="Run setup from config",
             variable=option_var,
             value=1,
             fg=self.white,
@@ -71,15 +71,24 @@ class SettingsGUI(GUI):
 
         ##############################################################
         # accdb and table select
-        import_btn, menu = FileImport(subroot).create()
+        import_btn = FileImport(subroot).create()
         import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
-
-        menu_padx_left = self.width(import_btn) + 10
-        menu.grid(row=self.current_gen, sticky=EW, padx=(menu_padx_left, 15))
 
         ##############################################################
         # Import existing
+        import_subroot = LabelFrame(
+            subroot,
+            text="Import",
+            font=16,
+            borderwidth=3,
+            relief="groove",
+        )
+        import_subroot.grid(row=next(gen), sticky=W)
 
+        import_btn = FileImport(import_subroot).create(btn_name="Import previously generated emission process group abbreviations")
+        import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
+
+        """
         epg_var = IntVar()
         import_epg_btn = Checkbutton(
             subroot,
@@ -91,7 +100,7 @@ class SettingsGUI(GUI):
             # command=lambda: self.select_all(select_all_var, regCode_button_list),
         )
         import_epg_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
-
+        """
         srcid_var = IntVar()
         import_srcid_btn = Checkbutton(
             subroot,
@@ -111,7 +120,7 @@ class SettingsGUI(GUI):
             subroot,
             text="Emissions Type",
             font=16,
-            borderwidth=2,
+            borderwidth=3,
             relief="groove",
         )
         emissions_subroot.grid(row=next(gen), sticky=W)

@@ -10,9 +10,9 @@ class AccdbHandle:
         elif how == "open":
             self.open_accdb()
 
-    def create_accdb(self, fp):
-        msaccessdb.create(fp)
-        self.open_accdb(fp)
+    def create_accdb(self):
+        msaccessdb.create(self.accdb_fp)
+        self.open_accdb()
 
     def open_accdb(self):
         odbc_conn_str = (

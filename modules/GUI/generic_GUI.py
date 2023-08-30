@@ -82,30 +82,25 @@ class FileImport:
     working_dir = os.getcwd()
     ftypes = [("Microsoft Access Database", "*.accdb"), ("Excel files", ".xlsx")]
 
+    table_var = None
+
     def __init__(self, root, init_list=None):
         self.opts = [""] if not init_list else init_list
         self.root = root
 
-    def create(self):
-        tables_var = StringVar(self.root)
-        tables_var.set(self.opts[0])  # default value
-        tables_menu = OptionMenu(self.root, tables_var, *self.opts)
-
+    def create(self, btn_name="Import File"):
         import_btn = Button(
             self.root,
-            text="Import File",
-            command=lambda: self.import_file(tables_menu, tables_var),
+            text=btn_name,
+            command=lambda: self.import_file(),
         )
 
-        return import_btn, tables_menu
+        return import_btn
 
-    def import_file(self, dropdown, var):
-        menu = dropdown["menu"]
-        menu.delete(0, "end")
+    def tables_popup(self, filepath):
+        popup_root= Toplevel(self.root)
+        popup_root.title("Table Select")
 
-        filepath = filedialog.askopenfilename(
-            initialdir=self.working_dir, filetypes=self.ftypes
-        )
         tables = []
 
         if pathlib.Path(filepath).suffix == ".accdb":
@@ -120,9 +115,19 @@ class FileImport:
         else:
             return
 
+        sbf = ScrollbarFrame(popup_root)
+        frame = sbf.scrolled_frame
+        sbf.grid(row=0, column=0, sticky="nsew")
+
+        self.table_var = StringVar(frame, tables[0])
         for table in tables:
-            menu.add_command(label=table, command=lambda name=table: var.set(name))
-        var.set(tables[0])
+            Radiobutton(frame, text=table, variable=self.table_var, value=table).grid(sticky=W)
+
+    def import_file(self):
+        filepath = filedialog.askopenfilename(
+            initialdir=self.working_dir, filetypes=self.ftypes
+        )
+        self.tables_popup(filepath)
 
 
 class GUI(ErrorHandling):
@@ -137,6 +142,7 @@ class GUI(ErrorHandling):
         if dimensions:
             self.root.geometry(dimensions)
 
+        self.root.resizable(False, False)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
