@@ -1,5 +1,6 @@
 from tkinter import *
 from .generic_GUI import GUI, FileImport
+from modules.utils import config
 
 
 class SettingsGUI(GUI):
@@ -109,6 +110,8 @@ class SettingsGUI(GUI):
         emissions_subroot.grid(row=next(gen), sticky=W)
         emiss_var = StringVar(value="Actual")
 
+        emissions_subroot_row = self.current_gen
+
         actual = Radiobutton(
             emissions_subroot,
             text="Actual Emissions",
@@ -134,6 +137,37 @@ class SettingsGUI(GUI):
         acute.grid(row=next(gen), sticky=W)
 
         ##############################################################
+        # Category/Whole Records choice
+        records_subroot = LabelFrame(
+            subroot,
+            text="Records Type",
+            font=16,
+            borderwidth=3,
+            relief="groove",
+        )
+        emiss_subroot_width = self.width(emissions_subroot) + 5
+        records_subroot.grid(
+            row=emissions_subroot_row, padx=(emiss_subroot_width, 5), sticky=W
+        )
+        records_var = StringVar(value="Cat")
+
+        cat_only = Radiobutton(
+            records_subroot,
+            text="File only has category records",
+            variable=records_var,
+            value="Cat",
+        )
+        cat_only.grid(sticky=W)
+
+        cat_whole = Radiobutton(
+            records_subroot,
+            text="File has category and non-category records",
+            variable=records_var,
+            value="CatWhole",
+        )
+        cat_whole.grid(sticky=W)
+
+        ##############################################################
         # Submit
         run_setup = Button(
             self.root,
@@ -142,6 +176,7 @@ class SettingsGUI(GUI):
                 src_cat_textbox,
                 import_obj,
                 emiss_var,
+                records_var,
                 epgs=epgs,
                 srcids=srcid,
             ),
@@ -166,29 +201,39 @@ class SettingsGUI(GUI):
             else:
                 self.enableChildren(child)
 
-    def run_setup(self, src_cat_name, import_table, emiss_var, epgs=None, srcids=None):
-        print(src_cat_name.get())
-        """
-        {
+    def run_setup(
+        self, src_cat_name, import_table, emiss_var, record_var, epgs=None, srcids=None
+    ):
+        if not src_cat_name.get():
+            self.warn(msg="Source Category name must not be empty")
+            return
+
+        if not import_table.filepath:
+            self.warn(msg="No file selected to import")
+            return
+
+        settings_json = {
             "settings": {
-                "source_category_name": "Refractories",
-                "only_category_records": false,
-                "emission_type": "Actual emissions",
+                "source_category_name": src_cat_name.get(),
+                "only_category_records": True if record_var.get() == "Cat" else False,
+                "emission_type": emiss_var.get(),
                 "emission_abbr": {
-                    "import": false,
-                    "file": "",
-                    "table": ""
+                    "import": True if epgs.filepath else False,
+                    "file": epgs.filepath,
+                    "table": epgs.table_var.get() if epgs.table_var else None,
                 },
                 "src_ids": {
-                    "import": false,
-                    "file": "",
-                    "table": ""
+                    "import": True if srcids.filepath else False,
+                    "file": srcids.filepath,
+                    "table": srcids.table_var.get() if srcids.table_var else None,
                 },
-                "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
-                "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
-                "static": "./static"
-            },
-            "processing_columns": {
+                "input_file": import_table.filepath,
+                "input_table": import_table.table_var.get(),
+                "static": "./static",
+            }
+        }
+        """
+             "processing_columns": {
                 "pre": {
                     "emission_process_group": "",
                     "regulatory_code": "",
@@ -205,5 +250,5 @@ class SettingsGUI(GUI):
                     "metal_speciation_factor": ""
                 }
             }
-        }
         """
+        config.load_config(settings_json)

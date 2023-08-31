@@ -5,7 +5,6 @@ from modules.GUI.settings import SettingsGUI
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
-from modules.write_outputs import WriteOuputs
 from modules.utils import get_col, config
 
 """
@@ -28,6 +27,8 @@ reg code 63SSSSS
 dont forget that the results get loaded into pre-existing templates
 """
 SettingsGUI()
+
+from modules.write_outputs import WriteOuputs
 
 output_handler = WriteOuputs()
 

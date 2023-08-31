@@ -167,15 +167,17 @@ class Config:
     Read in config settings, either by a .json input file or settings GUI
     """
 
-    def __init__(self, config_fp=".\config.json", config_obj=None):
-        if not config_obj:
-            self.load_config(config_fp)
-        else:
-            self.config = config_obj
+    def __init__(self):
+        pass
 
-    def load_config(self, fp=".\config.json"):
-        with open(fp) as fh:
-            self.config = json.load(fh)
+    def load_config(self, fp=".\config.json", obj=None):
+        if not obj:
+            with open(fp) as fh:
+                self.config = json.load(fh)
+        else:
+            self.config = obj
+        self.get_settings()
+        self.get_tables()
 
     def get_settings(self):
         settings = self.config["settings"]
@@ -198,6 +200,5 @@ class Config:
 
         self.static_dir = self.config["settings"]["static"]
         return self
-
 
 config = Config()
