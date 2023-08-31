@@ -49,7 +49,7 @@ class SettingsGUI(GUI):
         )
 
         ##############################################################
-        
+
         subroot = LabelFrame(
             self.root,
             text="Settings",

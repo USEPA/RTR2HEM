@@ -4,7 +4,7 @@ from modules.mp_queries.HH._03_summary_setup import SummarySetup
 from modules.mp_queries.HH._04_summary_gather import SummaryGather
 from modules.mp_queries.HH._05_summary_populate import SummaryPopulate
 
-from modules.utils import src_cat_name, emission_type
+from modules.utils import config
 
 
 def run_HH_module(working_crosswalk, latlons, accdb):
@@ -14,7 +14,7 @@ def run_HH_module(working_crosswalk, latlons, accdb):
     SummaryGather(HH_obj)
     SummaryPopulate(HH_obj)
 
-    src_cat_str = f"{src_cat_name}_{emission_type}"
+    src_cat_str = f"{config.src_cat_name}_{config.emission_type}"
     HH_obj.working_MP04HH_T1ChemResults["Src Cat"] = src_cat_str
     HH_obj.working_MP05HH_T1GrpResults["Src Cat"] = src_cat_str
     HH_obj.working_MP07HH_T1Summary["Src Cat"] = src_cat_str

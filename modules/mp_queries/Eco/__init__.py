@@ -4,7 +4,7 @@ from modules.mp_queries.Eco._03_summary_setup import SummarySetup
 from modules.mp_queries.Eco._04_summary_gather import SummaryGather
 from modules.mp_queries.Eco._05_summary_populate import SummaryPopulate
 
-from modules.utils import src_cat_name, emission_type
+from modules.utils import config
 
 
 def run_Eco_module(working_crosswalk, working_eco_crosswalk, latlons, accdb):
@@ -14,7 +14,7 @@ def run_Eco_module(working_crosswalk, working_eco_crosswalk, latlons, accdb):
     SummaryGather(Eco_obj)
     SummaryPopulate(Eco_obj)
 
-    src_cat_str = f"{src_cat_name}_{emission_type}"
+    src_cat_str = f"{config.src_cat_name}_{config.emission_type}"
     Eco_obj.working_MP04Eco_T1ChemResults["Src Cat"] = src_cat_str
     Eco_obj.working_MP05Eco_T1GrpResults["Src Cat"] = src_cat_str
     Eco_obj.working_MP07Eco_T1Summary["Src Cat"] = src_cat_str

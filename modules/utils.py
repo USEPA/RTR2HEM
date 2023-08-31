@@ -161,24 +161,44 @@ class Join:
 
 ################################
 
-with open(".\config.json") as fh:
-    config = json.load(fh)
 
-settings = config["settings"]
-timestamp = str(datetime.datetime.now().strftime("%Y%m%d"))
-src_cat_name = settings["source_category_name"]
-emission_type = settings["emission_type"]
-only_category = settings["only_category_records"]
+class Config:
+    """
+    Read in config settings, either by a .json input file or settings GUI
+    """
 
-columns_map = config["processing_columns"]["pre"]
-columns_map = {k.lower(): v for k, v in columns_map.items()}
-postprocessing_columns = config["processing_columns"]["post"]
+    def __init__(self, config_fp=".\config.json", config_obj=None):
+        if not config_obj:
+            self.load_config(config_fp)
+        else:
+            self.config = config_obj
 
-# fetch input access table
-input_fp = config["inputs"]["input_file"]
-input_table = config["inputs"]["input_table"]
+    def load_config(self, fp=".\config.json"):
+        with open(fp) as fh:
+            self.config = json.load(fh)
 
-accdb_reader = AccdbHandle(input_fp, how="open")
-input_df = accdb_reader.accdb_to_df(input_table)
+    def get_settings(self):
+        settings = self.config["settings"]
+        self.timestamp = str(datetime.datetime.now().strftime("%Y%m%d"))
+        self.src_cat_name = settings["source_category_name"]
+        self.emission_type = settings["emission_type"]
+        self.only_category = settings["only_category_records"]
 
-static_dir = config["inputs"]["static"]
+        columns_map = self.config["processing_columns"]["pre"]
+        self.columns_map = {k.lower(): v for k, v in columns_map.items()}
+        self.postprocessing_columns = self.config["processing_columns"]["post"]
+        return self
+
+    def get_tables(self):
+        """fetch input access table"""
+        self.input_fp = self.config["inputs"]["input_file"]
+        self.input_table = self.config["inputs"]["input_table"]
+
+        accdb_reader = AccdbHandle(self.input_fp, how="open")
+        self.input_df = accdb_reader.accdb_to_df(self.input_table)
+
+        self.static_dir = self.config["inputs"]["static"]
+        return self
+
+
+config = Config()

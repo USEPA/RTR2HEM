@@ -1,11 +1,5 @@
 import pandas as pd
-from .utils import (
-    set_column,
-    get_static,
-    get_col,
-    emission_type,
-    postprocessing_columns,
-)
+from .utils import set_column, get_static, get_col, config
 
 
 class InitialProcessing:
@@ -63,7 +57,7 @@ class InitialProcessing:
 
     def drop_unneeded_columns(self):
         """Drops any columns not in configs/processing_columns/post section"""
-        lower_preprocessed = [w.lower() for w in postprocessing_columns]
+        lower_preprocessed = [w.lower() for w in config.postprocessing_columns]
         for c in self.df.columns:
             if c.lower() not in lower_preprocessed:
                 self.df = self.df.drop(c, axis=1)
@@ -107,7 +101,9 @@ class InitialProcessing:
 
     def set_selected_emission_type(self, row):
         try:
-            emissions_df = self.df.filter(regex=emission_type.lower().replace(" ", "_"))
+            emissions_df = self.df.filter(
+                regex=config.emission_type.lower().replace(" ", "_")
+            )
             emissions_col = emissions_df.columns[0]
             return row[emissions_col]
         except:

@@ -6,7 +6,7 @@ from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
 from modules.write_outputs import WriteOuputs
-from modules.utils import get_col, input_df, columns_map
+from modules.utils import get_col, config
 
 """
 Demo refactories data settings
@@ -32,16 +32,16 @@ SettingsGUI()
 output_handler = WriteOuputs()
 
 
-for name in columns_map:
-    if columns_map[name]:
-        print(f"Column {name} is set with override {columns_map[name]}")
+for name in config.columns_map:
+    if config.columns_map[name]:
+        print(f"Column {name} is set with override {config.columns_map[name]}")
 
 # preprocessing
-for column in input_df.columns:
+for column in config.input_df.columns:
     if column != get_col("regulatory_code") and column != get_col(
         "emission_process_group"
     ):
-        input_df[column].fillna(0, inplace=True)
+        config.input_df[column].fillna(0, inplace=True)
 
 
 """
@@ -54,7 +54,7 @@ uses:
 
 TODO - add import option
 """
-epgs = get_col("emission_process_group", input_df)
+epgs = get_col("emission_process_group", config.input_df)
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
 # epgs = EpgGUI(epgs).get_response()
@@ -68,7 +68,7 @@ uses:
     module “03 Initial Processing” 
     form "Form_frmRegSelections"
 """
-reg_codes = get_col("regulatory_code", input_df)
+reg_codes = get_col("regulatory_code", config.input_df)
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
 # reg_codes = RegCodesGUI(reg_codes).get_response()
@@ -88,7 +88,7 @@ reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
 #########################
 
 
-processed_df = InitialProcessing(input_df, epgs, reg_codes).run()
+processed_df = InitialProcessing(config.input_df, epgs, reg_codes).run()
 
 # 7d
 processed_df = SourceIDs(processed_df).run()
