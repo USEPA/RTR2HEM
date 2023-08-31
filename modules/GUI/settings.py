@@ -20,11 +20,11 @@ class SettingsGUI(GUI):
     def main(self):
         gen = self.row_generator()
 
-        option_var = StringVar(self.root, "0")
+        self.option_var = StringVar(self.root, "0")
         read_user_opts = Radiobutton(
             self.root,
             text="Run setup from input fields",
-            variable=option_var,
+            variable=self.option_var,
             value=0,
             fg=self.white,
             selectcolor="black",
@@ -34,7 +34,7 @@ class SettingsGUI(GUI):
         read_config = Radiobutton(
             self.root,
             text="Run setup from config",
-            variable=option_var,
+            variable=self.option_var,
             value=1,
             fg=self.white,
             selectcolor="black",
@@ -204,6 +204,12 @@ class SettingsGUI(GUI):
     def run_setup(
         self, src_cat_name, import_table, emiss_var, record_var, epgs=None, srcids=None
     ):
+        # load from file
+        if self.option_var.get() == "1":
+            config.load_config()
+            self.close_window()
+            return
+
         if not src_cat_name.get():
             self.warn(msg="Source Category name must not be empty")
             return
@@ -251,4 +257,5 @@ class SettingsGUI(GUI):
                 }
             }
         """
-        config.load_config(settings_json)
+        config.load_config(obj=settings_json)
+        self.close_window()

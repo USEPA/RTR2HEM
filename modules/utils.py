@@ -201,4 +201,5 @@ class Config:
         self.static_dir = self.config["settings"]["static"]
         return self
 
+
 config = Config()
