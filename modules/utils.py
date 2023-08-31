@@ -10,7 +10,7 @@ def to_bool(val):
 
 
 def get_static(filename):
-    static_fp = os.path.join(static_dir, f"{filename}.xlsx")
+    static_fp = os.path.join(config.static_dir, f"{filename}.xlsx")
     df = pd.read_excel(static_fp, "static")
     df.columns = df.columns.str.lower()
     return df.fillna("")
@@ -22,7 +22,7 @@ def set_column(df, column_name, func):
 
 def get_col(name, df=None):
     """Gets mapped column name and attempts case insensitive lookup"""
-    response = columns_map.get(name.lower(), None)
+    response = config.columns_map.get(name.lower(), None)
     if response == None:
         raise KeyError(f"{name} could not be found in mapping")
     elif response == "":
@@ -186,18 +186,17 @@ class Config:
 
         columns_map = self.config["processing_columns"]["pre"]
         self.columns_map = {k.lower(): v for k, v in columns_map.items()}
-        self.postprocessing_columns = self.config["processing_columns"]["post"]
         return self
 
     def get_tables(self):
         """fetch input access table"""
-        self.input_fp = self.config["inputs"]["input_file"]
-        self.input_table = self.config["inputs"]["input_table"]
+        self.input_fp = self.config["settings"]["input_file"]
+        self.input_table = self.config["settings"]["input_table"]
 
         accdb_reader = AccdbHandle(self.input_fp, how="open")
         self.input_df = accdb_reader.accdb_to_df(self.input_table)
 
-        self.static_dir = self.config["inputs"]["static"]
+        self.static_dir = self.config["settings"]["static"]
         return self
 
 

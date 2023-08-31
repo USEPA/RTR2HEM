@@ -6,6 +6,51 @@ class InitialProcessing:
     ft_per_meter = 3.2808399
     fahrenheit_to_kelvin = lambda self, f_temp: ((f_temp - 32) * 0.5555) + 273.15
 
+    columns = [
+        "ICFFacilityID",
+        "sppd_facility_identifier",
+        "ICFSourceID",
+        "ICFSourceType",
+        "pollutant_code",
+        "pollutant_description",
+        "hap_category_name",
+        "emissions_tpy",
+        "ICFModelEmissionTPY",
+        "hem3_chemical_name",
+        "chem name for tier 2 tool",
+        "regulatory_code",
+        "ICFCatLevelModeling",
+        "emission_process_group",
+        "ICFEmissionProcessGroupAbbr",
+        "emission_unit_id",
+        "process_id",
+        "emission_release_point_id",
+        "emission_release_point_type",
+        "scc",
+        "naics_primary",
+        "y_coordinate",
+        "x_coordinate",
+        "fugitive_2d_midpoint1_x_coordinate",
+        "fugitive_2d_midpoint1_y_coordinate",
+        "fugitive_2d_midpoint2_x_coordinate",
+        "fugitive_2d_midpoint2_y_coordinate",
+        "ICFAreaVolLineReleaseHeight_m",
+        "ICFStackHeight_m",
+        "ICFExitGasTemperature_K",
+        "ICFStackDiameter_m",
+        "ICFExitGasVelocity_mps",
+        "ICFFugitiveLength_m",
+        "ICFFugitiveWidth_m",
+        "fugitive_angle_degrees",
+        "ICFMetal_Speciation_Factor",
+        "facility_name",
+        "location_address",
+        "city",
+        "county_name",
+        "state_abbr",
+        "zipcode",
+    ]
+
     def __init__(self, df, epgs, reg_codes=None):
         self.df = df
         self.epg_abbr_map = epgs
@@ -14,6 +59,7 @@ class InitialProcessing:
     def run(self):
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
 
+        self.df["ICFSourceID"] = ""
         set_column(self.df, "ICFFacilityID", self.set_icf_facility_id)
         set_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code)
         set_column(self.df, "emissions_tpy", self.set_selected_emission_type)
@@ -36,7 +82,7 @@ class InitialProcessing:
         set_column(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m)
 
         self.update_by_emission_release_point_type()
-        self.drop_unneeded_columns()
+        self.df = self.df[self.columns]
         self.df = self.df.fillna("")
         return self.df
 
@@ -54,13 +100,6 @@ class InitialProcessing:
             how="inner",
             suffixes=("", "_y"),
         )
-
-    def drop_unneeded_columns(self):
-        """Drops any columns not in configs/processing_columns/post section"""
-        lower_preprocessed = [w.lower() for w in config.postprocessing_columns]
-        for c in self.df.columns:
-            if c.lower() not in lower_preprocessed:
-                self.df = self.df.drop(c, axis=1)
 
     def update_by_emission_release_point_type(self):
         """Some columns should be empty based on emission release point type"""

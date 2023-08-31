@@ -61,14 +61,14 @@ class SettingsGUI(GUI):
         subroot.grid(row=next(gen), columnspan=10, padx=10)
 
         ##############################################################
-
+        # Source Category (output files) name
         src_cat_label = Label(subroot, text="Source Catgeory name", bg=self.grey)
         src_cat_label.grid(row=next(gen), column=0, padx=(0, 0), sticky=W)
 
         src_cat_textbox = Entry(subroot, width=40)
         src_cat_padx_left = self.width(src_cat_label) + 10
         src_cat_textbox.grid(
-            row=self.current_gen, padx=(src_cat_padx_left, 0), sticky=W
+            row=self.current_gen, padx=(src_cat_padx_left, 5), sticky=W
         )
 
         ##############################################################
@@ -168,3 +168,42 @@ class SettingsGUI(GUI):
 
     def run_setup(self, src_cat_name, import_table, emiss_var, epgs=None, srcids=None):
         print(src_cat_name.get())
+        """
+        {
+            "settings": {
+                "source_category_name": "Refractories",
+                "only_category_records": false,
+                "emission_type": "Actual emissions",
+                "emission_abbr": {
+                    "import": false,
+                    "file": "",
+                    "table": ""
+                },
+                "src_ids": {
+                    "import": false,
+                    "file": "",
+                    "table": ""
+                },
+                "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
+                "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
+                "static": "./static"
+            },
+            "processing_columns": {
+                "pre": {
+                    "emission_process_group": "",
+                    "regulatory_code": "",
+                    "state_county_fips": "",
+                    "sppd_facility_identifier": "",
+                    "fugitive_angle_degrees": "",
+                    "fugitive_length_sigmax_ft": "",
+                    "fugitive_width_sigmay_ft": "",
+                    "emission_release_point_type": "",
+                    "stack_height (ft)": "",
+                    "stack_diameter (ft)": "",
+                    "exit_gas_temperature (f)": "",
+                    "exit_gas_velocity (ft/sec)": "",
+                    "metal_speciation_factor": ""
+                }
+            }
+        }
+        """

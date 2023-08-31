@@ -76,7 +76,7 @@ class FileImport:
     """
     Creates two widgets:
         1. Import file option
-        2. Dropdown menu that dynamically updates with the tables in the imported file
+        2. Popup menu that dynamically updates with the tables in the imported file
     """
 
     working_dir = os.getcwd()
