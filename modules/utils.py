@@ -167,6 +167,21 @@ class Config:
     Read in config settings, either by a .json input file or settings GUI
     """
 
+    columns_map = {
+        "emission_process_group": "",
+        "regulatory_code": "",
+        "state_county_fips": "",
+        "sppd_facility_identifier": "",
+        "fugitive_angle_degrees": "",
+        "fugitive_length_sigmax_ft": "",
+        "fugitive_width_sigmay_ft": "",
+        "emission_release_point_type": "",
+        "stack_height (ft)": "",
+        "stack_diameter (ft)": "",
+        "exit_gas_temperature (f)": "",
+        "exit_gas_velocity (ft/sec)": "",
+    }
+
     def __init__(self):
         pass
 
@@ -185,9 +200,6 @@ class Config:
         self.src_cat_name = settings["source_category_name"]
         self.emission_type = settings["emission_type"]
         self.only_category = settings["only_category_records"]
-
-        columns_map = self.config["processing_columns"]["pre"]
-        self.columns_map = {k.lower(): v for k, v in columns_map.items()}
         return self
 
     def get_tables(self):

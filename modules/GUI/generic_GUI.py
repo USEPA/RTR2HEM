@@ -54,10 +54,13 @@ class ScrollbarFrame(Frame):
         # The Frame to be scrolled, layout into the canvas
         # All widgets to be scrolled have to use this Frame as parent
         self.scrolled_frame = Frame(self.canvas, background=self.canvas.cget("bg"))
-        self.canvas.create_window((4, 4), window=self.scrolled_frame, anchor="nw")
+        self.frame_id = self.canvas.create_window(
+            (4, 4), window=self.scrolled_frame, anchor="nw"
+        )
 
         # Configures the scrollregion of the Canvas dynamically
-        self.scrolled_frame.bind("<Configure>", self.on_configure)
+        self.canvas.bind("<Configure>", self.on_canvas_configure)
+        self.scrolled_frame.bind("<Configure>", self.on_frame_configure)
 
         # Mousewheel scroll
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
@@ -67,7 +70,10 @@ class ScrollbarFrame(Frame):
             return
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    def on_configure(self, event):
+    def on_canvas_configure(self, event):
+        self.canvas.itemconfig(self.frame_id, width=event.width)
+
+    def on_frame_configure(self, event):
         """Set the scroll region to encompass the scrolled frame"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 

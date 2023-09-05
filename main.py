@@ -2,6 +2,7 @@ import numpy as np
 from modules.GUI.epg_popup import EpgGUI
 from modules.GUI.regCodes_popup import RegCodesGUI
 from modules.GUI.settings import SettingsGUI
+from modules.GUI.column_map import ColumnMapGUI
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
@@ -26,7 +27,9 @@ reg code 63SSSSS
 
 dont forget that the results get loaded into pre-existing templates
 """
-SettingsGUI()
+# SettingsGUI()
+config.load_config()
+ColumnMapGUI()
 
 from modules.write_outputs import WriteOuputs
 
