@@ -10,25 +10,26 @@ from modules.utils import config
 
 class WriteOuputs:
     templates_fp = "templates"
-    filename_base = f"{config.src_cat_name}_{config.emission_type.split(' ')[0]}"
 
     def __init__(self):
-        self.out_fp = os.path.join(
-            "outputs", f"{self.filename_base}_HEMInputsAndXWalks_{config.timestamp}"
+        self.basename = f"{config.src_cat_name}_{config.emission_type.split(' ')[0]}"
+
+        self.output_dir = os.path.join(
+            "outputs", f"{self.basename}_HEMInputsAndXWalks_{config.timestamp}"
         )
         self.create_folder()
 
         accdb_fp = os.path.join(
-            self.out_fp, f"{self.filename_base}_XWalks_{config.timestamp}.accdb"
+            self.output_dir, f"{self.basename}_XWalks_{config.timestamp}.accdb"
         )
         self.accdb = AccdbHandle(accdb_fp)
 
     def create_folder(self):
         if not os.path.exists("outputs"):
             os.mkdir("outputs")
-        if os.path.exists(self.out_fp):
-            shutil.rmtree(self.out_fp)
-        os.mkdir(self.out_fp)
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
+        os.mkdir(self.output_dir)
 
     def run(self, df):
         self.df = df
@@ -46,8 +47,8 @@ class WriteOuputs:
 
     def write_to_template(self, result):
         template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
-        filename = f"{self.filename_base}_{result.filename}_Cat_{config.timestamp}"
-        out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
+        filename = f"{self.basename}_{result.filename}_Cat_{config.timestamp}"
+        out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
 
         # Write category records
         shutil.copyfile(template_src, out_dst)
@@ -57,10 +58,8 @@ class WriteOuputs:
 
         # Write whole records
         if not config.only_category:
-            filename = (
-                f"{self.filename_base}_{result.filename}_Whole_{config.timestamp}"
-            )
-            out_dst = os.path.join(self.out_fp, f"{filename}.xlsx")
+            filename = f"{self.basename}_{result.filename}_Whole_{config.timestamp}"
+            out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
 
             shutil.copyfile(template_src, out_dst)
             self.write_excel_sheet(

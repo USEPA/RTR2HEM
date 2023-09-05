@@ -63,7 +63,7 @@ class ScrollbarFrame(Frame):
         self.scrolled_frame.bind("<Configure>", self.on_frame_configure)
 
         # Mousewheel scroll
-        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        self.scrolled_frame.bind("<MouseWheel>", self._on_mousewheel)
 
     def _on_mousewheel(self, event):
         if self.vsb.get() == (0, 1):  # disabled

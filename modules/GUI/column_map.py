@@ -35,6 +35,17 @@ class ColumnMapGUI(GUI):
 
         ##################################################
 
+        local_label = Label(self.root, text="Local Field Name")
+        local_label.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+
+        import_spacing = self.width(local_label) + 160
+        import_label = Label(self.root, text="Imported Field Name")
+        import_label.grid(
+            row=self.current_gen, column=0, padx=(import_spacing, 10), sticky=W
+        )
+
+        ##################################################
+
         sbf = self.scrollbar(self.root)
         frame = sbf.scrolled_frame
         sbf.grid(row=next(gen), column=0, sticky="nsew")
@@ -56,6 +67,7 @@ class ColumnMapGUI(GUI):
             ##################################################
 
             menu = Combobox(frame, values=input_columns, width=30, state="readonly")
+            menu.bind("<MouseWheel>", self._on_mousewheel)
             menu.current(0)
             menu.grid(
                 row=self.current_gen,
@@ -74,8 +86,15 @@ class ColumnMapGUI(GUI):
         sbf.canvas.config(width=470)
         super().main()
 
+    def _on_mousewheel(self, event):
+        return "break"
+
     def submit(self, columns_to_map):
         for i, key in enumerate(config.columns_map):
-            config.columns_map[key] = columns_to_map[i].get()
+            renamed_col = columns_to_map[i].get()
+            if not renamed_col:
+                self.warn(msg="Field name could not be found and must be selected.")
+                return
+            config.columns_map[key] = renamed_col
 
-        print(config.columns_map)
+        self.close_window()

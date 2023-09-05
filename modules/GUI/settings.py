@@ -236,7 +236,21 @@ class SettingsGUI(GUI):
                 "input_file": import_table.filepath,
                 "input_table": import_table.table_var.get(),
                 "static": "./static",
-            }
+            },
+            "columns_map": {
+                "emission_process_group": "",
+                "regulatory_code": "",
+                "state_county_fips": "",
+                "sppd_facility_identifier": "",
+                "fugitive_angle_degrees": "",
+                "fugitive_length_sigmax_ft": "",
+                "fugitive_width_sigmay_ft": "",
+                "emission_release_point_type": "",
+                "stack_height (ft)": "",
+                "stack_diameter (ft)": "",
+                "exit_gas_temperature (f)": "",
+                "exit_gas_velocity (ft/sec)": "",
+            },
         }
 
         config.load_config(obj=settings_json)

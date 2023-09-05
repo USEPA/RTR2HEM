@@ -151,9 +151,7 @@ class InitialProcessing:
             )
 
     def set_model_emission_tpy(self, row):
-        return float(row["emissions_tpy"]) * float(
-            get_col("metal_speciation_factor", row)
-        )
+        return float(row["emissions_tpy"]) * float(row["metal_speciation_factor"])
 
     def set_epg_abbreviations(self, row):
         emissions_group = get_col("emission_process_group", row)
@@ -189,7 +187,7 @@ class InitialProcessing:
             return ""
 
     def set_metal_speciation_factor(self, row):
-        return get_col("metal_speciation_factor", row)
+        return row["metal_speciation_factor"]
 
     # unit conversions
     def stack_height_meter(self, row):

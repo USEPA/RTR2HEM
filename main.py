@@ -1,12 +1,14 @@
 import numpy as np
+from modules.initial_processing import InitialProcessing
+from modules.source_ids import SourceIDs
+from modules.multipathway_processing import MultiPathwayProcessing
+from modules.write_outputs import WriteOuputs
+from modules.utils import get_col, config
+
 from modules.GUI.epg_popup import EpgGUI
 from modules.GUI.regCodes_popup import RegCodesGUI
 from modules.GUI.settings import SettingsGUI
 from modules.GUI.column_map import ColumnMapGUI
-from modules.initial_processing import InitialProcessing
-from modules.source_ids import SourceIDs
-from modules.multipathway_processing import MultiPathwayProcessing
-from modules.utils import get_col, config
 
 """
 Demo refactories data settings
@@ -27,18 +29,10 @@ reg code 63SSSSS
 
 dont forget that the results get loaded into pre-existing templates
 """
-# SettingsGUI()
-config.load_config()
+SettingsGUI()
 ColumnMapGUI()
 
-from modules.write_outputs import WriteOuputs
-
 output_handler = WriteOuputs()
-
-
-for name in config.columns_map:
-    if config.columns_map[name]:
-        print(f"Column {name} is set with override {config.columns_map[name]}")
 
 # preprocessing
 for column in config.input_df.columns:
