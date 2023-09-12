@@ -88,45 +88,68 @@ class FileImport:
     working_dir = os.getcwd()
     ftypes = [("Microsoft Access Database", "*.accdb"), ("Excel files", ".xlsx")]
 
-    filepath = None
+    filepath = ""
     table_var = None
 
-    def __init__(self, root, init_list=None):
-        self.opts = [""] if not init_list else init_list
+    def __init__(self, root, row):
         self.root = root
+        self.row = row
 
     def create(self, btn_name="Import File"):
+        current_row = next(self.row)
+
         self.import_btn = Button(
             self.root,
             text=btn_name,
             command=lambda: self.import_file(),
         )
+        self.import_btn.grid(row=current_row, padx=(5, 0), pady=(5, 0), sticky=W)
+        spacing = GUI.width(self, self.import_btn) + 10
+
+        # filepath
+        self.file_lbl = Label(
+            self.root, text="", bg="#ffffff", borderwidth=1, relief=GROOVE, width=42
+        )
+        self.file_lbl.grid(row=current_row, padx=(spacing, 0), sticky=W)
+
+        # filename
+        self.table_lbl = Label(
+            self.root, text="", bg="#ffffff", borderwidth=1, relief=GROOVE, width=42
+        )
+        self.table_lbl.grid(
+            row=next(self.row), padx=(spacing, 5), pady=(0, 5), sticky=W
+        )
         return self
 
-    def tables_popup(self):
+    def toplevel_btns(self, toplevel, type="OK"):
+        """Close window, update filepath/name labels"""
+        tbl_name = self.table_var.get()
+        if type == "Cancel":
+            self.filepath = ""
+            self.filename = ""
+            tbl_name = ""
+        self.file_lbl.config(text=self.filename)
+        self.table_lbl.config(text=tbl_name)
+        toplevel.destroy()
+
+    def tables_popup(self, tables):
         popup_root = Toplevel(self.root)
         popup_root.title(f"{self.filename} - Table Select")
 
-        tables = []
-
-        if pathlib.Path(self.filepath).suffix == ".accdb":
-            reader = AccdbHandle(self.filepath, how="open")
-            tables = reader.get_tables()
-        elif pathlib.Path(self.filepath).suffix == ".xlsx":
-            reader = pd.ExcelFile(self.filepath)
-            sheets = reader.book.worksheets
-            for sheet in sheets:
-                if sheet.sheet_state == "visible":
-                    tables.append(sheet.title)
-        else:
-            return
-
-        if not tables:
-            return
+        ok_btn = Button(
+            popup_root, text="OK", command=lambda: self.toplevel_btns(popup_root)
+        )
+        ok_btn.grid(sticky=W, row=0, padx=(5, 5), pady=(5, 1))
+        cancel_btn = Button(
+            popup_root,
+            text="Cancel",
+            command=lambda: self.toplevel_btns(popup_root, type="Cancel"),
+        )
+        cancel_btn.grid(sticky=W, row=0, padx=(40, 5), pady=(5, 1))
 
         sbf = ScrollbarFrame(popup_root)
         frame = sbf.scrolled_frame
-        sbf.grid(row=0, column=0, sticky="nsew")
+        sbf.grid(row=1, column=0, sticky="nsew")
 
         self.table_var = StringVar(frame, tables[0])
         for table in tables:
@@ -141,7 +164,22 @@ class FileImport:
         if filepath:
             self.filepath = filepath
             self.filename = pathlib.Path(filepath).stem
-            self.tables_popup()
+            tables = []
+
+            if pathlib.Path(self.filepath).suffix == ".accdb":
+                reader = AccdbHandle(self.filepath, how="open")
+                tables = reader.get_tables()
+            elif pathlib.Path(self.filepath).suffix == ".xlsx":
+                reader = pd.ExcelFile(self.filepath)
+                sheets = reader.book.worksheets
+                for sheet in sheets:
+                    if sheet.sheet_state == "visible":
+                        tables.append(sheet.title)
+            else:
+                return
+            if not tables:
+                return
+            self.tables_popup(tables)
 
 
 class GUI(ErrorHandling):

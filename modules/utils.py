@@ -1,4 +1,4 @@
-import os
+import os, pathlib
 import datetime
 import json
 import pandas as pd
@@ -194,8 +194,11 @@ class Config:
         self.input_fp = self.config["settings"]["input_file"]
         self.input_table = self.config["settings"]["input_table"]
 
-        accdb_reader = AccdbHandle(self.input_fp, how="open")
-        self.input_df = accdb_reader.accdb_to_df(self.input_table)
+        if pathlib.Path(self.input_fp).suffix == ".xlsx":
+            self.input_df = pd.read_excel(self.input_fp, sheet_name=self.input_table)
+        else:
+            accdb_reader = AccdbHandle(self.input_fp, how="open")
+            self.input_df = accdb_reader.accdb_to_df(self.input_table)
 
         self.static_dir = self.config["settings"]["static"]
         return self

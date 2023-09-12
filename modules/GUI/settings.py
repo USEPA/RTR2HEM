@@ -74,8 +74,7 @@ class SettingsGUI(GUI):
 
         ##############################################################
         # accdb and table select
-        import_obj = FileImport(subroot).create()
-        import_obj.import_btn.grid(row=next(gen), padx=(5, 0), sticky=W)
+        import_obj = FileImport(subroot, gen).create()
 
         ##############################################################
         # Import existing EPGs and Source IDs
@@ -86,17 +85,18 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        import_subroot.grid(row=next(gen), pady=(5, 5), sticky=W)
+        import_subroot.grid(row=next(gen), padx=(5, 0), pady=(10, 10), sticky=W)
 
-        epgs = FileImport(import_subroot).create(
-            btn_name="Import previously generated emission process group abbreviations"
-        )
-        epgs.import_btn.grid(row=next(gen), padx=(5, 5), pady=(5, 5), sticky=W)
+        Label(
+            import_subroot,
+            text="Import previously generated emission process group abbreviations",
+        ).grid(row=next(gen), sticky=W)
+        epgs = FileImport(import_subroot, gen).create()
 
-        srcid = FileImport(import_subroot).create(
-            btn_name="Import previously generated SourceIDs"
+        Label(import_subroot, text="Import previously generated SourceIDs").grid(
+            row=next(gen), sticky=W
         )
-        srcid.import_btn.grid(row=next(gen), padx=(5, 5), pady=(5, 5), sticky=W)
+        srcid = FileImport(import_subroot, gen).create()
 
         ##############################################################
         # Emissions choice
@@ -107,7 +107,7 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        emissions_subroot.grid(row=next(gen), sticky=W)
+        emissions_subroot.grid(row=next(gen), padx=(5, 5), sticky=W)
         emiss_var = StringVar(value="Actual")
 
         emissions_subroot_row = self.current_gen
@@ -145,7 +145,7 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        emiss_subroot_width = self.width(emissions_subroot) + 5
+        emiss_subroot_width = self.width(emissions_subroot) + 10
         records_subroot.grid(
             row=emissions_subroot_row, padx=(emiss_subroot_width, 5), sticky=W
         )

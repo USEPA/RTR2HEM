@@ -167,10 +167,9 @@ class InitialProcessing:
             "4": "H",  # horizontal
             "5": "C",  # capped
             "6": "H",  # horizontal
-            "7": "A",  # area
+            "7": "V",  # volume
             "8": "P",
             "9": "N",  # line
-            "10": "V",  # volume
         }
         erp_type = get_col("emission_release_point_type", row)
         return erp_type_map.get(erp_type, "P")
