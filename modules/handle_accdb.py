@@ -23,6 +23,10 @@ class AccdbHandle:
         self.conn = pypyodbc.connect(odbc_conn_str)
         self.accdb = self.conn.cursor()
 
+    def close_accdb(self):
+        self.accdb.close()
+        self.conn.close()
+
     def accdb_to_df(self, table_name):
         dataframe = pd.read_sql(f"SELECT * FROM [{table_name}]", self.conn)
         return dataframe

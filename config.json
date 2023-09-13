@@ -2,7 +2,7 @@
     "settings": {
         "source_category_name": "Refractories",
         "only_category_records": false,
-        "emission_type": "Actual emissions",
+        "emission_type": "Actual",
         "emission_abbr": {
             "import": false,
             "file": "",

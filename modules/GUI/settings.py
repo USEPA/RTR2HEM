@@ -226,15 +226,15 @@ class SettingsGUI(GUI):
                 "emission_abbr": {
                     "import": True if epgs.filepath else False,
                     "file": epgs.filepath,
-                    "table": epgs.table_var.get() if epgs.table_var else None,
+                    "table": epgs.table,
                 },
                 "src_ids": {
                     "import": True if srcids.filepath else False,
                     "file": srcids.filepath,
-                    "table": srcids.table_var.get() if srcids.table_var else None,
+                    "table": srcids.table,
                 },
                 "input_file": import_table.filepath,
-                "input_table": import_table.table_var.get(),
+                "input_table": import_table.table,
                 "static": "./static",
             },
             "columns_map": {

@@ -55,7 +55,7 @@ TODO - add import option
 epgs = get_col("emission_process_group", config.input_df)
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
-# epgs = EpgGUI(epgs).get_response()
+epgs = EpgGUI(epgs).get_response()
 
 """
 7c
@@ -69,7 +69,7 @@ uses:
 reg_codes = get_col("regulatory_code", config.input_df)
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
-# reg_codes = RegCodesGUI(reg_codes).get_response()
+reg_codes = RegCodesGUI(reg_codes).get_response()
 
 
 ######## DEBUG ##########

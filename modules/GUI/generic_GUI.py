@@ -1,4 +1,4 @@
-import os, pathlib
+import os, pathlib, gc
 from tkinter import *
 from tkinter import filedialog
 import tkinter.messagebox
@@ -80,15 +80,21 @@ class ScrollbarFrame(Frame):
 
 class FileImport:
     """
-    Creates two widgets:
+    Creates four widgets:
         1. Import file option
         2. Popup menu that dynamically updates with the tables in the imported file
+        3. Two labels for selected choice
     """
 
     working_dir = os.getcwd()
-    ftypes = [("Microsoft Access Database", "*.accdb"), ("Excel files", ".xlsx")]
+    ftypes = [
+        ("Microsoft Access Database", "*.accdb"),
+        ("Excel files", ".xlsx"),
+        ("CSV Files", "*.csv"),
+    ]
 
     filepath = ""
+    table = ""
     table_var = None
 
     def __init__(self, root, row):
@@ -96,6 +102,7 @@ class FileImport:
         self.row = row
 
     def create(self, btn_name="Import File"):
+        """Initial button/labels widget create"""
         current_row = next(self.row)
 
         self.import_btn = Button(
@@ -121,25 +128,29 @@ class FileImport:
         )
         return self
 
-    def toplevel_btns(self, toplevel, type="OK"):
+    def toplevel_btns(self, toplevel, type):
         """Close window, update filepath/name labels"""
-        tbl_name = self.table_var.get()
+        self.table = self.table_var.get()
         if type == "Cancel":
             self.filepath = ""
             self.filename = ""
-            tbl_name = ""
+            self.table = ""
         self.file_lbl.config(text=self.filename)
-        self.table_lbl.config(text=tbl_name)
+        self.table_lbl.config(text=self.table)
         toplevel.destroy()
 
     def tables_popup(self, tables):
+        """Display list of tables in file"""
         popup_root = Toplevel(self.root)
         popup_root.title(f"{self.filename} - Table Select")
 
         ok_btn = Button(
-            popup_root, text="OK", command=lambda: self.toplevel_btns(popup_root)
+            popup_root,
+            text="OK",
+            command=lambda: self.toplevel_btns(popup_root, type="OK"),
         )
         ok_btn.grid(sticky=W, row=0, padx=(5, 5), pady=(5, 1))
+
         cancel_btn = Button(
             popup_root,
             text="Cancel",
@@ -147,6 +158,7 @@ class FileImport:
         )
         cancel_btn.grid(sticky=W, row=0, padx=(40, 5), pady=(5, 1))
 
+        # list of tables
         sbf = ScrollbarFrame(popup_root)
         frame = sbf.scrolled_frame
         sbf.grid(row=1, column=0, sticky="nsew")
@@ -158,23 +170,28 @@ class FileImport:
             )
 
     def import_file(self):
+        """Select file, trigger table popup"""
         filepath = filedialog.askopenfilename(
             initialdir=self.working_dir, filetypes=self.ftypes
         )
         if filepath:
             self.filepath = filepath
             self.filename = pathlib.Path(filepath).stem
+            ftype = pathlib.Path(self.filepath).suffix
             tables = []
 
-            if pathlib.Path(self.filepath).suffix == ".accdb":
+            if ftype == ".accdb":
                 reader = AccdbHandle(self.filepath, how="open")
                 tables = reader.get_tables()
-            elif pathlib.Path(self.filepath).suffix == ".xlsx":
+            elif ftype == ".xlsx":
                 reader = pd.ExcelFile(self.filepath)
                 sheets = reader.book.worksheets
                 for sheet in sheets:
                     if sheet.sheet_state == "visible":
                         tables.append(sheet.title)
+            elif ftype == ".csv":
+                self.file_lbl.config(text=self.filename)
+                return
             else:
                 return
             if not tables:
@@ -211,6 +228,8 @@ class GUI(ErrorHandling):
 
     def close_window(self):
         self.root.destroy()
+        self.root = None
+        gc.collect()
 
     def bind_entries(self, entries):
         """

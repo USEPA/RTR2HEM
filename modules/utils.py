@@ -177,7 +177,6 @@ class Config:
         else:
             self.config = obj
         self.get_settings()
-        self.get_tables()
 
     def get_settings(self):
         settings = self.config["settings"]
@@ -185,23 +184,36 @@ class Config:
         self.src_cat_name = settings["source_category_name"]
         self.emission_type = settings["emission_type"]
         self.only_category = settings["only_category_records"]
-
         self.columns_map = self.config["columns_map"]
+
+        self.input_fp = settings["input_file"]
+        self.input_table = settings["input_table"]
+        self.input_df = self.get_tables(self.input_fp, self.input_table)
+
+        self.epg_df = None
+        epg = settings["emission_abbr"]
+        if epg["import"]:
+            self.epg_df = self.get_tables(epg["file"], epg["table"])
+
+        self.srcid_df = None
+        srcid = settings["src_ids"]
+        if srcid["import"]:
+            self.srcid_df = self.get_tables(srcid["file"], srcid["table"])
+
+        self.static_dir = settings["static"]
         return self
 
-    def get_tables(self):
-        """fetch input access table"""
-        self.input_fp = self.config["settings"]["input_file"]
-        self.input_table = self.config["settings"]["input_table"]
-
-        if pathlib.Path(self.input_fp).suffix == ".xlsx":
-            self.input_df = pd.read_excel(self.input_fp, sheet_name=self.input_table)
+    def get_tables(self, filepath, tablename):
+        """fetch input table"""
+        ftype = pathlib.Path(filepath).suffix
+        if ftype == ".xlsx":
+            input_df = pd.read_excel(filepath, sheet_name=tablename)
+        elif ftype == ".csv":
+            input_df = pd.read_csv(filepath)
         else:
-            accdb_reader = AccdbHandle(self.input_fp, how="open")
-            self.input_df = accdb_reader.accdb_to_df(self.input_table)
-
-        self.static_dir = self.config["settings"]["static"]
-        return self
+            accdb_reader = AccdbHandle(filepath, how="open")
+            input_df = accdb_reader.accdb_to_df(tablename)
+        return input_df
 
 
 config = Config()
