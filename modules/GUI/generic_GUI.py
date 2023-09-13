@@ -97,9 +97,13 @@ class FileImport:
     table = ""
     table_var = None
 
-    def __init__(self, root, row):
+    def __init__(self, root, row, required_columns=None):
         self.root = root
         self.row = row
+        if required_columns:
+            self.required_columns = "\n".join(required_columns)
+        else:
+            self.required_columns = None
 
     def create(self, btn_name="Import File"):
         """Initial button/labels widget create"""
@@ -171,6 +175,13 @@ class FileImport:
 
     def import_file(self):
         """Select file, trigger table popup"""
+        if self.required_columns:
+            ErrorHandling.warn(
+                self,
+                title="NOTE",
+                msg=f"Imported table must contain the following columns:\n{self.required_columns}",
+            )
+
         filepath = filedialog.askopenfilename(
             initialdir=self.working_dir, filetypes=self.ftypes
         )
@@ -194,6 +205,7 @@ class FileImport:
                 return
             else:
                 return
+
             if not tables:
                 return
             self.tables_popup(tables)

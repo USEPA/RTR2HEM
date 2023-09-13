@@ -5,10 +5,6 @@ import pandas as pd
 from modules.handle_accdb import AccdbHandle
 
 
-def to_bool(val):
-    return str(val).lower() == "true"
-
-
 def get_static(filename):
     static_fp = os.path.join(config.static_dir, f"{filename}.xlsx")
     df = pd.read_excel(static_fp, "static")
@@ -167,6 +163,8 @@ class Config:
     Read in config settings, either by a .json input file or settings GUI
     """
 
+    epg_required = ["EMISSION_PROCESS_GROUP", "EmissionProcessGroup_Abbr"]
+
     def __init__(self):
         pass
 
@@ -177,6 +175,7 @@ class Config:
         else:
             self.config = obj
         self.get_settings()
+        self.get_imports()
 
     def get_settings(self):
         settings = self.config["settings"]
@@ -185,20 +184,29 @@ class Config:
         self.emission_type = settings["emission_type"]
         self.only_category = settings["only_category_records"]
         self.columns_map = self.config["columns_map"]
+        return self
 
+    def get_imports(self):
+        lower = lambda lst: [e.lower() for e in lst]
+
+        settings = self.config["settings"]
         self.input_fp = settings["input_file"]
         self.input_table = settings["input_table"]
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
-        self.epg_df = None
+        # EPGS -- optional
+        self.epg_import = None
         epg = settings["emission_abbr"]
         if epg["import"]:
-            self.epg_df = self.get_tables(epg["file"], epg["table"])
+            self.epg_import = self.get_tables(epg["file"], epg["table"])
+            self.epg_import = self.epg_import[lower(self.epg_required)]
+            self.epg_import = self.epg_import.drop_duplicates()
 
-        self.srcid_df = None
+        # Source IDs -- optional
+        self.srcid_import = None
         srcid = settings["src_ids"]
         if srcid["import"]:
-            self.srcid_df = self.get_tables(srcid["file"], srcid["table"])
+            self.srcid_import = self.get_tables(srcid["file"], srcid["table"])
 
         self.static_dir = settings["static"]
         return self

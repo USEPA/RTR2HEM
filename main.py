@@ -5,10 +5,10 @@ from modules.multipathway_processing import MultiPathwayProcessing
 from modules.write_outputs import WriteOuputs
 from modules.utils import get_col, config
 
-from modules.GUI.epg_popup import EpgGUI
-from modules.GUI.regCodes_popup import RegCodesGUI
 from modules.GUI.settings import SettingsGUI
 from modules.GUI.column_map import ColumnMapGUI
+from modules.GUI.epg_popup import EpgGUI
+from modules.GUI.regCodes_popup import RegCodesGUI
 
 """
 Demo refactories data settings
@@ -44,22 +44,27 @@ for column in config.input_df.columns:
 
 """
 7b
-these names are taken from the "EMISSION_PROCESS_GROUP" column
-eventually gets used for source IDs
-
-uses: 
-    module “02 Emiss Process Grps” 
-
-TODO - add import option
 """
 epgs = get_col("emission_process_group", config.input_df)
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
+epgs = dict(zip(epgs, [""] * len(epgs)))
+
+# populate with import
+if config.epg_import is not None:
+    epg_import = config.epg_import.to_dict("records")
+    for i, item in enumerate(epg_import):
+        key = item["emission_process_group"]
+        val = item["emissionprocessgroup_abbr"]
+        epgs[key] = val
+
 epgs = EpgGUI(epgs).get_response()
 
 """
 7c
 these names are taken from the "REGULATORY_CODE" column
+
+TODO
 this GUI does only shows up if "category and non-category records" is selected
 
 uses:

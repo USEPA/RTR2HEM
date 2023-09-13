@@ -5,7 +5,8 @@ from .generic_GUI import GUI
 
 class EpgGUI(GUI):
     def __init__(self, epg_list):
-        self.epg_list = epg_list
+        self.epg_list = list(epg_list.keys())
+        self.epg_vals = list(epg_list.values())
         super().__init__(title="Emission Process Group Abbreviations")
         try:
             self.main()
@@ -123,7 +124,11 @@ class EpgGUI(GUI):
                 sticky=W,
             )
 
+            # abbreviation
             epg_abbr_entry = Entry(frame, width=5, borderwidth=1, relief=SOLID)
+            epg_abbr_entry.delete(0, END)
+            epg_abbr_entry.insert(0, self.epg_vals[i])
+
             epg_entry_list.append(epg_abbr_entry)
             epg_entry_list[i].grid(
                 row=self.current_gen, column=1, padx=(10, 10), sticky=W

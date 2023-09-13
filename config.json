@@ -5,8 +5,8 @@
         "emission_type": "Actual",
         "emission_abbr": {
             "import": false,
-            "file": "",
-            "table": ""
+            "file": "C:/Users/55586/Desktop/tools/access tool/Old Refractories Run/Output/example/SourceCategory_Actual_XWalks_YYYYMMDD.accdb",
+            "table": "02 - Emiss Process Grp Abbr Xwalk"
         },
         "src_ids": {
             "import": false,
