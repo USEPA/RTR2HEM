@@ -1,5 +1,5 @@
 import pandas as pd
-from .utils import set_column, get_static, config
+from .utils import Join, set_column, get_static, config
 
 
 class InitialProcessing:
@@ -93,12 +93,11 @@ class InitialProcessing:
         static_pollutantCrosswalk.columns = (
             static_pollutantCrosswalk.columns.str.lower()
         )
-        self.df = pd.merge(
-            self.df,
-            static_pollutantCrosswalk,
+
+        self.df = Join().join(
+            [self.df, static_pollutantCrosswalk],
             on="pollutant_code",
             how="inner",
-            suffixes=("", "_y"),
         )
 
     def update_by_emission_release_point_type(self):

@@ -92,9 +92,10 @@ class ColumnMapGUI(GUI):
     def submit(self, columns_to_map):
         for i, key in enumerate(config.columns_map):
             renamed_col = columns_to_map[i].get()
-            if not renamed_col:
+            if not renamed_col and key != "emission_process_group":
                 self.warn(msg="Field name could not be found and must be selected.")
                 return
-            config.columns_map[key] = renamed_col
+            if key != renamed_col:
+                config.columns_map[key] = renamed_col
 
         self.close_window()

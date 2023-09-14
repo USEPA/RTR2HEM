@@ -40,13 +40,7 @@ if settings.option_var.get() == "0":
     ColumnMapGUI()
 
 config.out = WriteOutputs()
-
-# preprocessing
-for column in config.input_df.columns:
-    if column == "regulatory_code" or column == "emission_process_group":
-        config.input_df[column].fillna("", inplace=True)
-    else:
-        config.input_df[column].fillna(0, inplace=True)
+config.rename_columns()
 
 # minimize wait by writing static files during GUI process
 config.out.accdb.write(
@@ -86,6 +80,7 @@ if config.epg_import is not None:
         val = item["emissionprocessgroup_abbr"]
         epgs[key] = val
 
+# if epgs:
 # epgs = EpgGUI(epgs).get_response()
 # epg_pairs = {
 #    config.epg_required[0]: list(epgs.keys()),
@@ -95,6 +90,8 @@ if config.epg_import is not None:
 
 """
 7c
+
+TODO -- If nothing selected, should everything be selected
 """
 if config.only_category:
     reg_codes = None
@@ -102,10 +99,11 @@ else:
     reg_codes = config.input_df["regulatory_code"]
     reg_codes = reg_codes.unique().tolist()
     reg_codes.sort()
-    # reg_codes = RegCodesGUI(reg_codes).get_response()
+    reg_codes = RegCodesGUI(reg_codes).get_response()
 
 
 ######## DEBUG ##########
+
 epgs = {
     "Conveying system transfer point": "AA",
     "Curing oven": "AB",
@@ -115,7 +113,7 @@ epgs = {
     "Tunnel kiln": "AF",
 }
 
-reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
+# reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
 
 epg_pairs = {
     config.epg_required[0]: list(epgs.keys()),

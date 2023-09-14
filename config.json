@@ -1,7 +1,7 @@
 {
     "settings": {
         "source_category_name": "Refractories",
-        "only_category_records": false,
+        "only_category_records": true,
         "emission_type": "Actual",
         "emission_abbr": {
             "import": false,
@@ -13,11 +13,11 @@
             "file": "C:/Users/55586/Desktop/tools/access tool/Old Refractories Run/Output/example/SourceCategory_Actual_XWalks_YYYYMMDD.accdb",
             "table": "03 - Source ID Xwalk"
         },
-        "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
-        "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
+        "input_file": "../example_epa_input.csv",
+        "input_table": "",
         "static": "./static"
     },
-    "columns_map" : {
+    "columns_map": {
         "emission_process_group": "",
         "regulatory_code": "",
         "state_county_fips": "",
@@ -29,6 +29,26 @@
         "stack_height (ft)": "",
         "stack_diameter (ft)": "",
         "exit_gas_temperature (f)": "",
-        "exit_gas_velocity (ft/sec)": ""
+        "exit_gas_velocity (ft/sec)": "",
+        "pollutant_code": "",
+        "pollutant_description": "",
+        "hap_category_name": "",
+        "emission_unit_id": "",
+        "process_id": "",
+        "emission_release_point_id": "",
+        "scc": "",
+        "naics_primary": "",
+        "y_coordinate": "",
+        "x_coordinate": "",
+        "fugitive_2d_midpoint1_x_coordinate": "fug_2d_midpnt1_x_co",
+        "fugitive_2d_midpoint1_y_coordinate": "fug_2d_midpnt1_y_co",
+        "fugitive_2d_midpoint2_x_coordinate": "fug_2d_midpt2_x_co",
+        "fugitive_2d_midpoint2_y_coordinate": "fug_2d_midpt2_y_co",
+        "facility_name": "",
+        "location_address": "",
+        "city": "",
+        "county_name": "",
+        "state_abbr": "",
+        "zipcode": ""
     }
 }

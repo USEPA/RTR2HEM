@@ -162,8 +162,12 @@ class Config:
         if not obj:
             with open(fp) as fh:
                 self.config = json.load(fh)
+            self.columns_map = self.config["columns_map"]
         else:
             self.config = obj
+            with open(fp) as fh:
+                self.columns_map = json.load(fh)["columns_map"]
+
         self.get_settings()
         self.get_imports()
 
@@ -183,6 +187,16 @@ class Config:
         self.input_table = settings["input_table"]
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
+        for column in self.input_df.columns:
+            if column == "regulatory_code" or column == "emission_process_group":
+                self.input_df[column].fillna("", inplace=True)
+            else:
+                self.input_df[column].fillna(0, inplace=True)
+
+        # exception for EIS input file
+        if "emission_process_group" not in self.input_df.columns:
+            self.input_df["emission_process_group"] = ""
+
         # EPGS -- optional
         self.epg_import = None
         epg = settings["emission_abbr"]
@@ -200,7 +214,6 @@ class Config:
             self.srcid_import = self.srcid_import.drop_duplicates()
 
         self.static_dir = settings["static"]
-        self.columns_map = self.rename_columns()
         return self
 
     def get_tables(self, filepath, tablename):
@@ -216,10 +229,9 @@ class Config:
         return input_df
 
     def rename_columns(self):
-        # NOTE -- may get weird if someone were to rename a column to an already existing column
-        columns_map = {v.lower(): k for k, v in self.config["columns_map"].items() if v}
+        # NOTE -- may get weird if a column were to be renamed as an already existing column
+        columns_map = {v.lower(): k for k, v in self.columns_map.items() if v}
         self.input_df = self.input_df.rename(columns=columns_map)
-        return columns_map
 
 
 config = Config()
