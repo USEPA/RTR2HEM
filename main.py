@@ -30,7 +30,7 @@ reg code 63SSSSS
 dont forget that the results get loaded into pre-existing templates
 """
 SettingsGUI()
-ColumnMapGUI()
+ColumnMapGUI()  # TODO -- do we want to skip this if config selected ...?
 
 output_handler = WriteOuputs()
 
@@ -58,7 +58,7 @@ if config.epg_import is not None:
         val = item["emissionprocessgroup_abbr"]
         epgs[key] = val
 
-epgs = EpgGUI(epgs).get_response()
+# epgs = EpgGUI(epgs).get_response()
 
 """
 7c
@@ -74,7 +74,7 @@ uses:
 reg_codes = get_col("regulatory_code", config.input_df)
 reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
 reg_codes.sort()
-reg_codes = RegCodesGUI(reg_codes).get_response()
+# reg_codes = RegCodesGUI(reg_codes).get_response()
 
 
 ######## DEBUG ##########

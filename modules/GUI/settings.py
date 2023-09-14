@@ -133,7 +133,9 @@ class SettingsGUI(GUI):
         Label(import_subroot, text="Import previously generated SourceIDs").grid(
             row=next(self.gen), sticky=W
         )
-        self.srcids = FileImport(import_subroot, self.gen).create()
+        self.srcids = FileImport(
+            import_subroot, self.gen, required_columns=config.srcid_required
+        ).create()
 
     def emissions_type(self, root):
         # Emissions choice

@@ -83,8 +83,10 @@ class Join:
                     pass
             return df
 
+        if dfs is None:
+            dfs = []
         if "left" in kwargs:
-            dfs = [kwargs.pop("left")]
+            dfs = [kwargs.pop("left")] + dfs
         if "right" in kwargs:
             dfs += [kwargs.pop("right")]
 
@@ -114,15 +116,18 @@ class Join:
         dfs = tmp_dfs
         to_list = lambda val: val if isinstance(val, list) else [val]
 
+        # columns to merge on
         on_col = to_list(kwargs.pop("on", []))
         left_on = to_list(kwargs.get("left_on", on_col))
         right_on = to_list(kwargs.get("right_on", on_col))
         if not left_on or not right_on:
             raise Exception("Missing columns to join on")
 
+        # convert column names to lowercase
         left_cpy = [f"{item}_cpy".lower() for item in left_on]
         right_cpy = [f"{item}_cpy".lower() for item in right_on]
 
+        # convert all rows in column_cpy to lowercase
         kwargs["left_on"] = left_cpy
         dfs[0][left_cpy] = dfs[0][left_on]
         for cpy_col in left_cpy:
@@ -164,6 +169,13 @@ class Config:
     """
 
     epg_required = ["EMISSION_PROCESS_GROUP", "EmissionProcessGroup_Abbr"]
+    srcid_required = [
+        "ICFFacilityID",
+        "ICFSourceID",
+        "emission_unit_id",
+        "process_id",
+        "emission_release_point_id",
+    ]
 
     def __init__(self):
         pass
@@ -207,6 +219,8 @@ class Config:
         srcid = settings["src_ids"]
         if srcid["import"]:
             self.srcid_import = self.get_tables(srcid["file"], srcid["table"])
+            self.srcid_import = self.srcid_import[lower(self.srcid_required)]
+            self.srcid_import = self.srcid_import.drop_duplicates()
 
         self.static_dir = settings["static"]
         return self

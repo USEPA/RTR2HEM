@@ -1,8 +1,8 @@
-from .utils import set_column
+from modules.utils import Join, set_column, config
 
 
 class SourceIDs:
-    facilty_counter = {}
+    facility_counter = {}
 
     source_id_columns = [
         "ICFFacilityID",
@@ -21,19 +21,32 @@ class SourceIDs:
             raise ValueError("Exceeded range of acceptible counter values")
         return f"{zero_count}{counter}"
 
+    def reverse_str_counter(self, row):
+        src_id = row["ICFSourceID"]
+        if not src_id:
+            return 0
+        counter_val = src_id[-4:]
+        return int(counter_val)
+
     def run(self):
         self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
         self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)
+
+        if config.srcid_import is not None:
+            self.import_existing_src_ids()
 
         set_column(self.src_list_df, "ICFSourceID", self.create_source_id)
         set_column(self.df, "ICFSourceID", self.remerge_src_ids)
         return self.df
 
     def create_source_id(self, row):
+        if row["ICFSourceID"]:
+            return row["ICFSourceID"]
+
         f_id = row["ICFFacilityID"]
-        self.facilty_counter.setdefault(f_id, 0)
-        self.facilty_counter[f_id] += 1
-        counter = self.facilty_counter[f_id]
+        self.facility_counter.setdefault(f_id, 0)
+        self.facility_counter[f_id] += 1
+        counter = self.facility_counter[f_id]
 
         erp_type = row["emission_release_point_type"]
         erp_type = f"0{erp_type}" if len(erp_type) == 1 else f"{erp_type}"
@@ -70,3 +83,31 @@ class SourceIDs:
         ]
         assert len(result) == 1
         return result.iloc[0]["ICFSourceID"]
+
+    def import_existing_src_ids(self):
+        # bit of a weird situation where some columns that are internally never lowercase become lowercase
+        right_cols = [e.lower() for e in self.source_id_columns]
+        result = Join().join(
+            left=self.src_list_df,
+            right=config.srcid_import,
+            how="left",
+            left_on=self.source_id_columns,
+            right_on=right_cols,
+        )
+        self.src_list_df["ICFSourceID"] = result["icfsourceid"]
+        self.src_list_df = self.src_list_df.fillna("")
+
+        # init facility counter
+        sort_by = ["ICFFacilityID", "srcid_tmp"]
+        set_column(self.src_list_df, "srcid_tmp", self.reverse_str_counter)
+        result = self.src_list_df[sort_by].sort_values(sort_by, ascending=False)
+        result = result.drop_duplicates("ICFFacilityID")
+
+        facility_ids = result["ICFFacilityID"].tolist()
+        src_id_vals = result["srcid_tmp"].tolist()
+        self.facility_counter = dict(zip(facility_ids, src_id_vals))
+
+        # cleanup
+        self.src_list_df = self.src_list_df.drop("srcid_tmp", axis=1)
+        self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
+        self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)
