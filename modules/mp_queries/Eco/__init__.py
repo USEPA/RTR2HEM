@@ -7,7 +7,7 @@ from modules.mp_queries.Eco._05_summary_populate import SummaryPopulate
 from modules.utils import config
 
 
-def run_Eco_module(working_crosswalk, working_eco_crosswalk, latlons, accdb):
+def run_Eco_module(working_crosswalk, working_eco_crosswalk, latlons):
     Eco_obj = Template(working_crosswalk, working_eco_crosswalk, latlons)
     GrpResults(Eco_obj)
     SummarySetup(Eco_obj)
@@ -19,13 +19,15 @@ def run_Eco_module(working_crosswalk, working_eco_crosswalk, latlons, accdb):
     Eco_obj.working_MP05Eco_T1GrpResults["Src Cat"] = src_cat_str
     Eco_obj.working_MP07Eco_T1Summary["Src Cat"] = src_cat_str
 
-    accdb.write(
+    config.out.accdb.write(
         "08 - T1 Eco Mpath Scrn By Facil-Chem",
         Eco_obj.working_MP04Eco_T1ChemResults,
     )
-    accdb.write(
+    config.out.accdb.write(
         "09 - T1 Eco Mpath Scrn By Facil-PBHAPGrp",
         Eco_obj.working_MP05Eco_T1GrpResults,
     )
-    accdb.write("10 - T1 Eco Mpath Scrn Summary", Eco_obj.working_MP07Eco_T1Summary)
+    config.out.accdb.write(
+        "10 - T1 Eco Mpath Scrn Summary", Eco_obj.working_MP07Eco_T1Summary
+    )
     return Eco_obj

@@ -1,8 +1,9 @@
 import numpy as np
+import pandas as pd
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
-from modules.write_outputs import WriteOuputs
+from modules.write_outputs import WriteOutputs
 from modules.utils import get_col, config
 
 from modules.GUI.settings import SettingsGUI
@@ -31,8 +32,8 @@ dont forget that the results get loaded into pre-existing templates
 """
 SettingsGUI()
 ColumnMapGUI()  # TODO -- do we want to skip this if config selected ...?
+config.out = WriteOutputs()
 
-output_handler = WriteOuputs()
 
 # preprocessing
 for column in config.input_df.columns:
@@ -59,6 +60,11 @@ if config.epg_import is not None:
         epgs[key] = val
 
 # epgs = EpgGUI(epgs).get_response()
+# epg_pairs = {
+#    config.epg_required[0]: list(epgs.keys()),
+#    config.epg_required[1]: list(epgs.values()),
+# }
+
 
 """
 7c
@@ -88,19 +94,27 @@ epgs = {
 }
 
 reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
+
+epg_pairs = {
+    config.epg_required[0]: list(epgs.keys()),
+    config.epg_required[1]: list(epgs.values()),
+}
 #########################
 
-
 processed_df = InitialProcessing(config.input_df, epgs, reg_codes).run()
+config.out.accdb.write("01 - RTR Emiss Inventory With ICF Work", processed_df)
+config.out.accdb.write(
+    "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(epg_pairs)
+)
 
 # 7d
 processed_df = SourceIDs(processed_df).run()
-output_handler.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
+config.out.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
 
 # 7e
-MultiPathwayProcessing(processed_df, output_handler.accdb).run()
+MultiPathwayProcessing(processed_df).run()
 
 # 7f
-output_handler.run(processed_df)
+config.out.run(processed_df)
 
 print("Done!")

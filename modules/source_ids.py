@@ -1,4 +1,4 @@
-from modules.utils import Join, set_column, config
+from modules.utils import set_column, config
 
 
 class SourceIDs:
@@ -22,7 +22,7 @@ class SourceIDs:
         return f"{zero_count}{counter}"
 
     def reverse_str_counter(self, row):
-        src_id = row["ICFSourceID"]
+        src_id = row["icfsourceid"]
         if not src_id:
             return 0
         counter_val = src_id[-4:]
@@ -36,7 +36,11 @@ class SourceIDs:
             self.import_existing_src_ids()
 
         set_column(self.src_list_df, "ICFSourceID", self.create_source_id)
-        set_column(self.df, "ICFSourceID", self.remerge_src_ids)
+        set_column(self.df, "ICFSourceID", self.merge_src_ids)
+
+        config.out.accdb.write(
+            "03 - Source ID Xwalk", self.src_list_df[config.srcid_required]
+        )
         return self.df
 
     def create_source_id(self, row):
@@ -73,7 +77,7 @@ class SourceIDs:
         assert len(source_id) == 8
         return source_id
 
-    def remerge_src_ids(self, row):
+    def merge_src_ids(self, row):
         src = self.src_list_df
         result = self.src_list_df.loc[
             (src["ICFFacilityID"] == row["ICFFacilityID"])
@@ -85,29 +89,26 @@ class SourceIDs:
         return result.iloc[0]["ICFSourceID"]
 
     def import_existing_src_ids(self):
-        # bit of a weird situation where some columns that are internally never lowercase become lowercase
-        right_cols = [e.lower() for e in self.source_id_columns]
-        result = Join().join(
-            left=self.src_list_df,
-            right=config.srcid_import,
-            how="left",
-            left_on=self.source_id_columns,
-            right_on=right_cols,
-        )
-        self.src_list_df["ICFSourceID"] = result["icfsourceid"]
-        self.src_list_df = self.src_list_df.fillna("")
+        def merge_import_src_ids(row):
+            src = config.srcid_import
+            result = src.loc[
+                (src["icffacilityid"] == row["ICFFacilityID"])
+                & (src["emission_unit_id"] == row["emission_unit_id"])
+                & (src["process_id"] == row["process_id"])
+                & (src["emission_release_point_id"] == row["emission_release_point_id"])
+            ]
+            if len(result) == 1:
+                return result.iloc[0]["icfsourceid"]
+            return ""
+
+        set_column(self.src_list_df, "ICFSourceID", merge_import_src_ids)
 
         # init facility counter
-        sort_by = ["ICFFacilityID", "srcid_tmp"]
-        set_column(self.src_list_df, "srcid_tmp", self.reverse_str_counter)
-        result = self.src_list_df[sort_by].sort_values(sort_by, ascending=False)
-        result = result.drop_duplicates("ICFFacilityID")
+        sort_by = ["icffacilityid", "srcid_tmp"]
+        set_column(config.srcid_import, "srcid_tmp", self.reverse_str_counter)
+        result = config.srcid_import[sort_by].sort_values(sort_by, ascending=False)
+        result = result.drop_duplicates("icffacilityid")
 
-        facility_ids = result["ICFFacilityID"].tolist()
+        facility_ids = result["icffacilityid"].tolist()
         src_id_vals = result["srcid_tmp"].tolist()
         self.facility_counter = dict(zip(facility_ids, src_id_vals))
-
-        # cleanup
-        self.src_list_df = self.src_list_df.drop("srcid_tmp", axis=1)
-        self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
-        self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)

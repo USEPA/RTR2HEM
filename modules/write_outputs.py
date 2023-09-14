@@ -8,7 +8,7 @@ from modules.handle_accdb import AccdbHandle
 from modules.utils import config
 
 
-class WriteOuputs:
+class WriteOutputs:
     templates_fp = "templates"
 
     def __init__(self):

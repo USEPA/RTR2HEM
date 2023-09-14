@@ -15,9 +15,8 @@ self.df = working_crosswalk_emissions
 
 
 class MultiPathwayProcessing:
-    def __init__(self, df, accdb):
+    def __init__(self, df):
         self.df = df.copy()
-        self.accdb = accdb
 
     def run(self):
         self.qry_00aEco_DuplicateCrosswalkInventory()
@@ -25,10 +24,8 @@ class MultiPathwayProcessing:
 
         lats_longs = LatLons(self.df)
 
-        run_HH_module(self.df, lats_longs, self.accdb)
-        run_Eco_module(
-            self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs, self.accdb
-        )
+        run_HH_module(self.df, lats_longs)
+        run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
 
     # working_CrosswalkEmissionInventory_Eco
     def qry_00aEco_DuplicateCrosswalkInventory(self):

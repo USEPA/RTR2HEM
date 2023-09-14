@@ -168,7 +168,7 @@ class Config:
     Read in config settings, either by a .json input file or settings GUI
     """
 
-    epg_required = ["EMISSION_PROCESS_GROUP", "EmissionProcessGroup_Abbr"]
+    epg_required = ["emission_process_group", "ICFEmissionProcessGroupAbbr"]
     srcid_required = [
         "ICFFacilityID",
         "ICFSourceID",
@@ -176,6 +176,9 @@ class Config:
         "process_id",
         "emission_release_point_id",
     ]
+
+    # output writer
+    out = None
 
     def __init__(self):
         pass
