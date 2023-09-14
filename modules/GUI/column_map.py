@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Combobox
 from .generic_GUI import GUI
-from modules.utils import get_col, config
+from modules.utils import config
 
 
 class ColumnMapGUI(GUI):

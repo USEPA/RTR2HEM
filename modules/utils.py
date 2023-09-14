@@ -16,28 +16,6 @@ def set_column(df, column_name, func):
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
-def get_col(name, df=None):
-    """Gets mapped column name and attempts case insensitive lookup"""
-    response = config.columns_map.get(name.lower(), None)
-    if response == None:
-        raise KeyError(f"{name} could not be found in mapping")
-    elif response == "":
-        response = name.lower()
-    response = response if response else name
-
-    if df is None:
-        return response
-    else:
-        try:
-            if response in df:
-                return df[response]
-            return df[response.lower()]
-        except:
-            raise Exception(
-                f'Column "{response}" could not be found in the provided dataframe'
-            )
-
-
 def calc_agg(df, group_by, agg, on_column, rename_column=None):
     """
     returns a dataframe with group_by and resulting on_column columns
@@ -160,9 +138,6 @@ class Join:
         return dfs
 
 
-################################
-
-
 class Config:
     """
     Read in config settings, either by a .json input file or settings GUI
@@ -198,7 +173,6 @@ class Config:
         self.src_cat_name = settings["source_category_name"]
         self.emission_type = settings["emission_type"]
         self.only_category = settings["only_category_records"]
-        self.columns_map = self.config["columns_map"]
         return self
 
     def get_imports(self):
@@ -226,6 +200,7 @@ class Config:
             self.srcid_import = self.srcid_import.drop_duplicates()
 
         self.static_dir = settings["static"]
+        self.columns_map = self.rename_columns()
         return self
 
     def get_tables(self, filepath, tablename):
@@ -239,6 +214,12 @@ class Config:
             accdb_reader = AccdbHandle(filepath, how="open")
             input_df = accdb_reader.accdb_to_df(tablename)
         return input_df
+
+    def rename_columns(self):
+        # NOTE -- may get weird if someone were to rename a column to an already existing column
+        columns_map = {v.lower(): k for k, v in self.config["columns_map"].items() if v}
+        self.input_df = self.input_df.rename(columns=columns_map)
+        return columns_map
 
 
 config = Config()

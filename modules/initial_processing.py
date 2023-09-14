@@ -1,5 +1,5 @@
 import pandas as pd
-from .utils import set_column, get_static, get_col, config
+from .utils import set_column, get_static, config
 
 
 class InitialProcessing:
@@ -51,7 +51,7 @@ class InitialProcessing:
         "zipcode",
     ]
 
-    def __init__(self, df, epgs, reg_codes=None):
+    def __init__(self, df, epgs, reg_codes):
         self.df = df
         self.epg_abbr_map = epgs
         self.reg_codes = reg_codes
@@ -103,7 +103,7 @@ class InitialProcessing:
 
     def update_by_emission_release_point_type(self):
         """Some columns should be empty based on emission release point type"""
-        erp_val = get_col("emission_release_point_type", self.df)
+        erp_val = self.df["emission_release_point_type"]
 
         update_columns = ["ICFAreaVolLineReleaseHeight_m", "ICFFugitiveWidth_m"]
         self.df.loc[
@@ -111,7 +111,7 @@ class InitialProcessing:
             update_columns,
         ] = ""
 
-        update_columns = ["ICFFugitiveLength_m", get_col("fugitive_angle_degrees")]
+        update_columns = ["ICFFugitiveLength_m", "fugitive_angle_degrees"]
         self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
 
         update_columns = [
@@ -126,12 +126,10 @@ class InitialProcessing:
         ] = ""
 
     def set_icf_facility_id(self, row):
-        return get_col("state_county_fips", row) + get_col(
-            "sppd_facility_identifier", row
-        )
+        return row["state_county_fips"] + row["sppd_facility_identifier"]
 
     def is_selected_regulatory_code(self, row):
-        code = get_col("regulatory_code", row)
+        code = row["regulatory_code"]
         if self.reg_codes == None:
             return "Yes"
         if self.reg_codes.get(code) == 1:
@@ -154,12 +152,12 @@ class InitialProcessing:
         return float(row["emissions_tpy"]) * float(row["metal_speciation_factor"])
 
     def set_epg_abbreviations(self, row):
-        emissions_group = get_col("emission_process_group", row)
+        emissions_group = row["emission_process_group"]
         return self.epg_abbr_map.get(emissions_group, "")
 
     def set_source_type(self, row):
-        length = int(get_col("fugitive_length_sigmax_ft", row))
-        width = int(get_col("fugitive_width_sigmay_ft", row))
+        length = int(row["fugitive_length_sigmax_ft"])
+        width = int(row["fugitive_width_sigmay_ft"])
         erp_type_map = {
             "1": "A" if length > 0 and width > 0 else "P",  # area
             "2": "P",
@@ -171,12 +169,12 @@ class InitialProcessing:
             "8": "P",
             "9": "N",  # line
         }
-        erp_type = get_col("emission_release_point_type", row)
+        erp_type = row["emission_release_point_type"]
         return erp_type_map.get(erp_type, "P")
 
     def set_release_height(self, row):
-        stack_height = get_col("stack_height (ft)", row)
-        erp_type = get_col("emission_release_point_type", row)
+        stack_height = row["stack_height (ft)"]
+        erp_type = row["emission_release_point_type"]
 
         if erp_type == "1" or erp_type == "7" or erp_type == "9":
             return float(stack_height)
@@ -190,32 +188,32 @@ class InitialProcessing:
 
     # unit conversions
     def stack_height_meter(self, row):
-        stack_height_ft = float(get_col("stack_height (ft)", row))
+        stack_height_ft = float(row["stack_height (ft)"])
         return stack_height_ft / self.ft_per_meter
 
     def stack_diameter_meter(self, row):
-        stack_diameter_ft = float(get_col("stack_diameter (ft)", row))
+        stack_diameter_ft = float(row["stack_diameter (ft)"])
         return stack_diameter_ft / self.ft_per_meter
 
     def gas_velocity_mps(self, row):
-        gas_velocity_fts = float(get_col("exit_gas_velocity (ft/sec)", row))
+        gas_velocity_fts = float(row["exit_gas_velocity (ft/sec)"])
         return gas_velocity_fts / self.ft_per_meter
 
     def gas_temperature_k(self, row):
-        gas_temperature_f = float(get_col("exit_gas_temperature (f)", row))
+        gas_temperature_f = float(row["exit_gas_temperature (f)"])
         return self.fahrenheit_to_kelvin(gas_temperature_f)
 
     def fugitive_length_m(self, row):
-        fugitive_length_f = float(get_col("fugitive_length_sigmax_ft", row))
+        fugitive_length_f = float(row["fugitive_length_sigmax_ft"])
         return fugitive_length_f / self.ft_per_meter
 
     def fugitive_width_m(self, row):
-        fugitive_width_f = float(get_col("fugitive_width_sigmay_ft", row))
+        fugitive_width_f = float(row["fugitive_width_sigmay_ft"])
         return fugitive_width_f / self.ft_per_meter
 
     def release_height_m(self, row):
         try:
-            release_height_ft = float(get_col("ICFAreaVolLineReleaseHeight", row))
+            release_height_ft = float(row["ICFAreaVolLineReleaseHeight"])
             return release_height_ft / self.ft_per_meter
         except:
             return ""

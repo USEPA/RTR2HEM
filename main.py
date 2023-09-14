@@ -4,7 +4,7 @@ from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
 from modules.write_outputs import WriteOutputs
-from modules.utils import get_static, get_col, config
+from modules.utils import get_static, config
 
 from modules.GUI.settings import SettingsGUI
 from modules.GUI.column_map import ColumnMapGUI
@@ -35,7 +35,7 @@ dont forget that the results get loaded into pre-existing templates
 1-7a
 """
 settings = SettingsGUI()
-# loaded from file
+# loaded from interface
 if settings.option_var.get() == "0":
     ColumnMapGUI()
 
@@ -43,9 +43,9 @@ config.out = WriteOutputs()
 
 # preprocessing
 for column in config.input_df.columns:
-    if column != get_col("regulatory_code") and column != get_col(
-        "emission_process_group"
-    ):
+    if column == "regulatory_code" or column == "emission_process_group":
+        config.input_df[column].fillna("", inplace=True)
+    else:
         config.input_df[column].fillna(0, inplace=True)
 
 # minimize wait by writing static files during GUI process
@@ -73,7 +73,7 @@ config.out.accdb.write(
 """
 7b
 """
-epgs = get_col("emission_process_group", config.input_df)
+epgs = config.input_df["emission_process_group"]
 epgs = epgs.replace("", np.nan).dropna().unique().tolist()
 epgs.sort()
 epgs = dict(zip(epgs, [""] * len(epgs)))
@@ -95,19 +95,14 @@ if config.epg_import is not None:
 
 """
 7c
-these names are taken from the "REGULATORY_CODE" column
-
-TODO
-this GUI does only shows up if "category and non-category records" is selected
-
-uses:
-    module “03 Initial Processing” 
-    form "Form_frmRegSelections"
 """
-reg_codes = get_col("regulatory_code", config.input_df)
-reg_codes = reg_codes.replace(np.nan, "").unique().tolist()
-reg_codes.sort()
-# reg_codes = RegCodesGUI(reg_codes).get_response()
+if config.only_category:
+    reg_codes = None
+else:
+    reg_codes = config.input_df["regulatory_code"]
+    reg_codes = reg_codes.unique().tolist()
+    reg_codes.sort()
+    # reg_codes = RegCodesGUI(reg_codes).get_response()
 
 
 ######## DEBUG ##########
@@ -127,6 +122,7 @@ epg_pairs = {
     config.epg_required[1]: list(epgs.values()),
 }
 #########################
+
 
 processed_df = InitialProcessing(config.input_df, epgs, reg_codes).run()
 config.out.accdb.write("01 - RTR Emiss Inventory With ICF Work", processed_df)
