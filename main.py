@@ -4,7 +4,7 @@ from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
 from modules.write_outputs import WriteOutputs
-from modules.utils import get_col, config
+from modules.utils import get_static, get_col, config
 
 from modules.GUI.settings import SettingsGUI
 from modules.GUI.column_map import ColumnMapGUI
@@ -30,10 +30,16 @@ reg code 63SSSSS
 
 dont forget that the results get loaded into pre-existing templates
 """
-SettingsGUI()
-ColumnMapGUI()  # TODO -- do we want to skip this if config selected ...?
-config.out = WriteOutputs()
 
+"""
+1-7a
+"""
+settings = SettingsGUI()
+# loaded from file
+if settings.option_var.get() == "0":
+    ColumnMapGUI()
+
+config.out = WriteOutputs()
 
 # preprocessing
 for column in config.input_df.columns:
@@ -42,6 +48,27 @@ for column in config.input_df.columns:
     ):
         config.input_df[column].fillna(0, inplace=True)
 
+# minimize wait by writing static files during GUI process
+config.out.accdb.write(
+    "00 - RTR-HEM and PBHAP Poll Xwalk",
+    get_static("static_PollutantCrosswalk_andMetalSpeciations"),
+)
+config.out.accdb.write(
+    "00 - Tier 1 Eco Mpath EcoEEFs",
+    get_static("static_MP_EcoEquivalencyFactors"),
+)
+config.out.accdb.write(
+    "00 - Tier 1 Eco Mpath Thresh",
+    get_static("static_MP_EcoScreeningThresholds"),
+)
+config.out.accdb.write(
+    "00 - Tier 1 HumHealth Mpath REFs",
+    get_static("static_MP_PBHAPChems_withHHEquivalencyFactors"),
+)
+config.out.accdb.write(
+    "00 - Tier 1 HumHealth Mpath Thresh",
+    get_static("static_MP_HHScreeningThresholds"),
+)
 
 """
 7b

@@ -38,23 +38,26 @@ class AccdbHandle:
     def write(self, table_name, df):
         df = df.astype(str).replace("\.0+$", "", regex=True)
         columns = df.columns.to_list()
-        columns = "] text(255), [".join(columns)
-        columns = f"([{columns}] text(255))"
+        values = df.to_numpy().tolist()
 
         # question marks are reserved syntax!
-        columns = columns.replace("?", "")
+        for i, c in enumerate(columns):
+            columns[i] = f"[{c}]".replace("?", "")
 
-        accdb_query = f"CREATE TABLE [{table_name}] {columns};"
+        columns_str = " text(255), ".join(columns)
+        columns_str = f"({columns_str} text(255))"
+        accdb_query = f"CREATE TABLE [{table_name}] {columns_str};"
         self._execute(accdb_query)
 
-        values = df.to_numpy().tolist()
+        columns_tpl = f"{tuple(columns)}".replace("'", "")
+        placeholder = f"{tuple(['?'] * len(columns))}".replace("'", "")
         for row in values:
-            row = "', '".join(row)
-            row = f"('{row}')"
+            accdb_query = (
+                f"INSERT INTO [{table_name}] {columns_tpl} VALUES {placeholder}"
+            )
+            params = tuple(row)
+            self._execute(accdb_query, params)
 
-            accdb_query = f"INSERT INTO [{table_name}] VALUES {row};"
-            self._execute(accdb_query)
-
-    def _execute(self, q):
-        self.accdb.execute(q)
+    def _execute(self, q, params=None):
+        self.accdb.execute(q, params)
         self.accdb.commit()
