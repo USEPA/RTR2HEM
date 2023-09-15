@@ -2,6 +2,7 @@ import os, pathlib
 import datetime
 import json
 import pandas as pd
+import numpy as np
 from modules.handle_accdb import AccdbHandle
 
 
@@ -187,16 +188,6 @@ class Config:
         self.input_table = settings["input_table"]
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
-        for column in self.input_df.columns:
-            if column == "regulatory_code" or column == "emission_process_group":
-                self.input_df[column].fillna("", inplace=True)
-            else:
-                self.input_df[column].fillna(0, inplace=True)
-
-        # exception for EIS input file
-        if "emission_process_group" not in self.input_df.columns:
-            self.input_df["emission_process_group"] = ""
-
         # EPGS -- optional
         self.epg_import = None
         epg = settings["emission_abbr"]
@@ -232,6 +223,34 @@ class Config:
         # NOTE -- may get weird if a column were to be renamed as an already existing column
         columns_map = {v.lower(): k for k, v in self.columns_map.items() if v}
         self.input_df = self.input_df.rename(columns=columns_map)
+
+    def set_input_df_column_types(self):
+        columns_int64 = ["fugitive_length_sigmax_ft", "fugitive_width_sigmay_ft"]
+        columns_float64 = [
+            "stack_height (ft)",
+            "exit_gas_temperature (f)",
+            "stack_diameter (ft)",
+            "exit_gas_velocity (ft/sec)",
+            "x_coordinate",
+            "y_coordinate",
+        ]
+
+        for c in self.input_df.columns:
+            if c == "regulatory_code" or c == "emission_process_group":
+                self.input_df[c].fillna("", inplace=True)
+            else:
+                self.input_df[c].fillna(0, inplace=True)
+
+            if c in columns_int64:
+                self.input_df[c] = self.input_df[c].astype(np.int64)
+            elif c in columns_float64:
+                self.input_df[c] = self.input_df[c].astype(np.float64)
+            else:
+                self.input_df[c] = self.input_df[c].astype(str)
+
+        # exception for EIS input file
+        if "emission_process_group" not in self.input_df.columns:
+            self.input_df["emission_process_group"] = ""
 
 
 config = Config()

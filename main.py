@@ -41,6 +41,7 @@ if settings.option_var.get() == "0":
 
 config.out = WriteOutputs()
 config.rename_columns()
+config.set_input_df_column_types()
 
 # minimize wait by writing static files during GUI process
 config.out.accdb.write(
@@ -103,7 +104,7 @@ else:
 
 
 ######## DEBUG ##########
-
+"""
 epgs = {
     "Conveying system transfer point": "AA",
     "Curing oven": "AB",
@@ -112,7 +113,7 @@ epgs = {
     "Periodic kiln": "AE",
     "Tunnel kiln": "AF",
 }
-
+"""
 # reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
 
 epg_pairs = {

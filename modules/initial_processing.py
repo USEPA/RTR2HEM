@@ -141,22 +141,22 @@ class InitialProcessing:
                 regex=config.emission_type.lower().replace(" ", "_")
             )
             emissions_col = emissions_df.columns[0]
-            return row[emissions_col]
+            return float(row[emissions_col])
         except:
             raise KeyError(
                 "Invalid emissions column name supplied. Rename through config."
             )
 
     def set_model_emission_tpy(self, row):
-        return float(row["emissions_tpy"]) * float(row["metal_speciation_factor"])
+        return row["emissions_tpy"] * float(row["metal_speciation_factor"])
 
     def set_epg_abbreviations(self, row):
         emissions_group = row["emission_process_group"]
         return self.epg_abbr_map.get(emissions_group, "")
 
     def set_source_type(self, row):
-        length = int(row["fugitive_length_sigmax_ft"])
-        width = int(row["fugitive_width_sigmay_ft"])
+        length = row["fugitive_length_sigmax_ft"]
+        width = row["fugitive_width_sigmay_ft"]
         erp_type_map = {
             "1": "A" if length > 0 and width > 0 else "P",  # area
             "2": "P",
@@ -176,43 +176,43 @@ class InitialProcessing:
         erp_type = row["emission_release_point_type"]
 
         if erp_type == "1" or erp_type == "7" or erp_type == "9":
-            return float(stack_height)
+            return stack_height
         elif erp_type == "10":
-            return float(stack_height) / 2
+            return stack_height / 2
         else:
-            return ""
+            return 0
 
     def set_metal_speciation_factor(self, row):
         return row["metal_speciation_factor"]
 
     # unit conversions
     def stack_height_meter(self, row):
-        stack_height_ft = float(row["stack_height (ft)"])
+        stack_height_ft = row["stack_height (ft)"]
         return stack_height_ft / self.ft_per_meter
 
     def stack_diameter_meter(self, row):
-        stack_diameter_ft = float(row["stack_diameter (ft)"])
+        stack_diameter_ft = row["stack_diameter (ft)"]
         return stack_diameter_ft / self.ft_per_meter
 
     def gas_velocity_mps(self, row):
-        gas_velocity_fts = float(row["exit_gas_velocity (ft/sec)"])
+        gas_velocity_fts = row["exit_gas_velocity (ft/sec)"]
         return gas_velocity_fts / self.ft_per_meter
 
     def gas_temperature_k(self, row):
-        gas_temperature_f = float(row["exit_gas_temperature (f)"])
+        gas_temperature_f = row["exit_gas_temperature (f)"]
         return self.fahrenheit_to_kelvin(gas_temperature_f)
 
     def fugitive_length_m(self, row):
-        fugitive_length_f = float(row["fugitive_length_sigmax_ft"])
+        fugitive_length_f = row["fugitive_length_sigmax_ft"]
         return fugitive_length_f / self.ft_per_meter
 
     def fugitive_width_m(self, row):
-        fugitive_width_f = float(row["fugitive_width_sigmay_ft"])
+        fugitive_width_f = row["fugitive_width_sigmay_ft"]
         return fugitive_width_f / self.ft_per_meter
 
     def release_height_m(self, row):
         try:
-            release_height_ft = float(row["ICFAreaVolLineReleaseHeight"])
+            release_height_ft = row["ICFAreaVolLineReleaseHeight"]
             return release_height_ft / self.ft_per_meter
         except:
-            return ""
+            return 0
