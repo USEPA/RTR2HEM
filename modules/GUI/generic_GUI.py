@@ -239,6 +239,10 @@ class GUI(ErrorHandling):
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
+        self.root.lift()
+        self.root.attributes("-topmost", True)
+        self.root.focus_force()
+
     def row_generator(self):
         rownum = 0
         while True:
