@@ -67,7 +67,8 @@ class RTR2HEM:
             for i, item in enumerate(epg_import):
                 key = item["emission_process_group"]
                 val = item["icfemissionprocessgroupabbr"]
-                epgs[key] = val
+                if key in epgs.keys():
+                    epgs[key] = val
 
         if epgs:
             epgs = EpgGUI(epgs).get_response()
