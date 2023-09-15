@@ -1,3 +1,4 @@
+import os, shutil
 import numpy as np
 import pandas as pd
 from modules.initial_processing import InitialProcessing
@@ -11,90 +12,110 @@ from modules.GUI.column_map import ColumnMapGUI
 from modules.GUI.epg_popup import EpgGUI
 from modules.GUI.regCodes_popup import RegCodesGUI
 
-"""
-1-7a
-"""
-settings = SettingsGUI()
-# loaded from interface
-if settings.option_var.get() == "0":
-    ColumnMapGUI()
 
-config.out = WriteOutputs()
-config.rename_columns()
-config.set_input_df_column_types()
+class RTR2HEM:
+    def __init__(self):
+        self.steps_to_7a()
+        self.step_7b()
+        self.step_7c()
+        self.step_7d()
+        self.step_7e()
+        self.step_7f()
 
-# minimize wait by writing static files during GUI process
-config.out.accdb.write(
-    "00 - RTR-HEM and PBHAP Poll Xwalk",
-    get_static("static_PollutantCrosswalk_andMetalSpeciations"),
-)
-config.out.accdb.write(
-    "00 - Tier 1 Eco Mpath EcoEEFs",
-    get_static("static_MP_EcoEquivalencyFactors"),
-)
-config.out.accdb.write(
-    "00 - Tier 1 Eco Mpath Thresh",
-    get_static("static_MP_EcoScreeningThresholds"),
-)
-config.out.accdb.write(
-    "00 - Tier 1 HumHealth Mpath REFs",
-    get_static("static_MP_PBHAPChems_withHHEquivalencyFactors"),
-)
-config.out.accdb.write(
-    "00 - Tier 1 HumHealth Mpath Thresh",
-    get_static("static_MP_HHScreeningThresholds"),
-)
+    def steps_to_7a(self):
+        """1-7a"""
+        settings = SettingsGUI()
+        # loaded from interface
+        if settings.option_var.get() == "0":
+            ColumnMapGUI()
 
-"""
-7b
-"""
-epgs = config.input_df["emission_process_group"]
-epgs = epgs.replace("", np.nan).dropna().unique().tolist()
-epgs.sort()
-epgs = dict(zip(epgs, [""] * len(epgs)))
+        config.out = WriteOutputs()
+        config.rename_columns()
+        config.set_input_df_column_types()
 
-# populate with import
-if config.epg_import is not None:
-    epg_import = config.epg_import.to_dict("records")
-    for i, item in enumerate(epg_import):
-        key = item["emission_process_group"]
-        val = item["icfemissionprocessgroupabbr"]
-        epgs[key] = val
+        # minimize wait by writing static files during GUI process
+        config.out.accdb.write(
+            "00 - RTR-HEM and PBHAP Poll Xwalk",
+            get_static("static_PollutantCrosswalk_andMetalSpeciations"),
+        )
+        config.out.accdb.write(
+            "00 - Tier 1 Eco Mpath EcoEEFs",
+            get_static("static_MP_EcoEquivalencyFactors"),
+        )
+        config.out.accdb.write(
+            "00 - Tier 1 Eco Mpath Thresh",
+            get_static("static_MP_EcoScreeningThresholds"),
+        )
+        config.out.accdb.write(
+            "00 - Tier 1 HumHealth Mpath REFs",
+            get_static("static_MP_PBHAPChems_withHHEquivalencyFactors"),
+        )
+        config.out.accdb.write(
+            "00 - Tier 1 HumHealth Mpath Thresh",
+            get_static("static_MP_HHScreeningThresholds"),
+        )
 
-if epgs:
-    epgs = EpgGUI(epgs).get_response()
+    def step_7b(self):
+        epgs = config.input_df["emission_process_group"]
+        epgs = epgs.replace("", np.nan).dropna().unique().tolist()
+        epgs.sort()
+        epgs = dict(zip(epgs, [""] * len(epgs)))
 
-epg_pairs = {
-    config.epg_required[0]: list(epgs.keys()),
-    config.epg_required[1]: list(epgs.values()),
-}
+        # populate with import
+        if config.epg_import is not None:
+            epg_import = config.epg_import.to_dict("records")
+            for i, item in enumerate(epg_import):
+                key = item["emission_process_group"]
+                val = item["icfemissionprocessgroupabbr"]
+                epgs[key] = val
 
-"""
-7c
-"""
-if config.only_category:
-    reg_codes = None
-else:
-    reg_codes = config.input_df["regulatory_code"]
-    reg_codes = reg_codes.unique().tolist()
-    reg_codes.sort()
-    reg_codes = RegCodesGUI(reg_codes).get_response()
+        if epgs:
+            epgs = EpgGUI(epgs).get_response()
 
-processed_df = InitialProcessing(config.input_df, epgs, reg_codes).run()
+        self.epgs = epgs
+        self.epg_pairs = {
+            config.epg_required[0]: list(epgs.keys()),
+            config.epg_required[1]: list(epgs.values()),
+        }
 
-config.out.accdb.write("01 - RTR Emiss Inventory With ICF Work", processed_df)
-config.out.accdb.write(
-    "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(epg_pairs)
-)
+    def step_7c(self):
+        if config.only_category:
+            reg_codes = None
+        else:
+            reg_codes = config.input_df["regulatory_code"]
+            reg_codes = reg_codes.unique().tolist()
+            reg_codes.sort()
+            reg_codes = RegCodesGUI(reg_codes).get_response()
 
-# 7d
-processed_df = SourceIDs(processed_df).run()
-config.out.accdb.write("04 - Final RTR-HEM Emiss Inventory Xwalk", processed_df)
+        self.processed_df = InitialProcessing(
+            config.input_df, self.epgs, reg_codes
+        ).run()
 
-# 7e
-MultiPathwayProcessing(processed_df).run()
+        config.out.accdb.write(
+            "01 - RTR Emiss Inventory With ICF Work", self.processed_df
+        )
+        config.out.accdb.write(
+            "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(self.epg_pairs)
+        )
 
-# 7f
-config.out.run(processed_df)
+    def step_7d(self):
+        self.processed_df = SourceIDs(self.processed_df).run()
+        config.out.accdb.write(
+            "04 - Final RTR-HEM Emiss Inventory Xwalk", self.processed_df
+        )
 
-print("Done!")
+    def step_7e(self):
+        MultiPathwayProcessing(self.processed_df).run()
+
+    def step_7f(self):
+        config.out.run(self.processed_df)
+
+
+if __name__ == "__main__":
+    try:
+        RTR2HEM()
+        print("Done!")
+    except Exception as e:
+        print(e)
+        if config.out and os.path.exists(config.out.output_dir):
+            shutil.rmtree(config.out.output_dir)
