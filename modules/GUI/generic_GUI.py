@@ -1,4 +1,8 @@
-import os, pathlib, gc
+import os
+import gc
+import re
+import math
+import pathlib
 import traceback
 from tkinter import *
 from tkinter import filedialog
@@ -151,6 +155,12 @@ class FileImport:
         popup_root = Toplevel(self.root)
         popup_root.title(f"{self.filename} - Table Select")
 
+        self.root.update()
+        x = self.root.winfo_rootx()
+        y = self.root.winfo_rooty()
+        popup_root.geometry("+%d+%d" % (x - 200, y - 200))
+
+        # widgets
         ok_btn = Button(
             popup_root,
             text="OK",
@@ -240,6 +250,12 @@ class GUI(ErrorHandling):
     def width(self, widget):
         widget.update()
         return widget.winfo_width()
+
+    def update_box_height(self, widget, w, h=1):
+        text_length = str(widget.index("1.end"))
+        text_length = int(re.search(".(\d+)", text_length).group(1))
+        new_height = math.floor(text_length / w)
+        widget.config(height=new_height + h)
 
     def close_window(self):
         self.root.destroy()

@@ -62,6 +62,7 @@ class ColumnMapGUI(GUI):
 
             column_txtbox.delete(1.0, END)
             column_txtbox.insert(END, column)
+            self.update_box_height(column_txtbox, 30)
             column_txtbox.config(state=DISABLED)
             column_txtbox.grid(
                 row=next(gen),

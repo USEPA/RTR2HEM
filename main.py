@@ -12,26 +12,6 @@ from modules.GUI.epg_popup import EpgGUI
 from modules.GUI.regCodes_popup import RegCodesGUI
 
 """
-Demo refactories data settings
-
-src_cat_name = "Refractories" + date
-new_emission_abbr = True
-only_category_records = False -- has "WholeFacility" in the filename
-emission_type = 'Actual Emissions' -- this changes depending on what you want to process, this file has all 3
-create_src_ids = True
-
-input_table = "Refractories_WholeFacil_ATAGFormat_20200904(edited)"
-
-both source category records and whole-facility records
-has source category emissions of 4 of the 5 PB-HAPs (missing: dioxins) 
-    but, only 2 ERPTs and the both map to modeling as point sources
-reg code 63SSSSS
-6 unique EPGs
-
-dont forget that the results get loaded into pre-existing templates
-"""
-
-"""
 1-7a
 """
 settings = SettingsGUI()
@@ -78,21 +58,19 @@ if config.epg_import is not None:
     epg_import = config.epg_import.to_dict("records")
     for i, item in enumerate(epg_import):
         key = item["emission_process_group"]
-        val = item["emissionprocessgroup_abbr"]
+        val = item["icfemissionprocessgroupabbr"]
         epgs[key] = val
 
-# if epgs:
-# epgs = EpgGUI(epgs).get_response()
-# epg_pairs = {
-#    config.epg_required[0]: list(epgs.keys()),
-#    config.epg_required[1]: list(epgs.values()),
-# }
+if epgs:
+    epgs = EpgGUI(epgs).get_response()
 
+epg_pairs = {
+    config.epg_required[0]: list(epgs.keys()),
+    config.epg_required[1]: list(epgs.values()),
+}
 
 """
 7c
-
-TODO -- If nothing selected, should everything be selected
 """
 if config.only_category:
     reg_codes = None
@@ -102,28 +80,8 @@ else:
     reg_codes.sort()
     reg_codes = RegCodesGUI(reg_codes).get_response()
 
-
-######## DEBUG ##########
-"""
-epgs = {
-    "Conveying system transfer point": "AA",
-    "Curing oven": "AB",
-    "Induction furnace": "AC",
-    "Lime Kiln and Cooler with common exhaust": "AD",
-    "Periodic kiln": "AE",
-    "Tunnel kiln": "AF",
-}
-"""
-# reg_codes = {"": 0, "63AAAAA": 0, "63SSSSS": 1, "SLT-0001": 0}
-
-epg_pairs = {
-    config.epg_required[0]: list(epgs.keys()),
-    config.epg_required[1]: list(epgs.values()),
-}
-#########################
-
-
 processed_df = InitialProcessing(config.input_df, epgs, reg_codes).run()
+
 config.out.accdb.write("01 - RTR Emiss Inventory With ICF Work", processed_df)
 config.out.accdb.write(
     "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(epg_pairs)

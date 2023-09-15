@@ -1,7 +1,7 @@
 {
     "settings": {
         "source_category_name": "Refractories",
-        "only_category_records": true,
+        "only_category_records": false,
         "emission_type": "Actual",
         "emission_abbr": {
             "import": false,
@@ -13,8 +13,8 @@
             "file": "C:/Users/55586/Desktop/tools/access tool/Old Refractories Run/Output/example/SourceCategory_Actual_XWalks_YYYYMMDD.accdb",
             "table": "03 - Source ID Xwalk"
         },
-        "input_file": "../example_epa_input.csv",
-        "input_table": "",
+        "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
+        "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
         "static": "./static"
     },
     "columns_map": {
@@ -40,10 +40,10 @@
         "naics_primary": "",
         "y_coordinate": "",
         "x_coordinate": "",
-        "fugitive_2d_midpoint1_x_coordinate": "fug_2d_midpnt1_x_co",
-        "fugitive_2d_midpoint1_y_coordinate": "fug_2d_midpnt1_y_co",
-        "fugitive_2d_midpoint2_x_coordinate": "fug_2d_midpt2_x_co",
-        "fugitive_2d_midpoint2_y_coordinate": "fug_2d_midpt2_y_co",
+        "fugitive_2d_midpoint1_x_coordinate": "",
+        "fugitive_2d_midpoint1_y_coordinate": "",
+        "fugitive_2d_midpoint2_x_coordinate": "",
+        "fugitive_2d_midpoint2_y_coordinate": "",
         "facility_name": "",
         "location_address": "",
         "city": "",

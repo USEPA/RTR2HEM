@@ -26,6 +26,8 @@ class RegCodesGUI(GUI):
             regCodes.append(regCode.get())
 
         self.regCode_results = dict(zip(self.regCode_list, regCodes))
+        if 1 not in regCodes:
+            self.regCode_results = None
         self.close_window()
 
     def select_all(self, is_checked, regCode_button_list):
