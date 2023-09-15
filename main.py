@@ -1,29 +1,30 @@
 import os, shutil
+import logging
 import numpy as np
 import pandas as pd
+
 from modules.initial_processing import InitialProcessing
 from modules.source_ids import SourceIDs
 from modules.multipathway_processing import MultiPathwayProcessing
 from modules.write_outputs import WriteOutputs
 from modules.utils import get_static, config
 
-from modules.GUI.settings import SettingsGUI
-from modules.GUI.column_map import ColumnMapGUI
-from modules.GUI.epg_popup import EpgGUI
-from modules.GUI.regCodes_popup import RegCodesGUI
+from modules.GUI import SettingsGUI, ColumnMapGUI, EpgGUI, RegCodesGUI
 
 
 class RTR2HEM:
     def __init__(self):
-        self.steps_to_7a()
-        self.step_7b()
-        self.step_7c()
-        self.step_7d()
-        self.step_7e()
-        self.step_7f()
+        self.settings_select()
+        self.epgs_select()
+        self.reg_codes_and_initial_processing()
+        self.source_ids_create()
+        self.multipathway_processing()
+        self.write_all_remaining_outputs()
 
-    def steps_to_7a(self):
+    def settings_select(self):
         """1-7a"""
+        logging.info("Settings select")
+
         settings = SettingsGUI()
         # loaded from interface
         if settings.option_var.get() == "0":
@@ -55,7 +56,10 @@ class RTR2HEM:
             get_static("static_MP_HHScreeningThresholds"),
         )
 
-    def step_7b(self):
+    def epgs_select(self):
+        """7b"""
+        logging.info("EPGs select")
+
         epgs = config.input_df["emission_process_group"]
         epgs = epgs.replace("", np.nan).dropna().unique().tolist()
         epgs.sort()
@@ -79,7 +83,10 @@ class RTR2HEM:
             config.epg_required[1]: list(epgs.values()),
         }
 
-    def step_7c(self):
+    def reg_codes_and_initial_processing(self):
+        """7c"""
+        logging.info("Regulatory codes select")
+
         if config.only_category:
             reg_codes = None
         else:
@@ -88,6 +95,7 @@ class RTR2HEM:
             reg_codes.sort()
             reg_codes = RegCodesGUI(reg_codes).get_response()
 
+        logging.info("Initial processing")
         self.processed_df = InitialProcessing(
             config.input_df, self.epgs, reg_codes
         ).run()
@@ -99,24 +107,30 @@ class RTR2HEM:
             "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(self.epg_pairs)
         )
 
-    def step_7d(self):
+    def source_ids_create(self):
+        """7d"""
+        logging.info("Creating source ids")
         self.processed_df = SourceIDs(self.processed_df).run()
         config.out.accdb.write(
             "04 - Final RTR-HEM Emiss Inventory Xwalk", self.processed_df
         )
 
-    def step_7e(self):
+    def multipathway_processing(self):
+        """7e"""
+        logging.info("Running multipathway processing queries")
         MultiPathwayProcessing(self.processed_df).run()
 
-    def step_7f(self):
+    def write_all_remaining_outputs(self):
+        """7f"""
+        logging.info("Writing outputs")
         config.out.run(self.processed_df)
 
 
 if __name__ == "__main__":
     try:
         RTR2HEM()
-        print("Done!")
+        logging.info("Done!")
     except Exception as e:
-        print(e)
+        logging.exception(e)
         if config.out and os.path.exists(config.out.output_dir):
             shutil.rmtree(config.out.output_dir)

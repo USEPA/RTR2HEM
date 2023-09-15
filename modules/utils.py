@@ -1,9 +1,19 @@
-import os, pathlib
+import os, sys, pathlib
+import logging
 import datetime
 import json
 import pandas as pd
 import numpy as np
+import warnings
 from modules.handle_accdb import AccdbHandle
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.DEBUG,
+    datefmt="%H:%M:%S",
+    format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
+)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def get_static(filename):
@@ -188,7 +198,7 @@ class Config:
         self.input_table = settings["input_table"]
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
-        # EPGS -- optional
+        # EPGs -- optional
         self.epg_import = None
         epg = settings["emission_abbr"]
         if epg["import"]:

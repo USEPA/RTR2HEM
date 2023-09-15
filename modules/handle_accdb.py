@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import msaccessdb, pypyodbc
 
@@ -8,6 +9,7 @@ class AccdbHandle:
         if how == "create":
             self.create_accdb()
         elif how == "open":
+            logging.info(f"Opening {self.accdb_fp}")
             self.open_accdb()
 
     def create_accdb(self):

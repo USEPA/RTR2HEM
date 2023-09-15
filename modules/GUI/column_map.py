@@ -97,9 +97,6 @@ class ColumnMapGUI(GUI):
     def _on_mousewheel(self, event):
         return "break"
 
-    def update_bg(self, e):
-        print(e)
-
     def submit(self, columns_to_map):
         for i, key in enumerate(config.columns_map):
             renamed_col = columns_to_map[i].get()

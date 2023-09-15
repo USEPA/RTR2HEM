@@ -1,3 +1,4 @@
+import logging
 from modules.utils import set_column
 
 
@@ -44,9 +45,8 @@ class HapEmissions:
     def set_SumEmissionTPY(self, row):
         val = float(row["ICFModelEmissionTPY"])
         if val < 9e-28 and val > 0:
-            print(
+            logging.warning(
                 "Some emissions are too small for modeling (On the order of E-29 or smaller TPY).  Setting them to 0."
             )
             val = 0
         return val
-        # return f'{val:.15f}'
