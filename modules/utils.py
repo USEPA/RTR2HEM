@@ -154,6 +154,7 @@ class Config:
     Read in config settings, either by a .json input file or settings GUI
     """
 
+    not_required = ["emission_process_group"]
     epg_required = ["emission_process_group", "ICFEmissionProcessGroupAbbr"]
     srcid_required = [
         "ICFFacilityID",

@@ -5,7 +5,6 @@ from modules.utils import config
 
 
 class ColumnMapGUI(GUI):
-    not_required = ["emission_process_group"]
     light_red = "#f79b9f"
 
     def __init__(self):
@@ -82,7 +81,7 @@ class ColumnMapGUI(GUI):
             if column in input_columns:
                 menu.set(column)
                 menu.configure(style="white.TCombobox")
-            elif column in self.not_required:
+            elif column in config.not_required:
                 menu.set("")
                 menu.configure(style="white.TCombobox")
             else:
@@ -100,7 +99,8 @@ class ColumnMapGUI(GUI):
     def submit(self, columns_to_map):
         for i, key in enumerate(config.columns_map):
             renamed_col = columns_to_map[i].get()
-            if key in self.not_required:
+
+            if key in config.not_required:
                 continue
             if not renamed_col:
                 self.warn(msg="Field name could not be found and must be selected.")

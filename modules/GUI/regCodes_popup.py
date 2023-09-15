@@ -5,7 +5,6 @@ from .generic_GUI import GUI
 class RegCodesGUI(GUI):
     def __init__(self, regCode_list):
         self.regCode_list = regCode_list
-
         super().__init__(title="Regulatory Codes")
         try:
             self.main()

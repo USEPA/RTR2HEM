@@ -153,12 +153,12 @@ class FileImport:
     def tables_popup(self, tables):
         """Display list of tables in file"""
         popup_root = Toplevel(self.root)
-        popup_root.title(f"{self.filename} - Table Select")
 
-        self.root.update()
         x = self.root.winfo_rootx()
         y = self.root.winfo_rooty()
         popup_root.geometry("+%d+%d" % (x - 200, y - 200))
+
+        popup_root.title(f"{self.filename} - Table Select")
 
         # widgets
         ok_btn = Button(
@@ -230,13 +230,12 @@ class GUI(ErrorHandling):
 
     def __init__(self, title="", dimensions=None):
         self.root = Tk()
-
+        self.root.resizable(False, False)
         self.root.eval("tk::PlaceWindow . center")
+
         self.root.title(title)
         if dimensions:
             self.root.geometry(dimensions)
-
-        self.root.resizable(False, False)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 

@@ -96,6 +96,7 @@ class RTR2HEM:
             reg_codes = RegCodesGUI(reg_codes).get_response()
 
         logging.info("Initial processing")
+
         self.processed_df = InitialProcessing(
             config.input_df, self.epgs, reg_codes
         ).run()
@@ -110,6 +111,7 @@ class RTR2HEM:
     def source_ids_create(self):
         """7d"""
         logging.info("Creating source ids")
+
         self.processed_df = SourceIDs(self.processed_df).run()
         config.out.accdb.write(
             "04 - Final RTR-HEM Emiss Inventory Xwalk", self.processed_df
