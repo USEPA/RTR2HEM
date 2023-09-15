@@ -1,4 +1,5 @@
 import os, pathlib, gc
+import traceback
 from tkinter import *
 from tkinter import filedialog
 import tkinter.messagebox
@@ -18,7 +19,9 @@ class ErrorHandling:
         )
         return
 
-    def error(self, errorMsg):
+    def error(self, errorMsg=None):
+        if not errorMsg:
+            errorMsg = traceback.format_exc()
         root = Tk()
         tkinter.messagebox.showinfo("Exception", errorMsg)
         root.destroy()

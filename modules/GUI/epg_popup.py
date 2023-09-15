@@ -11,7 +11,7 @@ class EpgGUI(GUI):
         try:
             self.main()
         except Exception as e:
-            self.error(e)
+            self.error()
 
     def get_response(self):
         return self.epg_results

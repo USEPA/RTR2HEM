@@ -10,7 +10,7 @@ class RegCodesGUI(GUI):
         try:
             self.main()
         except Exception as e:
-            self.error(e)
+            self.error()
 
     def get_response(self):
         return self.regCode_results

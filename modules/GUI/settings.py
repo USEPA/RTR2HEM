@@ -15,7 +15,7 @@ class SettingsGUI(GUI):
             self.root.configure(background=self.blue)
             self.main()
         except Exception as e:
-            self.error(e)
+            self.error()
 
     def main(self):
         self.gen = self.row_generator()
