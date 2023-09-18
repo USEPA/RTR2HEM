@@ -103,7 +103,7 @@ class ColumnMapGUI(GUI):
             if key in config.not_required:
                 continue
             if not renamed_col:
-                self.warn(msg="Field name could not be found and must be selected.")
+                self.warn(msg="Field name in red could not be found and must be selected.")
                 return
             if key != renamed_col:
                 config.columns_map[key] = renamed_col

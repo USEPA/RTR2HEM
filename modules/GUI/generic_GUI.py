@@ -158,6 +158,7 @@ class FileImport:
         y = self.root.winfo_rooty()
         popup_root.geometry("+%d+%d" % (x - 200, y - 200))
 
+        popup_root.attributes("-topmost", True)
         popup_root.title(f"{self.filename} - Table Select")
 
         # widgets
@@ -238,10 +239,7 @@ class GUI(ErrorHandling):
             self.root.geometry(dimensions)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
-
-        self.root.lift()
         self.root.attributes("-topmost", True)
-        self.root.focus_force()
 
     def row_generator(self):
         rownum = 0
