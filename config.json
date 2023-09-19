@@ -13,7 +13,7 @@
             "file": "C:/Users/55586/Desktop/tools/access tool/Old Refractories Run/Output/example/SourceCategory_Actual_XWalks_YYYYMMDD.accdb",
             "table": "03 - Source ID Xwalk"
         },
-        "input_file": "../Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
+        "input_file": "C:/Users/55586/Desktop/tools/access tool/Old Refractories Run/Input/Refractories_WholeFacil_ATAG_Format_20200904_edited(radionuclides).accdb",
         "input_table": "Refractories_WholeFacil_ATAGFormat_20200904(edited)",
         "static": "./static"
     },

@@ -4,6 +4,7 @@ import re
 import math
 import pathlib
 import traceback
+import logging
 from tkinter import *
 from tkinter import filedialog
 import tkinter.messagebox
@@ -30,8 +31,7 @@ class ErrorHandling:
         tkinter.messagebox.showinfo("Exception", errorMsg)
         root.destroy()
         root.mainloop()
-
-        raise Exception(errorMsg)
+        logging.exception(errorMsg)
 
 
 class ScrollbarFrame(Frame):

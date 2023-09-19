@@ -8,7 +8,9 @@ import warnings
 from modules.handle_accdb import AccdbHandle
 
 logging.basicConfig(
-    stream=sys.stdout,
+    filename="log.txt",
+    filemode="w",
+    # stream=sys.stdout,
     level=logging.DEBUG,
     datefmt="%H:%M:%S",
     format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",

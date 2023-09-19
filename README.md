@@ -1,5 +1,20 @@
-# RTR2HEM migration from access to python
+# RTR2HEM Tool
 
+## Structure
+The structure of the RTR2HEM tool is designed to reflect the structure of the original access tool so that debugging and referencing existing code
+is as easy as possible. Eventually, for optimization reasons, we may deviate more from this structure.
+
+## Naming Convention
+All columns not explicitly created by the tool (e.g. ICF...) should be converted to and referenced by lowercase until final output.
+This includes all intermediate steps where columns may be renamed to the same name.
+
+## Building the Executable
+All necessary files will be placed in an /exe/ directory after running:
+```
+    python build.py
+```
+
+### Notes
 ```
 [Settings]
 source_category_name=Refractories
