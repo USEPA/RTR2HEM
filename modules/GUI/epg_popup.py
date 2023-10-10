@@ -61,7 +61,6 @@ class EpgGUI(GUI):
     def main(self):
         epg_msg_list = []
         epg_entry_list = []
-        epg_longest_emission = len(max(self.epg_list, key=len))
 
         gen = RowGenerator()
 
@@ -100,19 +99,16 @@ class EpgGUI(GUI):
         )
         run_qa.grid(row=gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
+        ################################################
+
         sbf = self.scrollbar(self.root)
         frame = sbf.scrolled_frame
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         for i, epg in enumerate(self.epg_list):
-            if epg_longest_emission > 40:
-                epg_message_height = 2
-                epg = f"{epg[:40]}\n{epg[40:]}"
-            else:
-                epg_message_height = 1
-
+            epg, epg_h = self.split_str(40, epg)
             epg_message = Text(
-                frame, height=epg_message_height, width=40, borderwidth=1, relief=SOLID
+                frame, height=epg_h, width=40, borderwidth=1, relief=SOLID
             )
             epg_message.delete(1.0, END)
             epg_message.insert(END, epg)

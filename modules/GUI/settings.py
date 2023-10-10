@@ -113,7 +113,7 @@ class SettingsGUI(GUI):
         # Import existing EPGs and Source IDs
         import_subroot = LabelFrame(
             root,
-            text="Import",
+            text="Import (optional)",
             font=16,
             borderwidth=3,
             relief="groove",

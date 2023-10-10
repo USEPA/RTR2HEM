@@ -144,8 +144,12 @@ class FileImport:
             self.filepath = ""
             self.filename = ""
             self.table = ""
-        self.file_lbl.config(text=self.filename)
-        self.table_lbl.config(text=self.table)
+
+        file_str, h = GUI.split_str(self, 40, self.filename)
+        table_str, h = GUI.split_str(self, 40, self.table)
+
+        self.file_lbl.config(text=file_str, justify=LEFT)
+        self.table_lbl.config(text=table_str, justify=LEFT)
         toplevel.destroy()
 
     def tables_popup(self, tables):
@@ -230,8 +234,8 @@ class FileImport:
 
 
 class RowGenerator:
-    def __init__(self):
-        self.row = -1
+    def __init__(self, start=-1):
+        self.row = start
 
     def next(self):
         self.row += 1
@@ -266,11 +270,16 @@ class GUI(ErrorHandling):
         widget.update()
         return widget.winfo_width()
 
-    def update_box_height(self, widget, w, h=1):
-        text_length = str(widget.index("1.end"))
-        text_length = int(re.search(".(\d+)", text_length).group(1))
-        new_height = math.floor(text_length / w)
-        widget.config(height=new_height + h)
+    def split_str(self, h, str):
+        """Resize widgets and split strings based on width constraint"""
+        result = ""
+        height = 1
+        while len(str) >= h:
+            height += 1
+            result += f"{str[:h]}\n"
+            str = str[h:]
+        result += str
+        return result, height
 
     def close_window(self):
         self.root.destroy()
