@@ -14,10 +14,10 @@ class InitialProcessing:
         "pollutant_code",
         "pollutant_description",
         "hap_category_name",
-        "emissions_tpy",
-        "ICFModelEmissionTPY",
         "hem3_chemical_name",
         "chem name for tier 2 tool",
+        "emissions_tpy",
+        "ICFModelEmissionTPY",
         "regulatory_code",
         "ICFCatLevelModeling",
         "emission_process_group",
@@ -129,8 +129,6 @@ class InitialProcessing:
 
     def is_selected_regulatory_code(self, row):
         code = row["regulatory_code"]
-        if self.reg_codes == None:
-            return "Yes"
         if self.reg_codes.get(code) == 1:
             return "Yes"
         return "No"

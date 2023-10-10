@@ -1,5 +1,5 @@
 from tkinter import *
-from .generic_GUI import GUI
+from .generic_GUI import GUI, RowGenerator
 
 
 class RegCodesGUI(GUI):
@@ -25,8 +25,6 @@ class RegCodesGUI(GUI):
             regCodes.append(regCode.get())
 
         self.regCode_results = dict(zip(self.regCode_list, regCodes))
-        if 1 not in regCodes:
-            self.regCode_results = None
         self.close_window()
 
     def select_all(self, is_checked, regCode_button_list):
@@ -39,7 +37,13 @@ class RegCodesGUI(GUI):
     def main(self):
         regCode_button_list = []
 
-        gen = self.row_generator()
+        gen = RowGenerator()
+
+        title_label = Label(
+            self.root,
+            text="Select the regulatory code(s) defining the source category.",
+        )
+        title_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         select_all_var = IntVar()
         select_all_btn = Checkbutton(
@@ -51,7 +55,7 @@ class RegCodesGUI(GUI):
             variable=select_all_var,
             command=lambda: self.select_all(select_all_var, regCode_button_list),
         )
-        select_all_btn.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+        select_all_btn.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         clear_all_btn = Button(
             self.root,
@@ -59,7 +63,7 @@ class RegCodesGUI(GUI):
             command=lambda: self.clear_all(select_all_var, regCode_button_list),
         )
         clear_all_btn.grid(
-            row=next(gen), column=0, pady=(0, 5), padx=(10, 10), sticky=W
+            row=gen.next(), column=0, pady=(0, 5), padx=(10, 10), sticky=W
         )
 
         run_qa = Button(
@@ -67,18 +71,18 @@ class RegCodesGUI(GUI):
             text="Submit",
             command=lambda: self.qa_regCodes(regCode_button_list),
         )
-        run_qa.grid(row=next(gen), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
+        run_qa.grid(row=gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
         sbf = self.scrollbar(self.root, bg_color="#f0f0f0")
         frame = sbf.scrolled_frame
-        sbf.grid(row=next(gen), column=0, sticky="nsew")
+        sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         for i, regCode in enumerate(self.regCode_list):
             regCode_var = IntVar()
             regCode_button = Checkbutton(
                 frame, text=regCode, onvalue=1, offvalue=0, variable=regCode_var
             )
-            regCode_button.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+            regCode_button.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
             regCode_button_list.append(regCode_var)
 
         super().main()

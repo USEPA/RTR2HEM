@@ -1,5 +1,5 @@
 from tkinter import *
-from modules.GUI.generic_GUI import GUI, FileImport
+from modules.GUI.generic_GUI import GUI, RowGenerator, FileImport
 from modules.utils import config
 
 
@@ -18,7 +18,7 @@ class SettingsGUI(GUI):
             self.error()
 
     def main(self):
-        self.gen = self.row_generator()
+        self.gen = RowGenerator()
 
         subroot = self.settings_option()
         self.name_and_base_import(subroot)
@@ -33,7 +33,7 @@ class SettingsGUI(GUI):
             command=lambda: self.run_setup(),
         )
         run_setup.grid(
-            row=next(self.gen), column=0, pady=(5, 5), padx=(10, 10), sticky=W
+            row=self.gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W
         )
 
         super().main()
@@ -77,11 +77,11 @@ class SettingsGUI(GUI):
             command=lambda: disableChildren(subroot),
         )
 
-        read_user_opts.grid(row=next(self.gen), column=0, padx=(12, 0), sticky=W)
+        read_user_opts.grid(row=self.gen.next(), column=0, padx=(12, 0), sticky=W)
 
         config_padx_left = self.width(read_user_opts) + 20
         read_config.grid(
-            row=self.current_gen, column=0, padx=(config_padx_left, 0), sticky=W
+            row=self.gen.current(), column=0, padx=(config_padx_left, 0), sticky=W
         )
 
         subroot = LabelFrame(
@@ -92,18 +92,18 @@ class SettingsGUI(GUI):
             borderwidth=2,
             relief="groove",
         )
-        subroot.grid(row=next(self.gen), columnspan=10, padx=10)
+        subroot.grid(row=self.gen.next(), columnspan=10, padx=10)
         return subroot
 
     def name_and_base_import(self, root):
         # Source Category (output files) name
         src_cat_label = Label(root, text="Source Catgeory name", bg=self.grey)
-        src_cat_label.grid(row=next(self.gen), column=0, padx=(0, 0), sticky=W)
+        src_cat_label.grid(row=self.gen.next(), column=0, padx=(0, 0), sticky=W)
 
         self.src_cat_name = Entry(root, width=40)
         src_cat_padx_left = self.width(src_cat_label) + 10
         self.src_cat_name.grid(
-            row=self.current_gen, padx=(src_cat_padx_left, 5), sticky=W
+            row=self.gen.current(), padx=(src_cat_padx_left, 5), sticky=W
         )
 
         # accdb and table select
@@ -118,12 +118,12 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        import_subroot.grid(row=next(self.gen), padx=(5, 0), pady=(10, 10), sticky=W)
+        import_subroot.grid(row=self.gen.next(), padx=(5, 0), pady=(10, 10), sticky=W)
 
         Label(
             import_subroot,
             text="Import previously generated emission process group abbreviations",
-        ).grid(row=next(self.gen), sticky=W)
+        ).grid(row=self.gen.next(), sticky=W)
         self.epgs = FileImport(
             import_subroot,
             self.gen,
@@ -131,7 +131,7 @@ class SettingsGUI(GUI):
         ).create()
 
         Label(import_subroot, text="Import previously generated SourceIDs").grid(
-            row=next(self.gen), sticky=W
+            row=self.gen.next(), sticky=W
         )
         self.srcids = FileImport(
             import_subroot, self.gen, required_columns=config.srcid_required
@@ -146,10 +146,10 @@ class SettingsGUI(GUI):
             borderwidth=3,
             relief="groove",
         )
-        self.emissions_subroot.grid(row=next(self.gen), padx=(5, 5), sticky=W)
+        self.emissions_subroot.grid(row=self.gen.next(), padx=(5, 5), sticky=W)
         self.emiss_var = StringVar(value="Actual")
 
-        self.emissions_subroot_row = self.current_gen
+        self.emissions_subroot_row = self.gen.current()
 
         actual = Radiobutton(
             self.emissions_subroot,
@@ -157,7 +157,7 @@ class SettingsGUI(GUI):
             variable=self.emiss_var,
             value="Actual",
         )
-        actual.grid(row=next(self.gen), sticky=W)
+        actual.grid(row=self.gen.next(), sticky=W)
 
         allowable = Radiobutton(
             self.emissions_subroot,
@@ -165,7 +165,7 @@ class SettingsGUI(GUI):
             variable=self.emiss_var,
             value="Allowable",
         )
-        allowable.grid(row=next(self.gen), sticky=W)
+        allowable.grid(row=self.gen.next(), sticky=W)
 
         acute = Radiobutton(
             self.emissions_subroot,
@@ -173,7 +173,7 @@ class SettingsGUI(GUI):
             variable=self.emiss_var,
             value="Acute",
         )
-        acute.grid(row=next(self.gen), sticky=W)
+        acute.grid(row=self.gen.next(), sticky=W)
 
     def records_type(self, root):
         # Category/Whole Records choice

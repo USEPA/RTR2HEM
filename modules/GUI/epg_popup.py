@@ -1,6 +1,6 @@
 from string import ascii_uppercase
 from tkinter import *
-from .generic_GUI import GUI
+from .generic_GUI import GUI, RowGenerator
 
 
 class EpgGUI(GUI):
@@ -63,12 +63,14 @@ class EpgGUI(GUI):
         epg_entry_list = []
         epg_longest_emission = len(max(self.epg_list, key=len))
 
-        gen = self.row_generator()
+        gen = RowGenerator()
 
         title_label = Label(
-            self.root, text="Abbreviations must be made up of 2 unique letters."
+            self.root,
+            text="Supply unique 2-character abbreviations (on the right) for each\nemission process group.",
+            justify=LEFT,
         )
-        title_label.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+        title_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         autofill_var = IntVar()
         autofill_abbreviations = Checkbutton(
@@ -80,7 +82,7 @@ class EpgGUI(GUI):
             variable=autofill_var,
             command=lambda: self.autofill(autofill_var, epg_entry_list),
         )
-        autofill_abbreviations.grid(row=next(gen), column=0, padx=(10, 10), sticky=W)
+        autofill_abbreviations.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         clear_abbr_button = Button(
             self.root,
@@ -88,7 +90,7 @@ class EpgGUI(GUI):
             command=lambda: self.clear_epgs(autofill_var, epg_entry_list),
         )
         clear_abbr_button.grid(
-            row=next(gen), column=0, pady=(0, 5), padx=(10, 10), sticky=W
+            row=gen.next(), column=0, pady=(0, 5), padx=(10, 10), sticky=W
         )
 
         run_qa = Button(
@@ -96,11 +98,11 @@ class EpgGUI(GUI):
             text="Submit",
             command=lambda: self.qa_epgs(epg_entry_list),
         )
-        run_qa.grid(row=next(gen), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
+        run_qa.grid(row=gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
         sbf = self.scrollbar(self.root)
         frame = sbf.scrolled_frame
-        sbf.grid(row=next(gen), column=0, sticky="nsew")
+        sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         for i, epg in enumerate(self.epg_list):
             if epg_longest_emission > 40:
@@ -117,7 +119,7 @@ class EpgGUI(GUI):
             epg_message.config(state=DISABLED)
             epg_msg_list.append(epg_message)
             epg_msg_list[i].grid(
-                row=next(gen),
+                row=gen.next(),
                 column=0,
                 pady=(5, 5),
                 padx=(5, 0),
@@ -130,9 +132,7 @@ class EpgGUI(GUI):
             epg_abbr_entry.insert(0, self.epg_vals[i])
 
             epg_entry_list.append(epg_abbr_entry)
-            epg_entry_list[i].grid(
-                row=self.current_gen, column=1, padx=(10, 10), sticky=W
-            )
+            epg_entry_list[i].grid(row=gen.current(), column=1, padx=(10, 10), sticky=W)
         self.bind_entries(epg_entry_list)
 
         super().main()

@@ -104,9 +104,9 @@ class RTR2HEM:
             config.input_df, self.epgs, reg_codes
         ).run()
 
-        config.out.accdb.write(
-            "01 - RTR Emiss Inventory With ICF Work", self.processed_df
-        )
+        # config.out.accdb.write(
+        #    "01 - RTR Emiss Inventory With ICF Work", self.processed_df
+        # )
         config.out.accdb.write(
             "02 - Emiss Process Grp Abbr Xwalk", pd.DataFrame.from_dict(self.epg_pairs)
         )
@@ -138,4 +138,5 @@ if __name__ == "__main__":
     except Exception as e:
         logging.exception(e)
         if config.out and os.path.exists(config.out.output_dir):
+            config.out.accdb.close_accdb()
             shutil.rmtree(config.out.output_dir)

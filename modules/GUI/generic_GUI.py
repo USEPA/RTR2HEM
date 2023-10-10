@@ -114,28 +114,26 @@ class FileImport:
 
     def create(self, btn_name="Import File"):
         """Initial button/labels widget create"""
-        current_row = next(self.row)
-
         self.import_btn = Button(
             self.root,
             text=btn_name,
             command=lambda: self.import_file(),
         )
-        self.import_btn.grid(row=current_row, padx=(5, 0), pady=(5, 0), sticky=W)
+        self.import_btn.grid(row=self.row.next(), padx=(5, 0), pady=(5, 0), sticky=W)
         spacing = GUI.width(self, self.import_btn) + 10
 
         # filepath
         self.file_lbl = Label(
             self.root, text="", bg="#ffffff", borderwidth=1, relief=GROOVE, width=42
         )
-        self.file_lbl.grid(row=current_row, padx=(spacing, 0), sticky=W)
+        self.file_lbl.grid(row=self.row.current(), padx=(spacing, 0), sticky=W)
 
         # filename
         self.table_lbl = Label(
             self.root, text="", bg="#ffffff", borderwidth=1, relief=GROOVE, width=42
         )
         self.table_lbl.grid(
-            row=next(self.row), padx=(spacing, 5), pady=(0, 5), sticky=W
+            row=self.row.next(), padx=(spacing, 5), pady=(0, 5), sticky=W
         )
         return self
 
@@ -153,6 +151,7 @@ class FileImport:
     def tables_popup(self, tables):
         """Display list of tables in file"""
         popup_root = Toplevel(self.root)
+        gen = RowGenerator()
 
         x = self.root.winfo_rootx()
         y = self.root.winfo_rooty()
@@ -161,25 +160,30 @@ class FileImport:
         popup_root.attributes("-topmost", True)
         popup_root.title(f"{self.filename} - Table Select")
 
+        Label(
+            popup_root,
+            text="Select the table for the emission inventory file.",
+        ).grid(row=gen.next(), sticky=W)
+
         # widgets
         ok_btn = Button(
             popup_root,
             text="OK",
             command=lambda: self.toplevel_btns(popup_root, type="OK"),
         )
-        ok_btn.grid(sticky=W, row=0, padx=(5, 5), pady=(5, 1))
+        ok_btn.grid(sticky=W, row=gen.next(), padx=(5, 5), pady=(5, 1))
 
         cancel_btn = Button(
             popup_root,
             text="Cancel",
             command=lambda: self.toplevel_btns(popup_root, type="Cancel"),
         )
-        cancel_btn.grid(sticky=W, row=0, padx=(40, 5), pady=(5, 1))
+        cancel_btn.grid(sticky=W, row=gen.current(), padx=(40, 5), pady=(5, 1))
 
         # list of tables
         sbf = ScrollbarFrame(popup_root)
         frame = sbf.scrolled_frame
-        sbf.grid(row=1, column=0, sticky="nsew")
+        sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         self.table_var = StringVar(frame, tables[0])
         for table in tables:
@@ -225,6 +229,23 @@ class FileImport:
             self.tables_popup(tables)
 
 
+class RowGenerator:
+    def __init__(self):
+        self.row = -1
+
+    def next(self):
+        self.row += 1
+        return self.row
+
+    def current(self):
+        return self.row
+
+    def prev(self):
+        if self.row > 0:
+            self.row -= 1
+        return self.row
+
+
 class GUI(ErrorHandling):
     root = None
     scrollbar = ScrollbarFrame
@@ -240,13 +261,6 @@ class GUI(ErrorHandling):
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.attributes("-topmost", True)
-
-    def row_generator(self):
-        rownum = 0
-        while True:
-            self.current_gen = rownum
-            yield rownum
-            rownum = rownum + 1
 
     def width(self, widget):
         widget.update()

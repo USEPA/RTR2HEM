@@ -144,6 +144,9 @@ class Join:
         for df in dfs:
             existing_columns += [f"{item}".lower() for item in df.columns]
 
+        if not dfs:
+            dfs = [pd.DataFrame()]
+
         for empty in empty_dfs:
             for col in empty.columns:
                 if col.lower() not in existing_columns:
@@ -164,6 +167,11 @@ class Config:
         "emission_unit_id",
         "process_id",
         "emission_release_point_id",
+        "emission_release_point_type",
+        "regulatory_code",
+        "ICFCatLevelModeling",
+        "emission_process_group",
+        "ICFEmissionProcessGroupAbbr",
     ]
 
     # output writer
