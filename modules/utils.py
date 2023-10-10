@@ -2,19 +2,29 @@ import os, sys, pathlib
 import logging
 import datetime
 import json
+import warnings
+
 import pandas as pd
 import numpy as np
-import warnings
+
 from modules.handle_accdb import AccdbHandle
 
-logging.basicConfig(
-    # filename="log.txt",
-    # filemode="w",
-    stream=sys.stdout,
-    level=logging.DEBUG,
-    datefmt="%H:%M:%S",
-    format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
-)
+
+if getattr(sys, "frozen", False):  # exe
+    logging.basicConfig(
+        filename="log.txt",
+        filemode="w",
+        level=logging.DEBUG,
+        datefmt="%H:%M:%S",
+        format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
+    )
+elif __file__:
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=logging.DEBUG,
+        datefmt="%H:%M:%S",
+        format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
+    )
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
