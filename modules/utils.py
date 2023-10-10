@@ -8,9 +8,9 @@ import warnings
 from modules.handle_accdb import AccdbHandle
 
 logging.basicConfig(
-    filename="log.txt",
-    filemode="w",
-    # stream=sys.stdout,
+    # filename="log.txt",
+    # filemode="w",
+    stream=sys.stdout,
     level=logging.DEBUG,
     datefmt="%H:%M:%S",
     format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
@@ -184,34 +184,34 @@ class Config:
         if not obj:
             with open(fp) as fh:
                 self.config = json.load(fh)
+            self.settings = self.config["settings"]
             self.columns_map = self.config["columns_map"]
         else:
             self.config = obj
             with open(fp) as fh:
+                self.settings = self.config["settings"]
                 self.columns_map = json.load(fh)["columns_map"]
 
         self.get_settings()
         self.get_imports()
 
     def get_settings(self):
-        settings = self.config["settings"]
         self.timestamp = str(datetime.datetime.now().strftime("%Y%m%d"))
-        self.src_cat_name = settings["source_category_name"]
-        self.emission_type = settings["emission_type"]
-        self.only_category = settings["only_category_records"]
+        self.src_cat_name = self.settings["source_category_name"]
+        self.emission_type = self.settings["emission_type"]
+        self.only_category = self.settings["only_category_records"]
         return self
 
     def get_imports(self):
         lower = lambda lst: [e.lower() for e in lst]
 
-        settings = self.config["settings"]
-        self.input_fp = settings["input_file"]
-        self.input_table = settings["input_table"]
+        self.input_fp = self.settings["input_file"]
+        self.input_table = self.settings["input_table"]
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
         # EPGs -- optional
         self.epg_import = None
-        epg = settings["emission_abbr"]
+        epg = self.settings["emission_abbr"]
         if epg["import"]:
             self.epg_import = self.get_tables(epg["file"], epg["table"])
             self.epg_import = self.epg_import[lower(self.epg_required)]
@@ -219,13 +219,13 @@ class Config:
 
         # Source IDs -- optional
         self.srcid_import = None
-        srcid = settings["src_ids"]
+        srcid = self.settings["src_ids"]
         if srcid["import"]:
             self.srcid_import = self.get_tables(srcid["file"], srcid["table"])
             self.srcid_import = self.srcid_import[lower(self.srcid_required)]
             self.srcid_import = self.srcid_import.drop_duplicates()
 
-        self.static_dir = settings["static"]
+        self.static_dir = self.settings["static"]
         return self
 
     def get_tables(self, filepath, tablename):

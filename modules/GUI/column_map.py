@@ -103,14 +103,14 @@ class ColumnMapGUI(GUI):
         for i, key in enumerate(config.columns_map):
             renamed_col = columns_to_map[i].get()
 
-            if key in config.not_required:
+            if renamed_col and key != renamed_col:
+                config.columns_map[key] = renamed_col
+            elif key in config.not_required:
                 continue
-            if not renamed_col:
+            elif not renamed_col:
                 self.warn(
                     msg="Field name in red could not be found and must be selected."
                 )
                 return
-            if key != renamed_col:
-                config.columns_map[key] = renamed_col
 
         self.close_window()

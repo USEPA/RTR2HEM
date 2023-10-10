@@ -1,4 +1,5 @@
 import os, shutil
+import json
 import logging
 import numpy as np
 import pandas as pd
@@ -129,6 +130,14 @@ class RTR2HEM:
         """7f"""
         logging.info("Writing outputs")
         config.out.run(self.processed_df)
+
+        user_settings = {"settings": config.settings, "columns_map": config.columns_map}
+        fp = os.path.join(
+            config.out.output_dir,
+            f"{config.out.basename}_config_{config.timestamp}.json",
+        )
+        with open(fp, "w") as fh:
+            json.dump(user_settings, fh)
 
 
 if __name__ == "__main__":

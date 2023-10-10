@@ -129,7 +129,7 @@ class InitialProcessing:
 
     def is_selected_regulatory_code(self, row):
         code = row["regulatory_code"]
-        if self.reg_codes.get(code) == 1:
+        if self.reg_codes and self.reg_codes.get(code) == 1:
             return "Yes"
         return "No"
 
