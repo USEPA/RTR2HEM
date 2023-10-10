@@ -58,8 +58,8 @@ class WriteOutputs:
             out_dst, result.cat_df, result.sheet_name, result.rowstart
         )
 
-        # Write whole records
-        if not config.only_category:
+        # Write whole records only if actual emissions
+        if not config.only_category and config.emission_type == "Actual":
             filename = f"{self.basename}_{result.filename}_Whole_{config.timestamp}"
             out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
 

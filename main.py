@@ -18,8 +18,10 @@ class RTR2HEM:
         self.epgs_select()
         self.reg_codes_and_initial_processing()
         self.source_ids_create()
-        self.multipathway_processing()
+        if config.emission_type != "Acute":
+            self.multipathway_processing()
         self.write_all_remaining_outputs()
+        config.out.accdb.close_accdb()
 
     def settings_select(self):
         """1-7a"""
@@ -34,27 +36,28 @@ class RTR2HEM:
         config.rename_columns()
         config.set_input_df_column_types()
 
-        # minimize wait by writing static files during GUI process
         config.out.accdb.write(
             "00 - RTR-HEM and PBHAP Poll Xwalk",
             get_static("static_PollutantCrosswalk_andMetalSpeciations"),
         )
-        config.out.accdb.write(
-            "00 - Tier 1 Eco Mpath EcoEEFs",
-            get_static("static_MP_EcoEquivalencyFactors"),
-        )
-        config.out.accdb.write(
-            "00 - Tier 1 Eco Mpath Thresh",
-            get_static("static_MP_EcoScreeningThresholds"),
-        )
-        config.out.accdb.write(
-            "00 - Tier 1 HumHealth Mpath REFs",
-            get_static("static_MP_PBHAPChems_withHHEquivalencyFactors"),
-        )
-        config.out.accdb.write(
-            "00 - Tier 1 HumHealth Mpath Thresh",
-            get_static("static_MP_HHScreeningThresholds"),
-        )
+
+        if config.emission_type != "Acute":
+            config.out.accdb.write(
+                "00 - Tier 1 Eco Mpath EcoEEFs",
+                get_static("static_MP_EcoEquivalencyFactors"),
+            )
+            config.out.accdb.write(
+                "00 - Tier 1 Eco Mpath Thresh",
+                get_static("static_MP_EcoScreeningThresholds"),
+            )
+            config.out.accdb.write(
+                "00 - Tier 1 HumHealth Mpath REFs",
+                get_static("static_MP_PBHAPChems_withHHEquivalencyFactors"),
+            )
+            config.out.accdb.write(
+                "00 - Tier 1 HumHealth Mpath Thresh",
+                get_static("static_MP_HHScreeningThresholds"),
+            )
 
     def epgs_select(self):
         """7b"""

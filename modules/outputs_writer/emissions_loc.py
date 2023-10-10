@@ -38,7 +38,6 @@ class EmissionLoc:
 
     def create(self):
         emiss_loc_df = self.df.copy()
-        emiss_loc_df = emiss_loc_df.sort_values(self.sort_by)
 
         for c in self.columns:
             if c not in self.df:
@@ -62,8 +61,8 @@ class EmissionLoc:
 
         # drop unneeded columns
         self.columns.pop()  # remove ICFCatLevelModeling
-        self.whole_df = emiss_loc_df[self.columns]
-        self.cat_df = cat_emiss_loc_df[self.columns]
+        self.whole_df = emiss_loc_df[self.columns].sort_values(self.sort_by)
+        self.cat_df = cat_emiss_loc_df[self.columns].sort_values(self.sort_by)
 
         return self
 

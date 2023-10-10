@@ -111,4 +111,12 @@ class Template:
         )
 
         result = result.drop(self.working_MPEco_ChemEmissSums.columns, axis=1)
+
+        sort_by = [
+            "Facility ID",
+            "Chem",
+            "assessment endpoint",
+            "benchmark effects level",
+        ]
+        result = result.sort_values(sort_by)
         self.working_MP04Eco_T1ChemResults = result

@@ -109,4 +109,7 @@ class Template:
         )
 
         result = result.drop(self.working_MPHH_ChemEmissSums.columns, axis=1)
+
+        sort_by = ["Facility ID", "Chem"]
+        result = result.sort_values(sort_by)
         self.working_MP04HH_T1ChemResults = result

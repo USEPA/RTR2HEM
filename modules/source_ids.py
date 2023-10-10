@@ -11,6 +11,8 @@ class SourceIDs:
         "emission_release_point_id",
     ]
 
+    sort_by = ["ICFFacilityID", "ICFSourceID"]
+
     def __init__(self, df):
         self.df = df
         self.src_list_df = self.df.copy()
@@ -41,6 +43,7 @@ class SourceIDs:
         config.out.accdb.write(
             "03 - Source ID Xwalk", self.src_list_df[config.srcid_required]
         )
+        self.df = self.df.sort_values(self.sort_by)
         return self.df
 
     def create_source_id(self, row):

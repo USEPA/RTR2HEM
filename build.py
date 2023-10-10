@@ -2,9 +2,10 @@ import os
 import shutil
 import subprocess
 
-exe_fp = os.path.join(".", "exe")
+exe_fp = os.path.join(".", "RTR2HEM")
 exe_name = "RTR2HEM"
-#lib_fp = r"--paths=C:\Users\55586\.virtualenvs\Python_Tool-HlJboBwr\Lib\site-packages"
+
+# pyinstaller --onefile --noconsole .\main.py
 
 
 def create_folder():
@@ -41,8 +42,11 @@ def important_files_copy():
 
 def run_pyinstaller():
     cmd = [
-        "pyinstaller",
+        "python",
+        "-m",
+        "PyInstaller",
         "--onefile",
+        "--noconsole",
         ".\main.py",
     ]
     with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, bufsize=1) as sp:

@@ -49,15 +49,20 @@ class SummaryPopulate:
             "Num Facil Exceeding by x10": "Num Facil Exceeding by x10",
         }
 
-        order_by = ["EcoHAP Grp", "benchmark effects level"]
-
         self.eco.working_MP07Eco_T1Summary = self.eco.working_MP07Eco_T1Summary[
             list(columns.keys())
         ]
 
-        self.eco.working_MP07Eco_T1Summary = (
-            self.eco.working_MP07Eco_T1Summary.sort_values(order_by)
-        )
         self.eco.working_MP07Eco_T1Summary = self.eco.working_MP07Eco_T1Summary.rename(
             columns=columns
+        )
+
+        sort_by = [
+            "Max Facility",
+            "EcoHAP Grp",
+            "Assessment Endpoint",
+            "Benchmark Effects Level",
+        ]
+        self.eco.working_MP07Eco_T1Summary = (
+            self.eco.working_MP07Eco_T1Summary.sort_values(sort_by)
         )
