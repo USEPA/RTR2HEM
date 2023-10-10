@@ -98,6 +98,7 @@ class FileImport:
         ("Microsoft Access Database", "*.accdb"),
         ("Excel files", ".xlsx"),
         ("CSV Files", "*.csv"),
+        ("JSON Source File", ".json"),
     ]
 
     filepath = ""
@@ -198,14 +199,14 @@ class FileImport:
     def import_file(self):
         """Select file, trigger table popup"""
         if self.required_columns:
-            ErrorHandling.warn(
+            GUI.warn(
                 self,
                 title="NOTE",
                 msg=f"Imported table must contain the following columns:\n{self.required_columns}",
             )
 
         filepath = filedialog.askopenfilename(
-            initialdir=self.working_dir, filetypes=self.ftypes
+            initialdir=self.working_dir  # , filetypes=self.ftypes
         )
         if filepath:
             self.filepath = filepath
@@ -223,9 +224,15 @@ class FileImport:
                     if sheet.sheet_state == "visible":
                         tables.append(sheet.title)
             elif ftype == ".csv":
-                self.file_lbl.config(text=self.filename)
+                file_str, h = GUI.split_str(self, 40, self.filename)
+                self.file_lbl.config(text=file_str)
+                return
+            elif ftype == ".json":
+                file_str, h = GUI.split_str(self, 40, self.filename)
+                self.file_lbl.config(text=file_str)
                 return
             else:
+                GUI.warn(self, msg=f"Invalid filetype '{ftype}'.")
                 return
 
             if not tables:
@@ -270,15 +277,15 @@ class GUI(ErrorHandling):
         widget.update()
         return widget.winfo_width()
 
-    def split_str(self, h, str):
+    def split_str(self, w, val):
         """Resize widgets and split strings based on width constraint"""
         result = ""
         height = 1
-        while len(str) >= h:
+        while len(val) > w:
             height += 1
-            result += f"{str[:h]}\n"
-            str = str[h:]
-        result += str
+            result += f"{val[:w]}\n"
+            val = val[w:]
+        result += val
         return result, height
 
     def close_window(self):

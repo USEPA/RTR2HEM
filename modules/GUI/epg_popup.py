@@ -106,7 +106,7 @@ class EpgGUI(GUI):
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         for i, epg in enumerate(self.epg_list):
-            epg, epg_h = self.split_str(40, epg)
+            stuff, epg_h = self.split_str(40, epg)
             epg_message = Text(
                 frame, height=epg_h, width=40, borderwidth=1, relief=SOLID
             )

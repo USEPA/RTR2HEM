@@ -60,7 +60,7 @@ class ColumnMapGUI(GUI):
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
         for i, column in enumerate(config.columns_map):
-            column, column_h = self.split_str(30, column)
+            stuff, column_h = self.split_str(30, column)
             column_txtbox = Text(
                 frame, height=column_h, width=30, borderwidth=1, relief=SOLID
             )

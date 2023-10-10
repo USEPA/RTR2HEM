@@ -21,6 +21,7 @@ class SettingsGUI(GUI):
         self.gen = RowGenerator()
 
         subroot = self.settings_option()
+        self.config_import()
         self.name_and_base_import(subroot)
         self.import_existing_epg_srcid(subroot)
         self.emissions_type(subroot)
@@ -39,21 +40,27 @@ class SettingsGUI(GUI):
         super().main()
 
     def settings_option(self):
-        def disableChildren(parent):
-            for child in parent.winfo_children():
-                wtype = child.winfo_class()
-                if wtype not in ("Frame", "Labelframe"):
-                    child.configure(state="disable")
-                else:
-                    disableChildren(child)
-
-        def enableChildren(parent):
+        def enableOptions(parent):
             for child in parent.winfo_children():
                 wtype = child.winfo_class()
                 if wtype not in ("Frame", "Labelframe"):
                     child.configure(state="normal")
                 else:
-                    enableChildren(child)
+                    enableOptions(child)
+
+            self.subroot_config.grid_forget()
+            subroot.grid(row=subroot_row, columnspan=10, padx=10)
+
+        def disableOptions(parent):
+            for child in parent.winfo_children():
+                wtype = child.winfo_class()
+                if wtype not in ("Frame", "Labelframe"):
+                    child.configure(state="disable")
+                else:
+                    disableOptions(child)
+
+            self.subroot_config.grid(row=subroot_row, columnspan=10, padx=10)
+            subroot.grid_forget()
 
         self.option_var = StringVar(self.root, "0")
         read_user_opts = Radiobutton(
@@ -64,7 +71,7 @@ class SettingsGUI(GUI):
             fg=self.white,
             selectcolor="black",
             background=self.blue,
-            command=lambda: enableChildren(subroot),
+            command=lambda: enableOptions(subroot),
         )
         read_config = Radiobutton(
             self.root,
@@ -74,7 +81,7 @@ class SettingsGUI(GUI):
             fg=self.white,
             selectcolor="black",
             background=self.blue,
-            command=lambda: disableChildren(subroot),
+            command=lambda: disableOptions(subroot),
         )
 
         read_user_opts.grid(row=self.gen.next(), column=0, padx=(12, 0), sticky=W)
@@ -93,7 +100,26 @@ class SettingsGUI(GUI):
             relief="groove",
         )
         subroot.grid(row=self.gen.next(), columnspan=10, padx=10)
+        subroot_row = self.gen.current()
         return subroot
+
+    def config_import(self):
+        self.subroot_config = LabelFrame(
+            self.root,
+            text="Settings",
+            font=16,
+            bg=self.grey,
+            borderwidth=2,
+            relief="groove",
+        )
+        self.subroot_config.grid(row=self.gen.next(), columnspan=10, padx=10)
+
+        self.import_config = FileImport(self.subroot_config, self.gen).create()
+        self.import_config.filepath = ".\config.json"
+        self.import_config.file_lbl.config(text=".\config.json")
+
+        self.import_config.table_lbl.grid_forget()
+        self.subroot_config.grid_forget()
 
     def name_and_base_import(self, root):
         # Source Category (output files) name
@@ -209,9 +235,8 @@ class SettingsGUI(GUI):
     def run_setup(self):
         # load from file
         if self.option_var.get() == "1":
-            config.load_config()
+            config.load_config(fp=self.import_config.filepath)
             self.close_window()
-            return
 
         if not self.src_cat_name.get():
             self.warn(msg="Source Category name must not be empty")
