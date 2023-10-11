@@ -237,6 +237,7 @@ class SettingsGUI(GUI):
         if self.option_var.get() == "1":
             config.load_config(fp=self.import_config.filepath)
             self.close_window()
+            return
 
         if not self.src_cat_name.get():
             self.warn(msg="Source Category name must not be empty")

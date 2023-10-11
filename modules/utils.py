@@ -256,12 +256,14 @@ class Config:
         self.input_df = self.input_df.rename(columns=columns_map)
 
     def set_input_df_column_types(self):
-        columns_int64 = ["fugitive_length_sigmax_ft", "fugitive_width_sigmay_ft"]
+        columns_int64 = []
         columns_float64 = [
             "stack_height (ft)",
             "exit_gas_temperature (f)",
             "stack_diameter (ft)",
             "exit_gas_velocity (ft/sec)",
+            "fugitive_length_sigmax_ft",
+            "fugitive_width_sigmay_ft",
             "x_coordinate",
             "y_coordinate",
         ]
