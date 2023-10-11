@@ -209,6 +209,8 @@ class Config:
         self.timestamp = str(datetime.datetime.now().strftime("%Y%m%d"))
         self.src_cat_name = self.settings["source_category_name"]
         self.output_dir = self.settings["output_dir"]
+        if not self.output_dir:
+            self.output_dir = os.getcwd()
         self.emission_type = self.settings["emission_type"]
         self.only_category = self.settings["only_category_records"]
         return self
