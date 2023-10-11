@@ -5,6 +5,7 @@ import subprocess
 exe_fp = os.path.join(".", "RTR2HEM")
 exe_name = "RTR2HEM"
 
+# lib_fp = r"--paths=C:\Users\55586\.virtualenvs\Python_Tool-HlJboBwr\Lib\site-packages"
 # pyinstaller --onefile --noconsole .\main.py
 
 
@@ -27,7 +28,7 @@ def cleanup(include_exe=False):
 
 
 def important_files_copy():
-    srcs = ["static", "templates"]
+    srcs = ["static", "templates", "config.json"]  # why is config.json needed again?
     for src in srcs:
         dst = os.path.join(exe_fp, src)
         if os.path.isdir(src):
@@ -45,6 +46,7 @@ def run_pyinstaller():
         "python",
         "-m",
         "PyInstaller",
+        "--clean",
         "--onefile",
         "--noconsole",
         ".\main.py",

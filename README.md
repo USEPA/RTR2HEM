@@ -12,10 +12,11 @@ All columns not explicitly created by the tool (e.g. ICF...) should be converted
 This includes all intermediate steps where columns may be renamed to the same name.
 
 ## Building the Executable
-All necessary files will be placed in an /exe/ directory after running:
+All necessary files will be placed in an /RTR2HEM/ folder after running:
 ```
     python build.py
 ```
+In the event that this script fails, restarting your pc before re-running is a good idea
 
 ### Notes
 ```

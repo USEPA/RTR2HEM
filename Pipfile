@@ -10,6 +10,8 @@ sqlalchemy = "*"
 pypyodbc = "*"
 xlsxwriter = "*"
 msaccessdb = "*"
+pyinstaller = "*"
+auto-py-to-exe = "*"
 
 [dev-packages]
 
