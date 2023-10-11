@@ -316,3 +316,12 @@ class GUI(ErrorHandling):
 
         self.root.protocol("WM_DELETE_WINDOW", on_closing)
         self.root.mainloop()
+
+    def create_toplevel(self, root, title=""):
+        popup_root = Toplevel(root)
+        x = root.winfo_rootx()
+        y = root.winfo_rooty()
+        popup_root.geometry("+%d+%d" % (x - 200, y - 200))
+        popup_root.attributes("-topmost", True)
+        popup_root.title(title)
+        return popup_root
