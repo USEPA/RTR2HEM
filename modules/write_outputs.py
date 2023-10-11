@@ -14,24 +14,25 @@ class WriteOutputs:
     templates_fp = "templates"
 
     def __init__(self):
-        self.basename = f"{config.src_cat_name}_{config.emission_type.split(' ')[0]}"
+        self.base = config.output_dir
+        if os.getcwd() == config.output_dir:
+            self.base = os.path.join(config.output_dir, "outputs")
+        self.runname = f"{config.src_cat_name}_{config.emission_type.split(' ')[0]}"
 
         self.output_dir = os.path.join(
-            "outputs", f"{self.basename}_HEMInputsAndXWalks_{config.timestamp}"
+            self.base, f"{self.runname}_HEMInputsAndXWalks_{config.timestamp}"
         )
         self.create_folder()
 
         accdb_fp = os.path.join(
-            self.output_dir, f"{self.basename}_XWalks_{config.timestamp}.accdb"
+            self.output_dir, f"{self.runname}_XWalks_{config.timestamp}.accdb"
         )
         self.accdb = AccdbHandle(accdb_fp)
 
     def create_folder(self):
-        if not os.path.exists("outputs"):
-            os.mkdir("outputs")
         if os.path.exists(self.output_dir):
             shutil.rmtree(self.output_dir)
-        os.mkdir(self.output_dir)
+        os.makedirs(self.output_dir, exist_ok=True)
 
     def run(self, df):
         self.df = df
@@ -49,7 +50,7 @@ class WriteOutputs:
 
     def write_to_template(self, result):
         template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
-        filename = f"{self.basename}_{result.filename}_Cat_{config.timestamp}"
+        filename = f"{self.runname}_{result.filename}_Cat_{config.timestamp}"
         out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
 
         # Write category records
@@ -60,7 +61,7 @@ class WriteOutputs:
 
         # Write whole records only if actual emissions
         if not config.only_category and config.emission_type == "Actual":
-            filename = f"{self.basename}_{result.filename}_Whole_{config.timestamp}"
+            filename = f"{self.runname}_{result.filename}_Whole_{config.timestamp}"
             out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
 
             shutil.copyfile(template_src, out_dst)

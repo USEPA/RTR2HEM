@@ -134,7 +134,7 @@ class RTR2HEM:
         user_settings = {"settings": config.settings, "columns_map": config.columns_map}
         fp = os.path.join(
             config.out.output_dir,
-            f"{config.out.basename}_config_{config.timestamp}.json",
+            f"{config.out.runname}_config_{config.timestamp}.json",
         )
         with open(fp, "w") as fh:
             json.dump(user_settings, fh)

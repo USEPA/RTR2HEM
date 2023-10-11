@@ -1,7 +1,5 @@
 import os
 import gc
-import re
-import math
 import pathlib
 import traceback
 import logging
@@ -138,20 +136,26 @@ class FileImport:
         )
         return self
 
-    def toplevel_btns(self, toplevel, type):
+    def toplevel_btns(self, toplevel=None, type="OK"):
         """Close window, update filepath/name labels"""
-        self.table = self.table_var.get()
+        if self.table_var:
+            self.table = self.table_var.get()
         if type == "Cancel":
             self.filepath = ""
             self.filename = ""
             self.table = ""
 
-        file_str, h = GUI.split_str(self, 40, self.filename)
-        table_str, h = GUI.split_str(self, 40, self.table)
+        self.file_lbl.config(
+            text=GUI.split_str(self, 42, self.filename)[0],
+            justify=LEFT,
+        )
+        self.table_lbl.config(
+            text=GUI.split_str(self, 42, self.table)[0],
+            justify=LEFT,
+        )
 
-        self.file_lbl.config(text=file_str, justify=LEFT)
-        self.table_lbl.config(text=table_str, justify=LEFT)
-        toplevel.destroy()
+        if toplevel:
+            toplevel.destroy()
 
     def tables_popup(self, tables):
         """Display list of tables in file"""

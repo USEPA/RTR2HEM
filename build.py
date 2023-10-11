@@ -27,7 +27,7 @@ def cleanup(include_exe=False):
 
 
 def important_files_copy():
-    srcs = ["static", "templates", "config.json"]
+    srcs = ["static", "templates"]
     for src in srcs:
         dst = os.path.join(exe_fp, src)
         if os.path.isdir(src):

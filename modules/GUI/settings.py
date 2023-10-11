@@ -1,4 +1,8 @@
+import os
+
 from tkinter import *
+from tkinter import filedialog
+
 from modules.GUI.generic_GUI import GUI, RowGenerator, FileImport
 from modules.utils import config
 
@@ -135,6 +139,27 @@ class SettingsGUI(GUI):
         # accdb and table select
         self.import_table = FileImport(root, self.gen).create()
 
+        # output dir
+        def dir_select():
+            self.output_fp = filedialog.askdirectory()
+            out_lbl.config(text=GUI.split_str(self, 42, self.output_fp)[0])
+
+        self.output_fp = os.getcwd()
+        out_btn = Button(root, text="Output Dir", command=dir_select)
+        out_btn.grid(row=self.gen.next(), padx=(5, 0), pady=(5, 5), sticky=W)
+        out_lbl = Label(
+            root,
+            text=GUI.split_str(self, 42, self.output_fp)[0],
+            bg="#ffffff",
+            borderwidth=1,
+            relief=GROOVE,
+            width=42,
+            justify=LEFT,
+        )
+        out_lbl.grid(
+            row=self.gen.current(), padx=(GUI.width(self, out_btn) + 10, 0), sticky=W
+        )
+
     def import_existing_epg_srcid(self, root):
         # Import existing EPGs and Source IDs
         import_subroot = LabelFrame(
@@ -162,6 +187,14 @@ class SettingsGUI(GUI):
         self.srcids = FileImport(
             import_subroot, self.gen, required_columns=config.srcid_required
         ).create()
+
+        def clear():
+            FileImport.toplevel_btns(self.epgs, type="Cancel")
+            FileImport.toplevel_btns(self.srcids, type="Cancel")
+
+        Button(import_subroot, text="Clear", command=clear).grid(
+            row=self.gen.next(), padx=(5, 0), pady=(0, 5), sticky=W
+        )
 
     def emissions_type(self, root):
         # Emissions choice
@@ -266,6 +299,7 @@ class SettingsGUI(GUI):
                 },
                 "input_file": self.import_table.filepath,
                 "input_table": self.import_table.table,
+                "output_dir": self.output_fp,
                 "static": "./static",
             }
         }
