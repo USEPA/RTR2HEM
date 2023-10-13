@@ -33,6 +33,10 @@ class RTR2HEM:
         if settings.option_var.get() == "0":
             ColumnMapGUI()
 
+        logging.debug(
+            json.dumps({"settings": config.settings, "columns_map": config.columns_map})
+        )
+
         config.out = WriteOutputs()
         config.rename_columns()
         config.set_input_df_column_types()
