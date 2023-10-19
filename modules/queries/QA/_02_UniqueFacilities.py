@@ -79,7 +79,6 @@ class UniqueFacilities(QABase):
         res = Join().join(
             [all_unique_facilities, multiple_locations],
             on="sppd_facility_identifier",
-            how="right",
         )
         res = res.loc[res["CountOfFACILITY_NAME"] > 1]
         return len(res.index) == 0
