@@ -68,9 +68,14 @@ class Join:
     """
     Custom dataframe joins
 
+    NOTE
+    empty + non-empty will always try to favor/produce a non-empty dataframe
+    however sometimes an empty result dataframe may be desired
+
     join
-        accepts a list of dataframes, normal pd.merge arguments,
-        and drop_dupe='left'|'right'
+        accepts a list of dataframes, all pd.merge arguments,
+        optional:
+            drop_dupe = 'left'|'right'
 
         this custom join is case insensitive for both column names
         and cell values
@@ -85,17 +90,6 @@ class Join:
         return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
 
     def join(self, dfs=None, **kwargs):
-        def drop_tmp(df, also_drop_cpy=False):
-            for column in df.columns:
-                try:
-                    if "_tmp" in column:
-                        df = df.drop(column, axis=1)
-                    if also_drop_cpy and "_cpy" in column:
-                        df = df.drop(column, axis=1)
-                except:
-                    pass
-            return df
-
         if dfs is None:
             dfs = []
         if "left" in kwargs:
@@ -103,11 +97,11 @@ class Join:
         if "right" in kwargs:
             dfs += [kwargs.pop("right")]
 
-        dfs = self.handle_empty_df(dfs)
+        dfs = self._preserve_empty_df_columns(dfs)
         if len(dfs) == 1:
             return dfs[0]
 
-        dfs, kwargs = self.setup_tmp_columns(dfs, **kwargs)
+        dfs, kwargs = self._setup_tmp(dfs, **kwargs)
         drop_dupe = kwargs.pop("drop_dupe", "right")
         if drop_dupe == "right":
             kwargs["suffixes"] = ("", "_tmp")
@@ -115,14 +109,25 @@ class Join:
             kwargs["suffixes"] = ("_tmp", "")
 
         result = pd.merge(left=dfs[0], right=dfs[1], **kwargs)
-        result = drop_tmp(result)
+        result = self._drop_tmp(result)
         for i in range(2, len(dfs)):
             result = pd.merge(left=result, right=dfs[i], **kwargs)
-            result = drop_tmp(result)
-        result = drop_tmp(result, True)
+            result = self._drop_tmp(result)
+        result = self._drop_tmp(result, True)
         return result
 
-    def setup_tmp_columns(self, dfs, **kwargs):
+    def _drop_tmp(self, df, also_drop_cpy=False):
+        for column in df.columns:
+            try:
+                if "_tmp" in column:
+                    df = df.drop(column, axis=1)
+                if also_drop_cpy and "_cpy" in column:
+                    df = df.drop(column, axis=1)
+            except:
+                pass
+        return df
+
+    def _setup_tmp(self, dfs, **kwargs):
         """creates '_cpy' lowercase columns to be used for joining
         so that the original columns are not modified"""
         tmp_dfs = [df.copy() for df in dfs]
@@ -153,15 +158,10 @@ class Join:
                 df[cpy_col] = df[cpy_col].astype(str).str.lower()
         return dfs, kwargs
 
-    def handle_empty_df(self, dfs):
+    def _preserve_empty_df_columns(self, dfs):
         """copy unique columns from empty df before removing from the merge"""
-        empty_dfs = []
         existing_columns = []
-
-        for i, df in enumerate(dfs):
-            if df.empty:
-                empty_dfs.append(df)
-
+        empty_dfs = list(filter(lambda df: df.empty, dfs))
         dfs = list(filter(lambda df: not df.empty, dfs))
         for df in dfs:
             existing_columns += [f"{item}".lower() for item in df.columns]

@@ -11,9 +11,29 @@ class UniqueFacilities(QABase):
     QA_title = "Unique Facilities"
 
     def run(self):
-        self.qry_QA_02d_UniqueFac()
+        only_unique_locations = self.qry_QA_02d_UniqueFac()
+
+        # no facility with more than one unique location detail
+        if only_unique_locations:
+            self.update(
+                "Passed QA",
+                "As expected, each facility has a single, unique set of name and address information.",
+                "None.",
+            )
+        else:
+            num_locations = len(self.qry_QA_02c_UniqueFac().index)
+            self.update(
+                "Fatal Error",
+                f"""Number of facilities with inconsistencies in name or address information: 
+                {num_locations} (facility defined as field SPPD_FACILITY_IDENTIFIER). 
+                This will cause each facility to appear more than once in two of the output files. 
+                See information in the ""02"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program. 
+                """,
+                "qry_QA_02d_UniqueFac",
+            )
         return self.get()
 
+    # TODO -- where is this used..?
     def qry_QA_02a_UniqueFac(self):
         """
         list of unique facilities using SPPD_FACILITY_IDENTIFIER
@@ -54,19 +74,6 @@ class UniqueFacilities(QABase):
         this query joins 02c to 02b by the SPPD_Facility to supply details on those facilities with
         more than one unique location details
         """
-        """
-        SELECT qry_QA_02b_UniqueFac.SPPD_FACILITY_IDENTIFIER, 
-        qry_QA_02b_UniqueFac.FACILITY_NAME, 
-        qry_QA_02b_UniqueFac.LOCATION_ADDRESS, 
-        qry_QA_02b_UniqueFac.CITY,
-        qry_QA_02b_UniqueFac.COUNTY_NAME, 
-        qry_QA_02b_UniqueFac.STATE_COUNTY_FIPS, 
-        qry_QA_02b_UniqueFac.STATE_ABBR, 
-        qry_QA_02b_UniqueFac.ZIPCODE
-
-        FROM qry_QA_02c_UniqueFac INNER JOIN qry_QA_02b_UniqueFac 
-        ON qry_QA_02c_UniqueFac.SPPD_FACILITY_IDENTIFIER = qry_QA_02b_UniqueFac.SPPD_FACILITY_IDENTIFIER;
-        """
         all_unique_facilities = self.qry_QA_02b_UniqueFac()
         multiple_locations = self.qry_QA_02c_UniqueFac()
         res = Join().join(
@@ -74,4 +81,5 @@ class UniqueFacilities(QABase):
             on="sppd_facility_identifier",
             how="right",
         )
-        return res
+        res = res.loc[res["CountOfFACILITY_NAME"] > 1]
+        return len(res.index) == 0
