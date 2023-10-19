@@ -1,7 +1,7 @@
 import pandas as pd
-from modules.mp_queries.latitudes_longitudes import LatLons
-from modules.mp_queries.HH import run_HH_module
-from modules.mp_queries.Eco import run_Eco_module
+from modules.queries.latitudes_longitudes import LatLons
+from modules.queries.HH import run_HH_module
+from modules.queries.Eco import run_Eco_module
 
 
 """

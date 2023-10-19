@@ -1,8 +1,8 @@
-from modules.mp_queries.HH._01_template import Template
-from modules.mp_queries.HH._02_group_results import GrpResults
-from modules.mp_queries.HH._03_summary_setup import SummarySetup
-from modules.mp_queries.HH._04_summary_gather import SummaryGather
-from modules.mp_queries.HH._05_summary_populate import SummaryPopulate
+from modules.queries.HH._01_template import Template
+from modules.queries.HH._02_group_results import GrpResults
+from modules.queries.HH._03_summary_setup import SummarySetup
+from modules.queries.HH._04_summary_gather import SummaryGather
+from modules.queries.HH._05_summary_populate import SummaryPopulate
 
 from modules.utils import config
 

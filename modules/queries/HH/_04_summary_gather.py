@@ -1,4 +1,4 @@
-from modules.mp_queries.shared_queries import qry_02a_ListPBHAPEmittingFacilities01
+from modules.queries.shared_queries import qry_02a_ListPBHAPEmittingFacilities01
 from modules.utils import Join, get_static, calc_agg
 
 """

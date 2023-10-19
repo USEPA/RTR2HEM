@@ -10,7 +10,8 @@ import numpy as np
 from modules.handle_accdb import AccdbHandle
 
 
-if getattr(sys, "frozen", False):  # exe
+# write to file if running in an executable
+if getattr(sys, "frozen", False):
     logging.basicConfig(
         filename="log.txt",
         filemode="w",
@@ -18,7 +19,7 @@ if getattr(sys, "frozen", False):  # exe
         datefmt="%H:%M:%S",
         format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
     )
-elif __file__:
+else:
     logging.basicConfig(
         stream=sys.stdout,
         level=logging.DEBUG,
@@ -26,6 +27,7 @@ elif __file__:
         format="[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s",
     )
 warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def get_static(filename):
@@ -37,6 +39,16 @@ def get_static(filename):
 
 def set_column(df, column_name, func):
     df[column_name] = df.apply(lambda row: func(row), axis=1)
+
+
+def group(df, group_by, only_group=False):
+    # NOTE: not to be confused with pandas 'group_by'
+    if not isinstance(group_by, list):
+        group_by = [group_by]
+    grp = df.drop_duplicates(group_by)
+    if only_group:
+        return grp[group_by]
+    return grp
 
 
 def calc_agg(df, group_by, agg, on_column, rename_column=None):
@@ -183,6 +195,8 @@ class Config:
         "emission_process_group",
         "ICFEmissionProcessGroupAbbr",
     ]
+
+    reg_codes = None
 
     # output writer
     out = None

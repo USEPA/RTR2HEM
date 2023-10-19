@@ -1,9 +1,9 @@
-from modules.mp_queries.shared_queries import qry_01b_CountSrcCatFacilities
+from modules.queries.shared_queries import qry_01b_CountSrcCatFacilities
 from modules.utils import Join, calc_agg, set_column
 
 """
 sheets:
-    working_MP05HH_T1GrpResults
+    working_MP05Eco_T1GrpResults
 """
 
 
@@ -12,9 +12,12 @@ class GrpResults:
         "Src Cat",
         "Num Facil in Src Cat",
         "Facility ID",
-        "PB-HAP Grp",
+        "EcoHAP Grp",
         "Emiss (TPY; grp)",
-        "Emiss*REF (TPY; grp)",
+        "assessment endpoint",
+        "Emiss*EcoEEF (TPY; grp)",
+        "benchmark effects level",
+        "benchmark value",
         "Scrn Thresh (TPY; grp)",
         "Date Scrn Thresh Created",
         "SV (grp)",
@@ -23,43 +26,48 @@ class GrpResults:
         "Exceedance by x100?",
     ]
 
-    def __init__(self, HH):
-        self.HH = HH
-        self.qry_05aHH_T1GrpResults()
+    def __init__(self, eco):
+        self.eco = eco
+        self.qry_05bEco_T1GrpResults()
 
-    # working_MP05HH_T1GrpResults
-    def qry_05aHH_T1GrpResults(self):
+    # working_MP05Eco_T1GrpResults
+    def qry_05bEco_T1GrpResults(self):
         group_by = [
             "Src Cat",
             "Num Facil in Src Cat",
             "Facility ID",
-            "PB-HAP Grp",
+            "EcoHAP Grp",
+            "assessment endpoint",
+            "benchmark effects level",
+            "benchmark value",
             "Scrn Thresh (TPY; grp)",
             "Date Scrn Thresh Created",
         ]
 
-        num_src_cat_facilities = qry_01b_CountSrcCatFacilities(self.HH)
+        num_src_cat_facilities = qry_01b_CountSrcCatFacilities(self.eco)
 
-        tmp = self.HH.working_MP04HH_T1ChemResults.copy()
+        tmp = self.eco.working_MP04Eco_T1ChemResults.copy()
         tmp["Num Facil in Src Cat"] = num_src_cat_facilities
 
         emiss_grp = calc_agg(
             tmp, group_by, "sum", "Emiss (TPY; chem)", "Emiss (TPY; grp)"
         )
-        emiss_ref_grp = calc_agg(
-            tmp, group_by, "sum", "Emiss*REF (TPY; chem)", "Emiss*REF (TPY; grp)"
+        emiss_eef_grp = calc_agg(
+            tmp, group_by, "sum", "Emiss*EcoEEF (TPY; chem)", "Emiss*EcoEEF (TPY; grp)"
         )
         sv_grp = calc_agg(tmp, group_by, "sum", "SV (chem)", "SV (grp)")
 
         tmp = tmp[group_by].drop_duplicates()
-        tmp = Join().join([tmp, emiss_grp, emiss_ref_grp, sv_grp], on=group_by)
+        tmp = Join().join(
+            [tmp, emiss_grp, emiss_eef_grp, sv_grp], on=group_by, how="left"
+        )
         tmp = tmp.sort_values(group_by)
 
         set_column(tmp, "Exceedance?", self.exceed)
         set_column(tmp, "Exceedance by x10?", self.exceed_10)
         set_column(tmp, "Exceedance by x100?", self.exceed_100)
 
-        self.HH.working_MP05HH_T1GrpResults = tmp[self.column_order]
+        self.eco.working_MP05Eco_T1GrpResults = tmp[self.column_order]
 
     def exceed(self, row):
         try:

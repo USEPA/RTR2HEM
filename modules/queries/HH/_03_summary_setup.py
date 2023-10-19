@@ -1,4 +1,4 @@
-from modules.mp_queries.shared_queries import (
+from modules.queries.shared_queries import (
     qry_01b_CountSrcCatFacilities,
     qry_02c_CountPBHAPEmittingFacilities,
 )

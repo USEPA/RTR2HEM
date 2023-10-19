@@ -4,13 +4,15 @@ import logging
 import numpy as np
 import pandas as pd
 
-from modules.initial_processing import InitialProcessing
-from modules.source_ids import SourceIDs
-from modules.multipathway_processing import MultiPathwayProcessing
-from modules.write_outputs import WriteOutputs
-from modules.utils import get_static, config
-
+from modules import (
+    QA,
+    InitialProcessing,
+    SourceIDs,
+    MultiPathwayProcessing,
+    WriteOutputs,
+)
 from modules.GUI import SettingsGUI, ColumnMapGUI, EpgGUI, RegCodesGUI
+from modules.utils import get_static, config
 
 
 class RTR2HEM:
@@ -18,6 +20,7 @@ class RTR2HEM:
         self.settings_select()
         self.epgs_select()
         self.reg_codes_and_initial_processing()
+        QA().run()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
@@ -96,12 +99,13 @@ class RTR2HEM:
         logging.info("Regulatory codes select")
 
         if config.only_category:
-            reg_codes = None
+            reg_codes = {}
         else:
             reg_codes = config.input_df["regulatory_code"]
             reg_codes = reg_codes.unique().tolist()
             reg_codes.sort()
             reg_codes = RegCodesGUI(reg_codes).get_response()
+        config.reg_codes = reg_codes
 
         logging.info("Initial processing")
 
