@@ -283,6 +283,10 @@ class Config:
             "fugitive_width_sigmay_ft",
             "x_coordinate",
             "y_coordinate",
+            "fugitive_2d_midpoint1_y_coordinate",
+            "fugitive_2d_midpoint2_y_coordinate",
+            "fugitive_2d_midpoint1_x_coordinate",
+            "fugitive_2d_midpoint2_x_coordinate",
         ]
 
         for c in self.input_df.columns:

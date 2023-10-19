@@ -1,4 +1,4 @@
-from modules.queries.QA import QABase
+from modules.queries.QA.qa_base import QABase
 from modules.utils import group
 
 """
@@ -49,9 +49,9 @@ class Hemispheres(QABase):
         res = group(self.df, group_by, True)
         res = res.loc[
             (res["y_coordinate"] < 0)
-            | (res["x_coordinate"] < 0)
             | (res["fugitive_2d_midpoint1_y_coordinate"] < 0)
             | (res["fugitive_2d_midpoint2_y_coordinate"] < 0)
+            | (res["x_coordinate"] > 0)
             | (res["fugitive_2d_midpoint1_x_coordinate"] > 0)
             | (res["fugitive_2d_midpoint2_x_coordinate"] > 0)
         ]

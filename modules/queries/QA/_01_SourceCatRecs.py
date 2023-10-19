@@ -1,4 +1,4 @@
-from modules.queries.QA import QABase
+from modules.queries.QA.qa_base import QABase
 from modules.utils import group, config
 
 """
