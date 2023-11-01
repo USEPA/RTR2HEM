@@ -211,6 +211,6 @@ class InitialProcessing:
     def release_height_m(self, row):
         try:
             release_height_ft = row["ICFAreaVolLineReleaseHeight"]
-            return release_height_ft / self.ft_per_meter
+            return (release_height_ft / self.ft_per_meter) / 2
         except:
             return 0
