@@ -7,8 +7,8 @@ QA 02 - Unique Facilities: this QA ensures that no facility has multiple differe
 
 
 class UniqueFacilities(QABase):
-    QA_num = "02"
-    QA_title = "Unique Facilities"
+    qa_num = "02"
+    qa_title = "Unique Facilities"
 
     def run(self):
         only_unique_locations = self.qry_QA_02d_UniqueFac()

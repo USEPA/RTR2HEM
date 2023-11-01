@@ -9,8 +9,8 @@ qry_QA_04_Hemispheres - this query returns facilities with unexpected lat/long
 
 
 class Hemispheres(QABase):
-    QA_num = "04"
-    QA_title = "Latitude and Longitude Hemispheres"
+    qa_num = "04"
+    qa_title = "Latitude and Longitude Hemispheres"
 
     def run(self):
         num_invalid_lat_longs = self.qry_QA_04_Hemispheres()
@@ -55,4 +55,5 @@ class Hemispheres(QABase):
             | (res["fugitive_2d_midpoint1_x_coordinate"] > 0)
             | (res["fugitive_2d_midpoint2_x_coordinate"] > 0)
         ]
+        self.qa_df = res
         return len(res.index)

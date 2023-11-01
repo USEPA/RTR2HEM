@@ -1,14 +1,15 @@
+import pandas as pd
 from modules.utils import config
 
 
 class QABase:
-    QA_num = "NOT SET"
-    QA_title = "NOT SET"
-    QA_out = "NOT SET"
-    QA_msg = "NOT SET"
-    QA_result = "NOT SET"
+    qa_num = "NOT SET"
+    qa_title = "NOT SET"
+    qa_out = "NOT SET"
+    qa_msg = "NOT SET"
+    qa_result = "NOT SET"
 
-    filename = "Tier1_QA_Details"
+    filename = "RTRtoHEMandTier1_QA"
     template_name = "Tier1_QA_Details"
     sheet_name = "NOT SET"
 
@@ -17,23 +18,24 @@ class QABase:
 
     def __init__(self):
         self.df = config.input_df
+        self.qa_df = pd.DataFrame()
         self.run()
 
     # override
     def run(self):
-        pass
+        return self
 
     def update(self, out, msg, result):
-        self.QA_out = out
-        self.QA_msg = msg
-        self.QA_result = result
-        self.sheet_name = self.QA_num
+        self.qa_out = out
+        self.qa_msg = msg
+        self.qa_result = result
+        self.sheet_name = self.qa_num
 
     def get(self):
         return {
-            "QA_Number": self.QA_num,
-            "QA_Title": self.QA_title,
-            "QA_Outcome": self.QA_out,
-            "QA_Message": self.QA_msg,
-            "QA_Result": self.QA_result,
+            "QA_Number": self.qa_num,
+            "QA_Title": self.qa_title,
+            "QA_Outcome": self.qa_out,
+            "QA_Message": self.qa_msg,
+            "QA_Result": self.qa_result,
         }

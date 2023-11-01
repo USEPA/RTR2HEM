@@ -22,8 +22,8 @@ NOTE -- not implemented yet!
 
 
 class UniqueSources(QABase):
-    QA_num = "03"
-    QA_title = "Unique Sources"
+    qa_num = "03"
+    qa_title = "Unique Sources"
 
     def run(self):
         only_unique_emissions = self.qry_QA_03d_UniqueSrc()

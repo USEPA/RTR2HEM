@@ -1,5 +1,6 @@
 import os, shutil
 import pandas as pd
+from modules.queries.QA import run_qa as qa
 from modules.outputs_writer import (
     EmissionLoc,
     FacilityAddress,
@@ -34,6 +35,13 @@ class WriteOutputs:
             shutil.rmtree(self.output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
 
+    def run_qa(self):
+        results = qa()
+        filename = f"{config.src_cat_name}_{results['_'].filename}_{config.timestamp}"
+        out_dst = self.copy_template(filename, results["_"])
+        for result in results["queries"]:
+            self.write_excel_sheet(out_dst, result.qa_df, result)
+
     def run(self, df):
         self.df = df
         emis_loc = EmissionLoc(self.df).create()
@@ -49,35 +57,33 @@ class WriteOutputs:
         self.write_to_template(hap_emissions)
 
     def write_to_template(self, result):
-        template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
-        filename = f"{self.runname}_{result.filename}_Cat_{config.timestamp}"
-        out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
-
         # Write category records
-        shutil.copyfile(template_src, out_dst)
-        self.write_excel_sheet(
-            out_dst, result.cat_df, result.sheet_name, result.rowstart
-        )
+        filename = f"{self.runname}_{result.filename}_Cat_{config.timestamp}"
+        out_dst = self.copy_template(filename, result)
+        self.write_excel_sheet(out_dst, result.cat_df, result)
 
         # Write whole records only if actual emissions
         if not config.only_category and config.emission_type == "Actual":
             filename = f"{self.runname}_{result.filename}_Whole_{config.timestamp}"
-            out_dst = os.path.join(self.output_dir, f"{filename}.xlsx")
+            out_dst = self.copy_template(filename, result)
+            self.write_excel_sheet(out_dst, result.whole_df, result)
 
-            shutil.copyfile(template_src, out_dst)
-            self.write_excel_sheet(
-                out_dst, result.whole_df, result.sheet_name, result.rowstart
-            )
+    def copy_template(self, name, result):
+        template_src = os.path.join(self.templates_fp, f"{result.template_name}.xlsx")
+        out_dst = os.path.join(self.output_dir, f"{name}.xlsx")
+        shutil.copyfile(template_src, out_dst)
+        return out_dst
 
-    def write_excel_sheet(self, fp, df, sheet, row):
+    def write_excel_sheet(self, fp, df, data):
         writer = pd.ExcelWriter(
             fp, engine="openpyxl", mode="a", if_sheet_exists="overlay"
         )
         df.to_excel(
             writer,
-            sheet_name=sheet,
+            sheet_name=data.sheet_name,
             header=False,
             index=False,
-            startrow=row,
+            startrow=data.rowstart,
+            startcol=data.colstart,
         )
         writer.close()

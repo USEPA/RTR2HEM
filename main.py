@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 from modules import (
-    QA,
     InitialProcessing,
     SourceIDs,
     MultiPathwayProcessing,
@@ -20,7 +19,7 @@ class RTR2HEM:
         self.settings_select()
         self.epgs_select()
         self.reg_codes_and_initial_processing()
-        QA().run()
+        config.out.run_qa()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
@@ -101,7 +100,6 @@ class RTR2HEM:
         reg_codes = config.input_df["regulatory_code"]
         reg_codes = reg_codes.unique().tolist()
         reg_codes.sort()
-
         if config.only_category:
             reg_codes = dict(zip(reg_codes, [1] * len(reg_codes)))
         else:

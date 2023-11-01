@@ -7,6 +7,7 @@ class FacilityList:
     template_name = "HEM4_Facility_List_Options_ICF"
     sheet_name = "Facility List Options"
     rowstart = 2
+    colstart = 0
 
     def __init__(self, df):
         self.df = df

@@ -17,6 +17,7 @@ class HapEmissions:
     template_name = "HEM4_HAP_Emiss_ICF"
     sheet_name = "Hap emissions"
     rowstart = 1
+    colstart = 0
 
     def __init__(self, df):
         self.df = df

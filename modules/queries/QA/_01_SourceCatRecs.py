@@ -9,8 +9,8 @@ from modules.utils import group, config
 
 # NOTE: if cat only, this step gets skipped... and all regulatory codes get set as inside category?
 class SourceCatRecs(QABase):
-    QA_num = "01"
-    QA_title = "Facilities Without Records in the Source Category"
+    qa_num = "01"
+    qa_title = "Facilities Without Records in the Source Category"
 
     def run(self):
         if config.only_category:
@@ -53,7 +53,10 @@ class SourceCatRecs(QABase):
         records_in_category = res.loc[res["regulatory_code"].isin(reg_codes)]
         records_in_category = set(records_in_category["sppd_facility_identifier"])
 
-        all_records = group(self.df, ["sppd_facility_identifier"])
+        all_records = group(self.df, ["sppd_facility_identifier"], only_group=True)
         all_records = set(all_records["sppd_facility_identifier"])
 
-        return list(all_records - records_in_category)
+        res = list(all_records - records_in_category)
+        res = ["a", "b", "c"]
+        self.qa_df["sppd_facility_identifier"] = res
+        return res
