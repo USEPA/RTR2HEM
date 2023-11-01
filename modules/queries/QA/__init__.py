@@ -6,8 +6,8 @@ from modules.queries.QA._04_Hemispheres import Hemispheres
 
 def run_qa():
     return [
-        SourceCatRecs().run(),
-        UniqueFacilities().run(),
-        UniqueSources().run(),
-        Hemispheres().run(),
+        SourceCatRecs(),
+        UniqueFacilities(),
+        UniqueSources(),
+        Hemispheres(),
     ]

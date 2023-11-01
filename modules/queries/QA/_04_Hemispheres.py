@@ -31,7 +31,7 @@ class Hemispheres(QABase):
                 """,
                 "qry_QA_04_Hemispheres",
             )
-        return self.get()
+        return self
 
     def qry_QA_04_Hemispheres(self):
         group_by = [

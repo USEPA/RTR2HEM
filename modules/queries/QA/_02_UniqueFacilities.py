@@ -31,7 +31,7 @@ class UniqueFacilities(QABase):
                 """,
                 "qry_QA_02d_UniqueFac",
             )
-        return self.get()
+        return self
 
     # TODO -- where is this used..?
     def qry_QA_02a_UniqueFac(self):

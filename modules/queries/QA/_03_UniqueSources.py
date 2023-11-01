@@ -47,7 +47,7 @@ class UniqueSources(QABase):
                 """,
                 "qry_QA_03d_UniqueSrc",
             )
-        return self.get()
+        return self
 
     def qry_QA_03b_UniqueSrc(self):
         group_by = [

@@ -42,7 +42,7 @@ class SourceCatRecs(QABase):
                                 Contact EPA to inquire about this.""",
                     "qry_QA_01c_SrcCatRecs",  # TODO update,
                 )
-        return self.get()
+        return self
 
     def missing_records(self):
         # this query identifies all unique facility IDs that
