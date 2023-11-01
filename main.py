@@ -98,12 +98,13 @@ class RTR2HEM:
         """7c"""
         logging.info("Regulatory codes select")
 
+        reg_codes = config.input_df["regulatory_code"]
+        reg_codes = reg_codes.unique().tolist()
+        reg_codes.sort()
+
         if config.only_category:
-            reg_codes = {}
+            reg_codes = dict(zip(reg_codes, [1] * len(reg_codes)))
         else:
-            reg_codes = config.input_df["regulatory_code"]
-            reg_codes = reg_codes.unique().tolist()
-            reg_codes.sort()
             reg_codes = RegCodesGUI(reg_codes).get_response()
         config.reg_codes = reg_codes
 
