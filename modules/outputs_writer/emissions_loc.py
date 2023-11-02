@@ -82,67 +82,6 @@ class EmissionLoc:
             return row["fugitive_2d_midpoint1_y_coordinate"]
         return row["y_coordinate"]
 
-    """
-    "SELECT DISTINCT working_CrosswalkEmissionInventory.ICFFacilityID AS FacilityID, 
-    working_CrosswalkEmissionInventory.ICFSourceID AS SourceID, 
-    'L' AS LocationType, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT1_X_COORDINATE, working_CrosswalkEmissionInventory.X_COORDINATE) AS Longitude, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT1_Y_COORDINATE, working_CrosswalkEmissionInventory.Y_COORDINATE) AS Latitude, 
-    working_CrosswalkEmissionInventory.blank AS UTMzone, working_CrosswalkEmissionInventory.ICFSourceType AS SourceType, " _
-
-    & "IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',[working_CrosswalkEmissionInventory]![ICFFugitiveWidth_m],[working_CrosswalkEmissionInventory]![ICFFugitiveLength_m]) AS Lengthx, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9' OR [working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[working_CrosswalkEmissionInventory]![ICFFugitiveWidth_m]) AS Lengthy, " _
-
-    & "working_CrosswalkEmissionInventory.FUGITIVE_ANGLE_DEGREES AS Angle, 
-    IIf([ICFSourceType]<>'V',Null,[ICFFugitiveWidth_m]/4.3) AS HorzDim, 
-    IIf([ICFSourceType]<>'V',Null,[ICFAreaVolLineReleaseHeight_m]*2/2.15) AS VertDim, 
-    working_CrosswalkEmissionInventory.ICFAreaVolLineReleaseHeight_m AS AreaVolReleaseHgt, 
-    working_CrosswalkEmissionInventory.ICFStackHeight_m AS StackHgt_m, 
-    working_CrosswalkEmissionInventory.ICFStackDiameter_m AS StackDiameter_m, " _
-
-    & "working_CrosswalkEmissionInventory.ICFExitGasVelocity_mps AS ExitGasVel_m, 
-    working_CrosswalkEmissionInventory.ICFExitGasTemperature_K AS ExitGasTemp_K, 
-    working_CrosswalkEmissionInventory.blank AS Elevation_m, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT2_X_COORDINATE, Null) AS X2, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT2_Y_COORDINATE, Null) AS Y2 " _
-
-    & "INTO output_EmissionLocation " _
-    & "FROM working_CrosswalkEmissionInventory " _
-
-    
-    & "GROUP BY working_CrosswalkEmissionInventory.ICFFacilityID, 
-    working_CrosswalkEmissionInventory.ICFSourceID, 
-    'L', 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT1_X_COORDINATE, working_CrosswalkEmissionInventory.X_COORDINATE), 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT1_Y_COORDINATE, working_CrosswalkEmissionInventory.Y_COORDINATE), 
-    working_CrosswalkEmissionInventory.ICFSourceType, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',[working_CrosswalkEmissionInventory]![ICFFugitiveWidth_m], [working_CrosswalkEmissionInventory]![ICFFugitiveLength_m]), 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9' 
-
-    OR [working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='10',Null,[working_CrosswalkEmissionInventory]![ICFFugitiveWidth_m]), 
-    working_CrosswalkEmissionInventory.FUGITIVE_ANGLE_DEGREES, IIf([ICFSourceType]<>'V',Null,[ICFFugitiveWidth_m]/4.3), " _
-
-    & "IIf([ICFSourceType]<>'V',Null,[ICFAreaVolLineReleaseHeight_m]*2/2.15), 
-    working_CrosswalkEmissionInventory.ICFAreaVolLineReleaseHeight_m, 
-    working_CrosswalkEmissionInventory.ICFStackHeight_m, 
-    working_CrosswalkEmissionInventory.ICFStackDiameter_m, 
-    working_CrosswalkEmissionInventory.ICFExitGasVelocity_mps, 
-    working_CrosswalkEmissionInventory.ICFExitGasTemperature_K, 
-    working_CrosswalkEmissionInventory.blank, 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT2_X_COORDINATE, Null), 
-    IIf([working_CrosswalkEmissionInventory]![EMISSION_RELEASE_POINT_TYPE]='9',working_CrosswalkEmissionInventory.FUGITIVE_2D_MIDPOINT2_Y_COORDINATE, Null), " _
-    & "working_CrosswalkEmissionInventory.ICFFugitiveLength_m, 
-    working_CrosswalkEmissionInventory.ICFFugitiveWidth_m, 
-    working_CrosswalkEmissionInventory.ICFCatLevelModeling, 
-    working_CrosswalkEmissionInventory.StateGroup " _
-
-    & "HAVING (((working_CrosswalkEmissionInventory.ICFCatLevelModeling)='YES') 
-    AND ((working_CrosswalkEmissionInventory.StateGroup)=" & intJ & ")) " _
-
-    & "ORDER BY working_CrosswalkEmissionInventory.ICFFacilityID, 
-    working_CrosswalkEmissionInventory.ICFSourceID;"
-    """
-
     def set_Lengthx(self, row):
         erp_value = row["emission_release_point_type"]
         if erp_value == "9":
@@ -151,7 +90,7 @@ class EmissionLoc:
 
     def set_Lengthy(self, row):
         erp_value = row["emission_release_point_type"]
-        if erp_value == "9" or erp_value == "10":
+        if erp_value == "7" or erp_value == "9":
             return ""
         return row["ICFFugitiveWidth_m"]
 

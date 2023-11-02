@@ -9,6 +9,9 @@ class QABase:
     qa_msg = "NOT SET"
     qa_result = "NOT SET"
 
+    qa_df = None
+    pdf_params = None
+
     filename = "RTRtoHEMandTier1_QA"
     template_name = "Tier1_QA_Details"
     sheet_name = "NOT SET"
@@ -19,6 +22,7 @@ class QABase:
     def __init__(self):
         self.df = config.input_df
         self.qa_df = pd.DataFrame()
+        self.pdf_params = {}
         self.run()
 
     # override
@@ -31,11 +35,16 @@ class QABase:
         self.qa_result = result
         self.sheet_name = self.qa_num
 
+        self.pdf_params = {}
+
     def get(self):
         return {
-            "QA_Number": self.qa_num,
-            "QA_Title": self.qa_title,
-            "QA_Outcome": self.qa_out,
-            "QA_Message": self.qa_msg,
-            "QA_Result": self.qa_result,
+            "params": self.pdf_params,
+            "query": {
+                "QA_Number": self.qa_num,
+                "QA_Title": self.qa_title,
+                "QA_Outcome": self.qa_out,
+                "QA_Message": self.qa_msg,
+                "QA_Result": self.qa_result,
+            },
         }

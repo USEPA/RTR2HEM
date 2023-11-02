@@ -47,3 +47,6 @@ table=Refractories_WholeFacil_ATAGFormat_20200904(edited)
 [Static]
 static_files=./static_tables.xlsx
 ```
+
+### Changelog
+emissions_release_point_type - initially 7=A and 10=V, however 10 was removed and now 7=V

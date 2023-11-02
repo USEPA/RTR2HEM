@@ -111,7 +111,8 @@ class InitialProcessing:
         ] = ""
 
         update_columns = ["ICFFugitiveLength_m", "fugitive_angle_degrees"]
-        self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
+        # self.df.loc[(erp_val != "1") & (erp_val != "7"), update_columns] = ""
+        self.df.loc[(erp_val != "1"), update_columns] = ""
 
         update_columns = [
             "ICFStackHeight_m",
@@ -173,9 +174,9 @@ class InitialProcessing:
         stack_height = row["stack_height (ft)"]
         erp_type = row["emission_release_point_type"]
 
-        if erp_type == "1" or erp_type == "7" or erp_type == "9":
+        if erp_type == "1" or erp_type == "9":
             return stack_height
-        elif erp_type == "10":
+        elif erp_type == "7":
             return stack_height / 2
         else:
             return 0
@@ -211,6 +212,6 @@ class InitialProcessing:
     def release_height_m(self, row):
         try:
             release_height_ft = row["ICFAreaVolLineReleaseHeight"]
-            return (release_height_ft / self.ft_per_meter) / 2
+            return release_height_ft / self.ft_per_meter
         except:
             return 0

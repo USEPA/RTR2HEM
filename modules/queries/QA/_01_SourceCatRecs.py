@@ -57,6 +57,5 @@ class SourceCatRecs(QABase):
         all_records = set(all_records["sppd_facility_identifier"])
 
         res = list(all_records - records_in_category)
-        res = ["a", "b", "c"]
         self.qa_df["sppd_facility_identifier"] = res
         return res
