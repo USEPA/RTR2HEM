@@ -156,3 +156,7 @@ if __name__ == "__main__":
         if config.out and os.path.exists(config.out.output_dir):
             config.out.accdb.close_accdb()
             shutil.rmtree(config.out.output_dir)
+    finally:
+        from modules.GUI.generic_GUI import ErrorHandling
+
+        ErrorHandling.note(title="RTR2HEM Notification", msg="Done!")

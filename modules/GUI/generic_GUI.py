@@ -15,6 +15,13 @@ class ErrorHandling:
     def __init__(self):
         pass
 
+    @staticmethod
+    def note(title, msg):
+        tkinter.messagebox.showwarning(
+            title=title,
+            message=msg,
+        )
+
     def warn(self, title="Warning", msg=""):
         tkinter.messagebox.showwarning(
             title=title,
