@@ -3,7 +3,7 @@ import pandas as pd
 import msaccessdb, pypyodbc
 
 
-class AccdbHandle:
+class AccdbManager:
     def __init__(self, fp, how="create"):
         self.accdb_fp = fp
         if how == "create":

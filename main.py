@@ -148,6 +148,10 @@ class RTR2HEM:
 
 
 if __name__ == "__main__":
+    from modules.html_writer import HTMLWriter
+
+    HTMLWriter()
+
     try:
         RTR2HEM()
         logging.info("Done!")

@@ -7,7 +7,7 @@ from modules.outputs_writer import (
     FacilityList,
     HapEmissions,
 )
-from modules.handle_accdb import AccdbHandle
+from modules.accdb_manager import AccdbManager
 from modules.utils import config
 
 
@@ -28,7 +28,7 @@ class WriteOutputs:
         accdb_fp = os.path.join(
             self.output_dir, f"{self.runname}_XWalks_{config.timestamp}.accdb"
         )
-        self.accdb = AccdbHandle(accdb_fp)
+        self.accdb = AccdbManager(accdb_fp)
 
     def create_folder(self):
         if os.path.exists(self.output_dir):

@@ -8,7 +8,7 @@ from tkinter import filedialog
 import tkinter.messagebox
 
 import pandas as pd
-from modules.handle_accdb import AccdbHandle
+from modules.accdb_manager import AccdbManager
 
 
 class ErrorHandling:
@@ -226,7 +226,7 @@ class FileImport:
             tables = []
 
             if ftype == ".accdb":
-                reader = AccdbHandle(self.filepath, how="open")
+                reader = AccdbManager(self.filepath, how="open")
                 tables = reader.get_tables()
             elif ftype == ".xlsx":
                 reader = pd.ExcelFile(self.filepath)

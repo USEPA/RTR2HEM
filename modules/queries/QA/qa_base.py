@@ -38,6 +38,8 @@ class QABase:
         self.pdf_params = {}
 
     def get(self):
+        if "None." in self.qa_result:
+            self.qa_result = ""
         return {
             "params": self.pdf_params,
             "query": {

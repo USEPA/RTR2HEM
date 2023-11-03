@@ -7,7 +7,7 @@ import warnings
 import pandas as pd
 import numpy as np
 
-from modules.handle_accdb import AccdbHandle
+from modules.accdb_manager import AccdbManager
 
 
 # write to file if running in an executable
@@ -263,7 +263,7 @@ class Config:
         elif ftype == ".csv":
             input_df = pd.read_csv(filepath)
         else:
-            accdb_reader = AccdbHandle(filepath, how="open")
+            accdb_reader = AccdbManager(filepath, how="open")
             input_df = accdb_reader.accdb_to_df(tablename)
         return input_df
 
