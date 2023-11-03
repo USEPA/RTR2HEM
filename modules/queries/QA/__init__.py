@@ -1,8 +1,8 @@
 import os, shutil
 import pandas as pd
 
-from modules.utils import config
 from modules.html_writer import QAToHTML
+from modules.utils import config
 
 from modules.queries.QA.qa_base import QABase
 from modules.queries.QA._01_SourceCatRecs import SourceCatRecs
@@ -24,21 +24,19 @@ def run_qa():
 
     QAToHTML(results)
 
-    filename = results["_"].filename
-    out_dst = copy_template(filename, results["_"])
+    out_dst = copy_template(results["_"])
     writer = pd.ExcelWriter(
         out_dst, engine="openpyxl", mode="a", if_sheet_exists="overlay"
     )
     for result in results["queries"]:
         write_excel_sheet(writer, result.qa_df, result)
     writer.close()
-
     return result
 
 
-def copy_template(name, result):
-    template_src = os.path.join(config.out.templates_fp, f"{result.template_name}.xlsx")
-    out_dst = os.path.join(config.out.output_dir, f"{name}.xlsx")
+def copy_template(base):
+    template_src = os.path.join(config.out.templates_fp, f"{base.template_name}.xlsx")
+    out_dst = os.path.join(config.out.output_dir, f"{base.filename}.xlsx")
     shutil.copyfile(template_src, out_dst)
     return out_dst
 
