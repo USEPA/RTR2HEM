@@ -1,7 +1,5 @@
 import os, shutil
 import pandas as pd
-from modules.queries.QA import run_qa as qa
-from modules.html_writer import QAToHTML
 from modules.outputs_writer import (
     EmissionLoc,
     FacilityAddress,
@@ -35,16 +33,6 @@ class WriteOutputs:
         if os.path.exists(self.output_dir):
             shutil.rmtree(self.output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
-
-    def run_qa(self):
-        results = qa()
-
-        QAToHTML(results)
-
-        filename = results["_"].filename
-        out_dst = self.copy_template(filename, results["_"])
-        for result in results["queries"]:
-            self.write_excel_sheet(out_dst, result.qa_df, result)
 
     def run(self, df):
         self.df = df

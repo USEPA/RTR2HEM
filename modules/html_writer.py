@@ -30,22 +30,20 @@ class QAToHTML:
         }
 
         .QAtable td,th {
+            text-align: left;
+            border: none;
             padding: 5px;
         }
 
         .QAtable th {
             font-size: 14pt;
-            text-align: left;
             color: #4f81bd;
-            border: none;
             border-bottom: 2px solid #4f81bd;
         }
 
         .QAtable td {
             font-size: 12pt;
-            text-align: left;
             vertical-align: top;
-            border: none;
             padding-bottom: 2rem;
         }
         
@@ -126,3 +124,4 @@ class QAToHTML:
         out_dst = os.path.join(config.out.output_dir, f"{self.filename}.html")
         with open(out_dst, "w") as fh:
             fh.write(html_string)
+        os.startfile(out_dst)

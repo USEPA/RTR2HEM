@@ -4,6 +4,7 @@ import logging
 import numpy as np
 import pandas as pd
 
+from modules.queries.QA import run_qa
 from modules import (
     InitialProcessing,
     SourceIDs,
@@ -19,7 +20,7 @@ class RTR2HEM:
         self.settings_select()
         self.epgs_select()
         self.reg_codes_and_initial_processing()
-        config.out.run_qa()
+        run_qa()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
