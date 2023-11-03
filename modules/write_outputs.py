@@ -18,7 +18,7 @@ class WriteOutputs:
         self.base = config.output_dir
         if os.getcwd() == config.output_dir:
             self.base = os.path.join(config.output_dir, "outputs")
-        self.runname = f"{config.src_cat_name}_{config.emission_type.split(' ')[0]}"
+        self.runname = f"{config.src_cat_name}_{config.emission_type}"
 
         self.output_dir = os.path.join(
             self.base, f"{self.runname}_HEMInputsAndXWalks_{config.timestamp}"
@@ -37,7 +37,7 @@ class WriteOutputs:
 
     def run_qa(self):
         results = qa()
-        filename = f"{config.src_cat_name}_{results['_'].filename}_{config.timestamp}"
+        filename = results["_"].filename
         out_dst = self.copy_template(filename, results["_"])
         for result in results["queries"]:
             self.write_excel_sheet(out_dst, result.qa_df, result)

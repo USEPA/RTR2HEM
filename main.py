@@ -19,7 +19,7 @@ class RTR2HEM:
         self.settings_select()
         self.epgs_select()
         self.reg_codes_and_initial_processing()
-        # config.out.run_qa()
+        config.out.run_qa()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
@@ -148,10 +148,6 @@ class RTR2HEM:
 
 
 if __name__ == "__main__":
-    from modules.html_writer import HTMLWriter
-
-    HTMLWriter()
-
     try:
         RTR2HEM()
         logging.info("Done!")

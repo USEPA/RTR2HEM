@@ -4,9 +4,11 @@ from modules.queries.QA._02_UniqueFacilities import UniqueFacilities
 from modules.queries.QA._03_UniqueSources import UniqueSources
 from modules.queries.QA._04_Hemispheres import Hemispheres
 
+from modules.html_writer import QAToHTML
+
 
 def run_qa():
-    return {
+    results = {
         "_": QABase(),
         "queries": [
             SourceCatRecs(),
@@ -15,3 +17,5 @@ def run_qa():
             Hemispheres(),
         ],
     }
+    QAToHTML(results)
+    return results

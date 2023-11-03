@@ -1,11 +1,13 @@
-import pandas as pd
+import os
+import pathlib
+from modules.utils import config
 
 """
 Write QA results to HTML
 """
 
 
-class HTMLWriter:
+class QAToHTML:
     css = """
         body {
             font-family: Calibri;
@@ -43,6 +45,7 @@ class HTMLWriter:
         .QAtable td {
             font-size: 12pt;
             text-align: left;
+            vertical-align: top;
             border: none;
             padding-bottom: 2rem;
         }
@@ -50,52 +53,39 @@ class HTMLWriter:
         .QAtable tr:nth-child(even) {
             background: #E0E0E0;
         }
-
-        .QAtable tr:hover {
-            background: silver;
-            cursor: pointer;
-        }
     """
 
-    def __init__(self):
-        from modules.queries.QA.qa_base import QABase
+    color_map = {
+        "#758c48": ["Passed QA"],  # green
+        "#807b90": ["Repairs Not Needed", "Informational"],  # grey
+        "#000000": ["N/A"],  # black
+    }
 
-        # note -- outcome, message, result all go into the same cell
-        self.data = [
-            {
-                "params": {},
-                "query": {
-                    "QA_Number": "01",
-                    "QA_Title": "my title",
-                    "QA_Outcome": "my outcome",
-                    "QA_Message": "my msg",
-                    "QA_Result": "my result",
-                },
-            },
-            {
-                "params": {},
-                "query": {
-                    "QA_Number": "02",
-                    "QA_Title": "Pollutants that Cannot be Modeled for Inhalation Risk/Hazard",
-                    "QA_Outcome": "As expected, all records have positive latitude values (Y coordinates) and negative longitude values (X coordinates).",
-                    "QA_Message": "my second message",
-                    "QA_Result": "my second result",
-                },
-            },
-        ]
+    def __init__(self, queries):
+        self.data = [q.get() for q in queries["queries"]]
+        self.filename = queries["_"].filename
+
+        self.rcolor_map = {
+            new_key: index_key
+            for index_key, index_value in self.color_map.items()
+            for new_key in index_value
+        }
         table = self.build_table()
         self.write_html(table)
-        print("!")
 
     def qa_results_to_html(self):
         table_body_str = ""
         for row in self.data:
-            row = row["query"]
+            color = self.rcolor_map[row["QA_Outcome"]]
             table_body_str += f"""
                 <tr>
                     <td>{row['QA_Number']}</td>
                     <td>{row['QA_Title']}</td>
-                    <td>{row['QA_Outcome']}</td>
+                    <td>
+                        <strong style="color:{color};">{row['QA_Outcome']}</strong>
+                        </br>{row['QA_Message']}
+                        </br>{row['QA_Result']}
+                    </td>
                 </tr>
             """
         return table_body_str
@@ -121,8 +111,8 @@ class HTMLWriter:
         # TODO update
         header_str = f"""
             <h1>RTR-to-HEM Processing Tool -- QA of Import Data</h1>
-            <h3>Modeling File Table: Refractories_WholeFacil_ATAGFormat_20200918</h3>
-            <h3>Detailed Findings: Refractories20200918_RTRtoHEMandTier1_QA_20200921.xlsx</h3>
+            <h3>Modeling File Table: {config.input_table}</h3>
+            <h3>Detailed Findings: {self.filename}.xlsx</h3>
         """
 
         html_string = f"""
@@ -134,5 +124,6 @@ class HTMLWriter:
             </body>
             </html>
         """
-        with open("test.html", "w") as fh:
+        out_dst = os.path.join(config.out.output_dir, f"{self.filename}.html")
+        with open(out_dst, "w") as fh:
             fh.write(html_string)
