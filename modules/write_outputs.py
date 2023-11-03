@@ -1,6 +1,7 @@
 import os, shutil
 import pandas as pd
 from modules.queries.QA import run_qa as qa
+from modules.html_writer import QAToHTML
 from modules.outputs_writer import (
     EmissionLoc,
     FacilityAddress,
@@ -37,6 +38,9 @@ class WriteOutputs:
 
     def run_qa(self):
         results = qa()
+
+        QAToHTML(results)
+
         filename = results["_"].filename
         out_dst = self.copy_template(filename, results["_"])
         for result in results["queries"]:

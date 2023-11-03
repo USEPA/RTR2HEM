@@ -1,5 +1,4 @@
 import os
-import pathlib
 from modules.utils import config
 
 """
@@ -70,13 +69,14 @@ class QAToHTML:
             for index_key, index_value in self.color_map.items()
             for new_key in index_value
         }
+
         table = self.build_table()
         self.write_html(table)
 
     def qa_results_to_html(self):
         table_body_str = ""
         for row in self.data:
-            color = self.rcolor_map[row["QA_Outcome"]]
+            color = self.rcolor_map.get(row["QA_Outcome"], "#807b90")
             table_body_str += f"""
                 <tr>
                     <td>{row['QA_Number']}</td>
@@ -108,7 +108,6 @@ class QAToHTML:
         return table
 
     def write_html(self, table):
-        # TODO update
         header_str = f"""
             <h1>RTR-to-HEM Processing Tool -- QA of Import Data</h1>
             <h3>Modeling File Table: {config.input_table}</h3>
