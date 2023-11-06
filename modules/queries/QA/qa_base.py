@@ -18,6 +18,14 @@ class QABase:
     rowstart = 4
     colstart = 1
 
+    color_map = {
+        "#758c48": ["Passed QA"],  # green
+        "#ffc20e": ["Warning", "Repairs Were Needed"],  # yellow
+        "#ba1419": ["Fatal Error"],  # red
+        "#807b90": ["QA Not Needed", "Repairs Not Needed", "Informational"],  # grey
+        "#000000": ["N/A"],  # black
+    }
+
     def __init__(self):
         self.df = config.input_df
         self.filename = f"{config.src_cat_name}_RTRtoHEMandTier1_QA_{config.timestamp}"

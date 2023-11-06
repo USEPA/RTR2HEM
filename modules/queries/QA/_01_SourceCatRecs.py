@@ -7,7 +7,6 @@ from modules.utils import group, config
 """
 
 
-# NOTE: if cat only, this step gets skipped... and all regulatory codes get set as inside category?
 class SourceCatRecs(QABase):
     qa_num = "01"
     qa_title = "Facilities Without Records in the Source Category"
@@ -40,7 +39,7 @@ class SourceCatRecs(QABase):
                                 {len(records)} (facility defined as field SPPD_FACILITY_IDENTIFIER). 
                                 See information in the "01" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program. 
                                 Contact EPA to inquire about this.""",
-                    "qry_QA_01c_SrcCatRecs",  # TODO update,
+                    "qry_QA_01c_SrcCatRecs",
                 )
         return self
 

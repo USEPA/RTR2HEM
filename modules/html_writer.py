@@ -52,19 +52,13 @@ class QAToHTML:
         }
     """
 
-    color_map = {
-        "#758c48": ["Passed QA"],  # green
-        "#807b90": ["Repairs Not Needed", "Informational"],  # grey
-        "#000000": ["N/A"],  # black
-    }
-
     def __init__(self, queries):
         self.data = [q.get() for q in queries["queries"]]
         self.filename = queries["_"].filename
 
         self.rcolor_map = {
             new_key: index_key
-            for index_key, index_value in self.color_map.items()
+            for index_key, index_value in queries["_"].color_map.items()
             for new_key in index_value
         }
 
@@ -93,7 +87,7 @@ class QAToHTML:
             <tr>
                 <th style="width: 2rem;">No.</th>
                 <th style="width: 18rem;">Subject</th>
-                <th style="width: 35rem">Outcome</th>
+                <th style="width: 35rem;">Outcome</th>
             </tr>
         """
         table_body_str = self.qa_results_to_html()
