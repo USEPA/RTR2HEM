@@ -42,7 +42,10 @@ def set_column(df, column_name, func):
 
 
 def group(df, group_by, only_group=False):
-    # NOTE: not to be confused with pandas 'group_by'
+    """
+    Usually in msaccess this is the operation that SQL's group by best translates to
+    NOTE: not to be confused with pandas 'group_by'
+    """
     if not isinstance(group_by, list):
         group_by = [group_by]
     grp = df.drop_duplicates(group_by)

@@ -12,6 +12,7 @@ NOTE -- not implemented yet!
 'qry_QA_03b_UniqueSrc - this query returns a list of unique emission sources in the input_EmissionInventory_withICFWork
                         'table and other source parameter fields
 
+NOTE -- not quite true, 03a is not used
 'qry_QA_03c_UniqueSrc - this query joins 03a to 03b by the SPPD_FACILITY_IDENTIFIER & PROCESS_ID & EMISSION_UNIT_ID & EMISSION_RELEASE_POINT_ID
                         'fields and filters for facilities with more than one unique emission source detail to supply details on those facilities
                         'with more than one set of stack parameters
@@ -94,15 +95,6 @@ class UniqueSources(QABase):
         return res.loc[res["CountOfEMISSION_RELEASE_POINT_TYPE"] > 1]
 
     def qry_QA_03d_UniqueSrc(self):
-        """
-        SELECT qry_QA_03b_UniqueSrc.*
-        FROM qry_QA_03c_UniqueSrc INNER JOIN qry_QA_03b_UniqueSrc ON
-        (qry_QA_03c_UniqueSrc.EMISSION_RELEASE_POINT_ID = qry_QA_03b_UniqueSrc.EMISSION_RELEASE_POINT_ID)
-        AND (qry_QA_03c_UniqueSrc.PROCESS_ID = qry_QA_03b_UniqueSrc.PROCESS_ID)
-        AND (qry_QA_03c_UniqueSrc.EMISSION_UNIT_ID = qry_QA_03b_UniqueSrc.EMISSION_UNIT_ID)
-        AND (qry_QA_03c_UniqueSrc.SPPD_FACILITY_IDENTIFIER = qry_QA_03b_UniqueSrc.SPPD_FACILITY_IDENTIFIER);
-
-        """
         all_unique_emissions = self.qry_QA_03b_UniqueSrc()
         multiple_emissions = self.qry_QA_03c_UniqueSrc()
         res = Join().join(
@@ -115,4 +107,5 @@ class UniqueSources(QABase):
             ],
         )
         res = res.loc[res["CountOfEMISSION_RELEASE_POINT_TYPE"] > 1]
+        self.qa_df = res.drop("CountOfEMISSION_RELEASE_POINT_TYPE", axis=1)
         return len(res.index) == 0

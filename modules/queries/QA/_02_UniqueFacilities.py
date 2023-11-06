@@ -81,4 +81,5 @@ class UniqueFacilities(QABase):
             on="sppd_facility_identifier",
         )
         res = res.loc[res["CountOfFACILITY_NAME"] > 1]
+        self.qa_df = res.drop("CountOfFACILITY_NAME", axis=1)
         return len(res.index) == 0

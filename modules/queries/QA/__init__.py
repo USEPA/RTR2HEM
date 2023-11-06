@@ -9,6 +9,8 @@ from modules.queries.QA._01_SourceCatRecs import SourceCatRecs
 from modules.queries.QA._02_UniqueFacilities import UniqueFacilities
 from modules.queries.QA._03_UniqueSources import UniqueSources
 from modules.queries.QA._04_Hemispheres import Hemispheres
+from modules.queries.QA._05_ReleasePointFormat import ReleasePointFormat
+from modules.queries.QA._06_ReleasePointType import ReleasePointType
 
 
 def run_qa():
@@ -19,6 +21,8 @@ def run_qa():
             UniqueFacilities(),
             UniqueSources(),
             Hemispheres(),
+            ReleasePointFormat(),
+            ReleasePointType(),
         ],
     }
 
