@@ -284,6 +284,7 @@ class Config:
             "exit_gas_velocity (ft/sec)",
             "fugitive_length_sigmax_ft",
             "fugitive_width_sigmay_ft",
+            "fugitive_angle_degrees",
             "x_coordinate",
             "y_coordinate",
             "fugitive_2d_midpoint1_y_coordinate",

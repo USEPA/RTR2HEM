@@ -20,7 +20,7 @@ class RTR2HEM:
         self.settings_select()
         self.epgs_select()
         self.reg_codes_and_initial_processing()
-        run_qa()  # note... needs to be ran before initial processing, since input_df gets modified
+        run_qa()  # note... needs to be ran before initial processing
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()

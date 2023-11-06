@@ -11,6 +11,11 @@ from modules.queries.QA._03_UniqueSources import UniqueSources
 from modules.queries.QA._04_Hemispheres import Hemispheres
 from modules.queries.QA._05_ReleasePointFormat import ReleasePointFormat
 from modules.queries.QA._06_ReleasePointType import ReleasePointType
+from modules.queries.QA._07_PointParams import PointParams
+from modules.queries.QA._08_LengthWidthFix import LengthWidthFix
+from modules.queries.QA._09_AreaParamsVal import AreaParamsVal
+from modules.queries.QA._10_VolParams import VolParams
+from modules.queries.QA._11_LineParams import LineParams
 
 
 def run_qa():
@@ -23,6 +28,11 @@ def run_qa():
             Hemispheres(),
             ReleasePointFormat(),
             ReleasePointType(),
+            PointParams(),
+            LengthWidthFix(),
+            AreaParamsVal(),
+            VolParams(),
+            LineParams(),
         ],
     }
 
