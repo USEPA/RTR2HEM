@@ -16,6 +16,7 @@ from modules.queries.QA._08_LengthWidthFix import LengthWidthFix
 from modules.queries.QA._09_AreaParamsVal import AreaParamsVal
 from modules.queries.QA._10_VolParams import VolParams
 from modules.queries.QA._11_LineParams import LineParams
+from modules.queries.QA._12_HEM3Chem import HEM3Chem
 
 
 def run_qa():
@@ -33,6 +34,7 @@ def run_qa():
             AreaParamsVal(),
             VolParams(),
             LineParams(),
+            HEM3Chem(),
         ],
     }
 

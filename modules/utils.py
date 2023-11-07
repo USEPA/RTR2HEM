@@ -278,6 +278,7 @@ class Config:
     def set_input_df_column_types(self):
         columns_int64 = []
         columns_float64 = [
+            "actual_emissions_tpy",
             "stack_height (ft)",
             "exit_gas_temperature (f)",
             "stack_diameter (ft)",
