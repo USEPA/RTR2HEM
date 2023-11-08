@@ -1,4 +1,3 @@
-import pandas as pd
 from modules.queries.QA.qa_base import QABase
 from modules.utils import Join, get_static, set_column, calc_agg
 
@@ -73,12 +72,7 @@ class HEM3Chem(QABase):
             res["pollutant_code_static"].isnull() | (res["hem3_chemical_name"] == "")
         ].fillna("")
 
-        def pollutant_code_exists(row):
-            if row["pollutant_code_static"]:
-                return "Yes"
-            return "No"
-
-        set_column(res, "in_crosswalk", pollutant_code_exists)
+        set_column(res, "in_crosswalk", self.pollutant_code_exists)
         res = calc_agg(res, group_by, "sum", "actual_emissions_tpy")
 
         col_order = [
@@ -95,3 +89,8 @@ class HEM3Chem(QABase):
         res = res[col_order]
         self.qa_df = res
         return len(res.index)
+
+    def pollutant_code_exists(self, row):
+        if row["pollutant_code_static"]:
+            return "Yes"
+        return "No"

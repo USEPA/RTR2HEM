@@ -38,6 +38,7 @@ def get_static(filename):
 
 
 def set_column(df, column_name, func):
+    """costly operation, reserve for complex assignment"""
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
@@ -278,6 +279,7 @@ class Config:
     def set_input_df_column_types(self):
         columns_int64 = []
         columns_float64 = [
+            "metal_speciation_factor",
             "actual_emissions_tpy",
             "stack_height (ft)",
             "exit_gas_temperature (f)",

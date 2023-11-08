@@ -3,8 +3,8 @@ from .utils import Join, set_column, get_static, config
 
 
 class InitialProcessing:
-    ft_per_meter = 3.2808399
-    fahrenheit_to_kelvin = lambda self, f_temp: ((f_temp - 32) * 0.5555) + 273.15
+    ft_per_m = 3.2808399
+    f_to_k = lambda self, f_temp: ((f_temp - 32) * 0.5555) + 273.15
 
     columns = [
         "ICFFacilityID",
@@ -59,27 +59,26 @@ class InitialProcessing:
     def run(self):
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
 
+        # fmt: off
         self.df["ICFSourceID"] = ""
-        set_column(self.df, "ICFFacilityID", self.set_icf_facility_id)
         set_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code)
         set_column(self.df, "emissions_tpy", self.set_selected_emission_type)
-        set_column(self.df, "ICFModelEmissionTPY", self.set_model_emission_tpy)
         set_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations)
         set_column(self.df, "ICFSourceType", self.set_source_type)
         set_column(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height)
-        set_column(
-            self.df, "ICFMetal_Speciation_Factor", self.set_metal_speciation_factor
-        )
+        self.df["ICFFacilityID"] = self.df["state_county_fips"] + self.df["sppd_facility_identifier"]
+        self.df["ICFModelEmissionTPY"] = self.df["emissions_tpy"] * self.df["metal_speciation_factor"]
+        self.df["ICFMetal_Speciation_Factor"] = self.df["metal_speciation_factor"]
 
         # unit conversions
-        # might not need to store
-        set_column(self.df, "ICFStackHeight_m", self.stack_height_meter)
-        set_column(self.df, "ICFStackDiameter_m", self.stack_diameter_meter)
-        set_column(self.df, "ICFExitGasVelocity_mps", self.gas_velocity_mps)
-        set_column(self.df, "ICFExitGasTemperature_K", self.gas_temperature_k)
-        set_column(self.df, "ICFFugitiveLength_m", self.fugitive_length_m)
-        set_column(self.df, "ICFFugitiveWidth_m", self.fugitive_width_m)
         set_column(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m)
+        self.df["ICFStackHeight_m"] = self.df["stack_height (ft)"] / self.ft_per_m
+        self.df["ICFStackDiameter_m"] = self.df["stack_diameter (ft)"] / self.ft_per_m
+        self.df["ICFExitGasVelocity_mps"] = self.df["exit_gas_velocity (ft/sec)"] / self.ft_per_m
+        self.df["ICFExitGasTemperature_K"] = self.f_to_k(self.df["exit_gas_temperature (f)"])
+        self.df["ICFFugitiveLength_m"] = self.df["fugitive_length_sigmax_ft"] / self.ft_per_m
+        self.df["ICFFugitiveWidth_m"] = self.df["fugitive_width_sigmay_ft"] / self.ft_per_m
+        # fmt: on
 
         self.update_by_emission_release_point_type()
         self.df = self.df[self.columns]
@@ -125,9 +124,6 @@ class InitialProcessing:
             update_columns,
         ] = ""
 
-    def set_icf_facility_id(self, row):
-        return row["state_county_fips"] + row["sppd_facility_identifier"]
-
     def is_selected_regulatory_code(self, row):
         code = row["regulatory_code"]
         if self.reg_codes and self.reg_codes.get(code) == 1:
@@ -136,18 +132,12 @@ class InitialProcessing:
 
     def set_selected_emission_type(self, row):
         try:
-            emissions_df = self.df.filter(
-                regex=config.emission_type.lower().replace(" ", "_")
-            )
-            emissions_col = emissions_df.columns[0]
-            return float(row[emissions_col])
+            colname = f"{config.emission_type.lower()}_emissions_tpy"
+            return float(row[colname])
         except:
             raise KeyError(
                 "Invalid emissions column name supplied. Rename through config."
             )
-
-    def set_model_emission_tpy(self, row):
-        return row["emissions_tpy"] * float(row["metal_speciation_factor"])
 
     def set_epg_abbreviations(self, row):
         emissions_group = row["emission_process_group"]
@@ -181,37 +171,9 @@ class InitialProcessing:
         else:
             return 0
 
-    def set_metal_speciation_factor(self, row):
-        return row["metal_speciation_factor"]
-
-    # unit conversions
-    def stack_height_meter(self, row):
-        stack_height_ft = row["stack_height (ft)"]
-        return stack_height_ft / self.ft_per_meter
-
-    def stack_diameter_meter(self, row):
-        stack_diameter_ft = row["stack_diameter (ft)"]
-        return stack_diameter_ft / self.ft_per_meter
-
-    def gas_velocity_mps(self, row):
-        gas_velocity_fts = row["exit_gas_velocity (ft/sec)"]
-        return gas_velocity_fts / self.ft_per_meter
-
-    def gas_temperature_k(self, row):
-        gas_temperature_f = row["exit_gas_temperature (f)"]
-        return self.fahrenheit_to_kelvin(gas_temperature_f)
-
-    def fugitive_length_m(self, row):
-        fugitive_length_f = row["fugitive_length_sigmax_ft"]
-        return fugitive_length_f / self.ft_per_meter
-
-    def fugitive_width_m(self, row):
-        fugitive_width_f = row["fugitive_width_sigmay_ft"]
-        return fugitive_width_f / self.ft_per_meter
-
     def release_height_m(self, row):
         try:
             release_height_ft = row["ICFAreaVolLineReleaseHeight"]
-            return release_height_ft / self.ft_per_meter
+            return release_height_ft / self.ft_per_m
         except:
             return 0
