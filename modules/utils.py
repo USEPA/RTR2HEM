@@ -43,6 +43,13 @@ def set_column(df: pd.DataFrame, column_name, func):
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
+def vset_column(df: pd.DataFrame, column_name, func, arg_columns: list = [], **kwargs):
+    """set columns through vectorization"""
+    for c in arg_columns:
+        kwargs[c] = df[c]
+    df[column_name] = func(**kwargs)
+
+
 def group(df: pd.DataFrame, group_by, only_group=False):
     """
     Usually in msaccess this is the operation that SQL's group by best translates to

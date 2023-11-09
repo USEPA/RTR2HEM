@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import logging
 import pandas as pd
+from pathlib import Path
 import msaccessdb, pypyodbc
 
 
@@ -66,14 +66,15 @@ class AccdbManager:
 
     def large_write(self, table_name, df: pd.DataFrame, columns):
         """Time floors out at about 0.035s due to the .csv write"""
-        df.to_csv("tmp.csv", index=False)
+        tmp = "tmp.csv"
+        df.to_csv(tmp, index=False)
         try:
             columns_tpl = f"{tuple(columns)}".replace("'", "")
             columns_str = ", ".join(columns)
 
             accdb_query = f"""INSERT INTO [{table_name}] {columns_tpl} 
                             SELECT {columns_str} FROM 
-                            [text;HDR=Yes;FMT=Delimited(,);Database={Path.cwd()}].tmp.csv"""
+                            [text;HDR=Yes;FMT=Delimited(,);Database={Path.cwd()}].{tmp}"""
             self.accdb.execute(accdb_query)
             self.accdb.commit()
         finally:
