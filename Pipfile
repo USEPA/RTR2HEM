@@ -7,10 +7,10 @@ name = "pypi"
 pandas = "*"
 openpyxl = "*"
 sqlalchemy = "*"
-pypyodbc = "*"
 xlsxwriter = "*"
 msaccessdb = "*"
 pyinstaller = "*"
+pypyodbc = "*"
 
 [dev-packages]
 

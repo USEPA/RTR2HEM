@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import logging
 import pandas as pd
 import msaccessdb, pypyodbc
@@ -31,35 +33,58 @@ class AccdbManager:
 
     def accdb_to_df(self, table_name):
         dataframe = pd.read_sql(f"SELECT * FROM [{table_name}]", self.conn)
+        dataframe.columns = dataframe.columns.str.lower()
         return dataframe
 
     def get_tables(self):
         table_names = [x[2] for x in self.accdb.tables(tableType="TABLE")]
         return table_names
 
-    def write(self, table_name, df):
+    def write(self, table_name, df: pd.DataFrame):
+        columns = []
         df = df.astype(str).replace("\.0+$", "", regex=True)
-        columns = df.columns.to_list()
-        values = df.to_numpy().tolist()
+        for c in df.columns:
+            new_c = f"{c.replace('?', '')}"
+            columns.append(f"[{new_c}]")
+            df = df.rename(columns={c: new_c})
 
-        # question marks are reserved syntax!
-        for i, c in enumerate(columns):
-            columns[i] = f"[{c}]".replace("?", "")
+        self.create_table(table_name, columns)
 
+        if df.size > 1000:
+            self.large_write(table_name, df, columns)
+        else:
+            self.small_write(table_name, df, columns)
+
+    def create_table(self, table_name, columns):
+        """Create new ms access table"""
         columns_str = " text(255), ".join(columns)
         columns_str = f"({columns_str} text(255))"
-        accdb_query = f"CREATE TABLE [{table_name}] {columns_str};"
-        self._execute(accdb_query)
 
+        accdb_query = f"CREATE TABLE [{table_name}] {columns_str};"
+        self.accdb.execute(accdb_query)
+        self.accdb.commit()
+
+    def large_write(self, table_name, df: pd.DataFrame, columns):
+        """Time floors out at about 0.035s due to the .csv write"""
+        df.to_csv("tmp.csv", index=False)
+        try:
+            columns_tpl = f"{tuple(columns)}".replace("'", "")
+            columns_str = ", ".join(columns)
+
+            accdb_query = f"""INSERT INTO [{table_name}] {columns_tpl} 
+                            SELECT {columns_str} FROM 
+                            [text;HDR=Yes;FMT=Delimited(,);Database={Path.cwd()}].tmp.csv"""
+            self.accdb.execute(accdb_query)
+            self.accdb.commit()
+        finally:
+            os.remove("tmp.csv")
+
+    def small_write(self, table_name, df: pd.DataFrame, columns):
+        values = df.to_numpy().tolist()
         columns_tpl = f"{tuple(columns)}".replace("'", "")
         placeholder = f"{tuple(['?'] * len(columns))}".replace("'", "")
-        for row in values:
-            accdb_query = (
-                f"INSERT INTO [{table_name}] {columns_tpl} VALUES {placeholder}"
-            )
-            params = tuple(row)
-            self._execute(accdb_query, params)
 
-    def _execute(self, q, params=None):
-        self.accdb.execute(q, params)
+        accdb_query = f"INSERT INTO [{table_name}] {columns_tpl} VALUES {placeholder}"
+        for row in values:
+            self.accdb.execute(accdb_query, tuple(row))
         self.accdb.commit()

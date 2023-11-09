@@ -3,12 +3,13 @@ import logging
 import datetime
 import json
 import warnings
-
 import pandas as pd
 import numpy as np
-
 from modules.accdb_manager import AccdbManager
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from modules.write_outputs import WriteOutputs
 
 # write to file if running in an executable
 if getattr(sys, "frozen", False):
@@ -37,12 +38,12 @@ def get_static(filename):
     return df.fillna("")
 
 
-def set_column(df, column_name, func):
+def set_column(df: pd.DataFrame, column_name, func):
     """costly operation, reserve for complex assignment"""
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
-def group(df, group_by, only_group=False):
+def group(df: pd.DataFrame, group_by, only_group=False):
     """
     Usually in msaccess this is the operation that SQL's group by best translates to
     NOTE: not to be confused with pandas 'group_by'
@@ -55,7 +56,7 @@ def group(df, group_by, only_group=False):
     return grp
 
 
-def calc_agg(df, group_by, agg, on_column, rename_column=None):
+def calc_agg(df: pd.DataFrame, group_by, agg, on_column, rename_column=None):
     """
     returns a dataframe with group_by and resulting on_column columns
     """
@@ -199,11 +200,8 @@ class Config:
         "emission_process_group",
         "ICFEmissionProcessGroupAbbr",
     ]
-
     reg_codes = None
-
-    # output writer
-    out = None
+    out: "WriteOutputs" = None
 
     def __init__(self):
         pass
