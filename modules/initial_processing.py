@@ -89,10 +89,6 @@ class InitialProcessing:
         static_pollutantCrosswalk = get_static(
             "static_PollutantCrosswalk_andMetalSpeciations"
         )
-        static_pollutantCrosswalk.columns = (
-            static_pollutantCrosswalk.columns.str.lower()
-        )
-
         self.df = Join().join(
             [self.df, static_pollutantCrosswalk],
             on="pollutant_code",

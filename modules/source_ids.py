@@ -1,4 +1,5 @@
-from modules.utils import set_column, config
+import pandas as pd
+from modules.utils import Join, set_column, config
 
 
 class SourceIDs:
@@ -13,7 +14,7 @@ class SourceIDs:
 
     sort_by = ["ICFFacilityID", "ICFSourceID"]
 
-    def __init__(self, df):
+    def __init__(self, df: pd.DataFrame):
         self.df = df
         self.src_list_df = self.df.copy()
 
@@ -33,17 +34,15 @@ class SourceIDs:
     def run(self):
         self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
         self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)
-
         if config.srcid_import is not None:
             self.import_existing_src_ids()
 
         set_column(self.src_list_df, "ICFSourceID", self.create_source_id)
-        set_column(self.df, "ICFSourceID", self.merge_src_ids)
+        self.remerge_src_ids()
 
         config.out.accdb.write(
             "03 - Source ID Xwalk", self.src_list_df[config.srcid_required]
         )
-        self.df = self.df.sort_values(self.sort_by)
         return self.df
 
     def create_source_id(self, row):
@@ -80,33 +79,50 @@ class SourceIDs:
         assert len(source_id) == 8
         return source_id
 
-    def merge_src_ids(self, row):
-        src = self.src_list_df
-        result = self.src_list_df.loc[
-            (src["ICFFacilityID"] == row["ICFFacilityID"])
-            & (src["emission_unit_id"] == row["emission_unit_id"])
-            & (src["process_id"] == row["process_id"])
-            & (src["emission_release_point_id"] == row["emission_release_point_id"])
-        ]
-        assert len(result) == 1
-        return result.iloc[0]["ICFSourceID"]
+    def remerge_src_ids(self):
+        # custom join can't preserve both suffixes
+        self.df = pd.merge(
+            left=self.df,
+            right=self.src_list_df,
+            on=[
+                "ICFFacilityID",
+                "emission_unit_id",
+                "process_id",
+                "emission_release_point_id",
+            ],
+            suffixes=("", "_tmp"),
+        )
+        self.df["ICFSourceID"] = self.df["ICFSourceID_tmp"]
+        self.df = Join().drop_tmp(self.df)
+        self.df = self.df.sort_values(self.sort_by).reset_index(drop=True)
+        return self.df
 
     def import_existing_src_ids(self):
-        def merge_import_src_ids(row):
-            src = config.srcid_import
-            result = src.loc[
-                (src["icffacilityid"] == row["ICFFacilityID"])
-                & (src["emission_unit_id"] == row["emission_unit_id"])
-                & (src["process_id"] == row["process_id"])
-                & (src["emission_release_point_id"] == row["emission_release_point_id"])
-            ]
-            if len(result) == 1:
-                return result.iloc[0]["icfsourceid"]
-            return ""
+        # normalize column names
+        cols = {}
+        for c in self.src_list_df.columns:
+            for c2 in config.srcid_import.columns:
+                if c.lower() == c2.lower():
+                    cols[c2] = c
+        config.srcid_import = config.srcid_import.rename(columns=cols)
 
-        set_column(self.src_list_df, "ICFSourceID", merge_import_src_ids)
+        # merge imported src ids
+        self.src_list_df = pd.merge(
+            left=self.src_list_df,
+            right=config.srcid_import,
+            on=[
+                "ICFFacilityID",
+                "emission_unit_id",
+                "process_id",
+                "emission_release_point_id",
+            ],
+            suffixes=("", "_tmp"),
+        )
+        self.src_list_df["ICFSourceID"] = self.src_list_df["ICFSourceID_tmp"]
+        self.src_list_df = Join().drop_tmp(self.src_list_df)
+        self.src_list_df = self.src_list_df.reset_index(drop=True)
 
-        # init facility counter
+        # initialize facility counter
         sort_by = ["icffacilityid", "srcid_tmp"]
         set_column(config.srcid_import, "srcid_tmp", self.reverse_str_counter)
         result = config.srcid_import[sort_by].sort_values(sort_by, ascending=False)

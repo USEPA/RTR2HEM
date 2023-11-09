@@ -79,7 +79,7 @@ class Join:
     join
         accepts a list of dataframes, all pd.merge arguments,
         optional:
-            drop_dupe = 'left'|'right'
+            drop_dupe = 'left'|'right'(default)
 
         this custom join is case insensitive for both column names
         and cell values
@@ -93,7 +93,7 @@ class Join:
         df2["_key"] = 0
         return pd.merge(df1, df2, on="_key").drop("_key", axis=1)
 
-    def join(self, dfs=None, **kwargs):
+    def join(self, dfs=None, **kwargs) -> pd.DataFrame:
         if dfs is None:
             dfs = []
         if "left" in kwargs:
@@ -113,14 +113,14 @@ class Join:
             kwargs["suffixes"] = ("_tmp", "")
 
         result = pd.merge(left=dfs[0], right=dfs[1], **kwargs)
-        result = self._drop_tmp(result)
+        result = self.drop_tmp(result)
         for i in range(2, len(dfs)):
             result = pd.merge(left=result, right=dfs[i], **kwargs)
-            result = self._drop_tmp(result)
-        result = self._drop_tmp(result, True)
+            result = self.drop_tmp(result)
+        result = self.drop_tmp(result, True)
         return result
 
-    def _drop_tmp(self, df, also_drop_cpy=False):
+    def drop_tmp(self, df, also_drop_cpy=False) -> pd.DataFrame:
         for column in df.columns:
             try:
                 if "_tmp" in column:
