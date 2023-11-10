@@ -65,24 +65,25 @@ class AccdbManager:
         self.accdb.commit()
 
     def large_write(self, table_name, df: pd.DataFrame, columns):
-        """Time floors out due to the .csv write"""
+        """Execution time floor due to .csv write"""
         tmp = "tmp.csv"
-        df.to_csv(tmp, index=False)
+        dir = Path(self.accdb_fp).parent
+        df.to_csv(os.path.join(dir, tmp), index=False)
         try:
             columns_tpl = f"{tuple(columns)}".replace("'", "")
             columns_str = ", ".join(columns)
 
             accdb_query = f"""INSERT INTO [{table_name}] {columns_tpl} 
                             SELECT {columns_str} FROM 
-                            [text;HDR=Yes;FMT=Delimited(,);Database={Path.cwd()}].{tmp}"""
+                            [text;HDR=Yes;FMT=Delimited(,);Database={dir}].{tmp}"""
             self.accdb.execute(accdb_query)
             self.accdb.commit()
         finally:
             attempt = 1
             max_attempts = 10
-            while os.path.exists(tmp) and attempt <= max_attempts:
+            while os.path.exists(os.path.join(dir, tmp)) and attempt <= max_attempts:
                 try:
-                    os.remove(tmp)
+                    os.remove(os.path.join(dir, tmp))
                 except:
                     time.sleep(attempt)
                 attempt += 1
