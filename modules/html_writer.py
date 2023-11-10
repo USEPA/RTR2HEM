@@ -76,7 +76,6 @@ class QAToHTML:
                     <td>
                         <strong style="color:{color};">{row['QA_Outcome']}</strong>
                         </br>{row['QA_Message']}
-                        </br>{row['QA_Result']}
                     </td>
                 </tr>
             """

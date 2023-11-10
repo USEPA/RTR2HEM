@@ -1,4 +1,4 @@
-from modules.utils import vset_column
+from modules.utils import vset
 
 
 class EmissionLoc:
@@ -45,14 +45,14 @@ class EmissionLoc:
 
         # fmt: off
         emiss_loc_df["locationType"] = "L"
-        vset_column(emiss_loc_df, "Longitude", self.set_Longitude, ["emission_release_point_type", "fugitive_2d_midpoint1_x_coordinate", "x_coordinate"])
-        vset_column(emiss_loc_df, "Latitude", self.set_Latitude, ["emission_release_point_type", "fugitive_2d_midpoint1_y_coordinate", "y_coordinate"])
-        vset_column(emiss_loc_df, "Lengthx", self.set_Lengthx, ["emission_release_point_type", "ICFFugitiveWidth_m", "ICFFugitiveLength_m"])
-        vset_column(emiss_loc_df, "Lengthy", self.set_Lengthy, ["emission_release_point_type", "ICFFugitiveWidth_m"])
-        vset_column(emiss_loc_df, "HorzDim", self.set_HorzDim, ["ICFSourceType", "ICFFugitiveWidth_m"])
-        vset_column(emiss_loc_df, "VertDim", self.set_VertDim, ["ICFSourceType", "ICFAreaVolLineReleaseHeight_m"])
-        vset_column(emiss_loc_df, "X2", self.set_X2, ["emission_release_point_type", "fugitive_2d_midpoint2_x_coordinate"])
-        vset_column(emiss_loc_df, "Y2", self.set_Y2, ["emission_release_point_type", "fugitive_2d_midpoint2_y_coordinate"])
+        vset(emiss_loc_df, "Longitude", self.set_Longitude, ["emission_release_point_type", "fugitive_2d_midpoint1_x_coordinate", "x_coordinate"])
+        vset(emiss_loc_df, "Latitude", self.set_Latitude, ["emission_release_point_type", "fugitive_2d_midpoint1_y_coordinate", "y_coordinate"])
+        vset(emiss_loc_df, "Lengthx", self.set_Lengthx, ["emission_release_point_type", "ICFFugitiveWidth_m", "ICFFugitiveLength_m"])
+        vset(emiss_loc_df, "Lengthy", self.set_Lengthy, ["emission_release_point_type", "ICFFugitiveWidth_m"])
+        vset(emiss_loc_df, "HorzDim", self.set_HorzDim, ["ICFSourceType", "ICFFugitiveWidth_m"])
+        vset(emiss_loc_df, "VertDim", self.set_VertDim, ["ICFSourceType", "ICFAreaVolLineReleaseHeight_m"])
+        vset(emiss_loc_df, "X2", self.set_X2, ["emission_release_point_type", "fugitive_2d_midpoint2_x_coordinate"])
+        vset(emiss_loc_df, "Y2", self.set_Y2, ["emission_release_point_type", "fugitive_2d_midpoint2_y_coordinate"])
         # fmt: on
 
         emiss_loc_df = emiss_loc_df.drop_duplicates(self.columns)  # groupby

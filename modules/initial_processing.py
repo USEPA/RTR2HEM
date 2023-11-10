@@ -1,4 +1,4 @@
-from .utils import Join, vset_column, get_static, config
+from .utils import Join, vset, get_static, config
 
 
 class InitialProcessing:
@@ -61,18 +61,18 @@ class InitialProcessing:
 
         # fmt: off
         self.df["ICFSourceID"] = ""
-        vset_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code, ["regulatory_code"])
-        vset_column(self.df, "emissions_tpy", self.set_selected_emission_type, [emis_type])
-        vset_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations, ["emission_process_group"])
-        vset_column(self.df, "ICFSourceType", self.set_source_type, ["fugitive_length_sigmax_ft", "fugitive_width_sigmay_ft", "emission_release_point_type"])
-        vset_column(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height, ["stack_height (ft)", "emission_release_point_type"])
+        vset(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code, ["regulatory_code"])
+        vset(self.df, "emissions_tpy", self.set_selected_emission_type, [emis_type])
+        vset(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations, ["emission_process_group"])
+        vset(self.df, "ICFSourceType", self.set_source_type, ["fugitive_length_sigmax_ft", "fugitive_width_sigmay_ft", "emission_release_point_type"])
+        vset(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height, ["stack_height (ft)", "emission_release_point_type"])
 
         self.df["ICFFacilityID"] = self.df["state_county_fips"] + self.df["sppd_facility_identifier"]
         self.df["ICFModelEmissionTPY"] = self.df["emissions_tpy"] * self.df["metal_speciation_factor"]
         self.df["ICFMetal_Speciation_Factor"] = self.df["metal_speciation_factor"]
 
         # unit conversions
-        vset_column(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m, ["ICFAreaVolLineReleaseHeight"])
+        vset(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m, ["ICFAreaVolLineReleaseHeight"])
         self.df["ICFStackHeight_m"] = self.df["stack_height (ft)"] / self.ft_per_m
         self.df["ICFStackDiameter_m"] = self.df["stack_diameter (ft)"] / self.ft_per_m
         self.df["ICFExitGasVelocity_mps"] = self.df["exit_gas_velocity (ft/sec)"] / self.ft_per_m

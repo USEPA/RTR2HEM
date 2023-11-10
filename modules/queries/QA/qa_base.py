@@ -9,7 +9,7 @@ class QABase:
     qa_msg = "NOT SET"
     qa_result = "NOT SET"
 
-    qa_df = None
+    qa_df: pd.DataFrame = None
 
     filename = f"RTRtoHEMandTier1_QA"
     template_name = "Tier1_QA_Details"

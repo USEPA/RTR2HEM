@@ -1,5 +1,5 @@
 from modules.queries.QA.qa_base import QABase
-from modules.utils import Join, get_static, set_column, calc_agg
+from modules.utils import Join, get_static, vset, calc_agg
 
 """
 'QA 12 - Pollutants that Cannot be Modeled for Risk/Hazard: this QA will check to make sure pollutants are recognized.
@@ -72,7 +72,7 @@ class HEM3Chem(QABase):
             res["pollutant_code_static"].isnull() | (res["hem3_chemical_name"] == "")
         ].fillna("")
 
-        set_column(res, "in_crosswalk", self.pollutant_code_exists)
+        vset(res, "in_crosswalk", self.pollutant_code_exists, ["pollutant_code_static"])
         res = calc_agg(res, group_by, "sum", "actual_emissions_tpy")
 
         col_order = [
@@ -90,7 +90,7 @@ class HEM3Chem(QABase):
         self.qa_df = res
         return len(res.index)
 
-    def pollutant_code_exists(self, row):
-        if row["pollutant_code_static"]:
+    def pollutant_code_exists(self, poll_code):
+        if poll_code:
             return "Yes"
         return "No"

@@ -17,6 +17,10 @@ from modules.queries.QA._09_AreaParamsVal import AreaParamsVal
 from modules.queries.QA._10_VolParams import VolParams
 from modules.queries.QA._11_LineParams import LineParams
 from modules.queries.QA._12_HEM3Chem import HEM3Chem
+from modules.queries.QA._13_GenericHgCr import GenericHgCr
+from modules.queries.QA._14_GenericDF import GenericDF
+from modules.queries.QA._15_UnscreenedPOMs import UnscreenedPOMs
+from modules.queries.QA._16_SrcTypes import SrcTypes
 
 
 def run_qa():
@@ -35,6 +39,10 @@ def run_qa():
             VolParams(),
             LineParams(),
             HEM3Chem(),
+            GenericHgCr(),
+            GenericDF(),
+            UnscreenedPOMs(),
+            SrcTypes(),
         ],
     }
 
@@ -50,14 +58,14 @@ def run_qa():
     return result
 
 
-def copy_template(base):
+def copy_template(base: QABase):
     template_src = os.path.join(config.out.templates_fp, f"{base.template_name}.xlsx")
     out_dst = os.path.join(config.out.output_dir, f"{base.filename}.xlsx")
     shutil.copyfile(template_src, out_dst)
     return out_dst
 
 
-def write_excel_sheet(writer, df, data):
+def write_excel_sheet(writer, df: pd.DataFrame, data: QABase):
     df.to_excel(
         writer,
         sheet_name=data.sheet_name,

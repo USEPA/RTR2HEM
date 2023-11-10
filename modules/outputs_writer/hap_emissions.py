@@ -1,5 +1,5 @@
 import logging
-from modules.utils import vset_column
+from modules.utils import vset
 
 
 class HapEmissions:
@@ -26,7 +26,7 @@ class HapEmissions:
         hap_emiss_df = self.df.copy()
         hap_emiss_df = hap_emiss_df.sort_values(self.sort_by)
 
-        vset_column(
+        vset(
             hap_emiss_df,
             "ICFModelEmissionTPY",
             self.set_SumEmissionTPY,

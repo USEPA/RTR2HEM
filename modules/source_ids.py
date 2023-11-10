@@ -1,5 +1,5 @@
 import pandas as pd
-from modules.utils import Join, vset_column, config
+from modules.utils import Join, vset, config
 
 
 class SourceIDs:
@@ -37,7 +37,7 @@ class SourceIDs:
         if config.srcid_import is not None:
             self.import_existing_src_ids()
 
-        vset_column(
+        vset(
             self.src_list_df,
             "ICFSourceID",
             self.create_source_id,
@@ -126,8 +126,11 @@ class SourceIDs:
 
         # initialize facility counter
         sort_by = ["ICFFacilityID", "srcid_tmp"]
-        vset_column(
-            config.srcid_import, "srcid_tmp", self.reverse_str_counter, ["ICFSourceID"]
+        vset(
+            config.srcid_import,
+            "srcid_tmp",
+            self.reverse_str_counter,
+            ["ICFSourceID"],
         )
         result = config.srcid_import[sort_by].sort_values(sort_by, ascending=False)
         result = result.drop_duplicates("ICFFacilityID")

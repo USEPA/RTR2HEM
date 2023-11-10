@@ -106,7 +106,7 @@ class RTR2HEM:
             reg_codes = RegCodesGUI(reg_codes).get_response()
         config.reg_codes = reg_codes
 
-        # run_qa()  # NOTE move eventually...
+        run_qa()  # NOTE move eventually...
 
         logging.info("Initial processing")
 

@@ -1,5 +1,5 @@
 from modules.queries.shared_queries import qry_01b_CountSrcCatFacilities
-from modules.utils import Join, calc_agg, vset_column
+from modules.utils import Join, calc_agg, vset
 
 """
 sheets:
@@ -63,9 +63,9 @@ class GrpResults:
         )
         tmp = tmp.sort_values(group_by)
 
-        vset_column(tmp, "Exceedance?", self.exceed, ["SV (grp)"])
-        vset_column(tmp, "Exceedance by x10?", self.exceed_10, ["SV (grp)"])
-        vset_column(tmp, "Exceedance by x100?", self.exceed_100, ["SV (grp)"])
+        vset(tmp, "Exceedance?", self.exceed, ["SV (grp)"])
+        vset(tmp, "Exceedance by x10?", self.exceed_10, ["SV (grp)"])
+        vset(tmp, "Exceedance by x100?", self.exceed_100, ["SV (grp)"])
 
         self.eco.working_MP05Eco_T1GrpResults = tmp[self.column_order]
 
