@@ -1,5 +1,5 @@
 from modules.queries.shared_queries import qry_01b_CountSrcCatFacilities
-from modules.utils import Join, calc_agg, set_column
+from modules.utils import Join, calc_agg, vset_column
 
 """
 sheets:
@@ -63,35 +63,35 @@ class GrpResults:
         )
         tmp = tmp.sort_values(group_by)
 
-        set_column(tmp, "Exceedance?", self.exceed)
-        set_column(tmp, "Exceedance by x10?", self.exceed_10)
-        set_column(tmp, "Exceedance by x100?", self.exceed_100)
+        vset_column(tmp, "Exceedance?", self.exceed, ["SV (grp)"])
+        vset_column(tmp, "Exceedance by x10?", self.exceed_10, ["SV (grp)"])
+        vset_column(tmp, "Exceedance by x100?", self.exceed_100, ["SV (grp)"])
 
         self.eco.working_MP05Eco_T1GrpResults = tmp[self.column_order]
 
-    def exceed(self, row):
+    def exceed(self, sv_grp):
         try:
-            if row["SV (grp)"] < 1.5:
+            if sv_grp < 1.5:
                 return "Screens Out"
             return "Yes"
         except:
             return "ERROR"
 
-    def exceed_10(self, row):
+    def exceed_10(self, sv_grp):
         try:
-            if row["SV (grp)"] < 1.5:
+            if sv_grp < 1.5:
                 return "Screens Out"
-            elif row["SV (grp)"] < 10:
+            elif sv_grp < 10:
                 return "No"
             return "Yes"
         except:
             return "ERROR"
 
-    def exceed_100(self, row):
+    def exceed_100(self, sv_grp):
         try:
-            if row["SV (grp)"] < 1.5:
+            if sv_grp < 1.5:
                 return "Screens Out"
-            elif row["SV (grp)"] < 100:
+            elif sv_grp < 100:
                 return "No"
             return "Yes"
         except:
