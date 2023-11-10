@@ -1,5 +1,4 @@
-import numpy as np
-from .utils import Join, set_column, get_static, config
+from .utils import Join, vset_column, get_static, config
 
 
 class InitialProcessing:
@@ -60,26 +59,20 @@ class InitialProcessing:
         emis_type = f"{config.emission_type.lower()}_emissions_tpy"
         self.join_static_PollutantCrosswalk_andMetalSpeciations()
 
-        """
-        would like to make more readable
-        maybe revisit vset_column...but slightly different approach
-        is it really slow to include every column..?
-        """
-
         # fmt: off
         self.df["ICFSourceID"] = ""
-        self.df["ICFCatLevelModeling"] = is_selected_regulatory_code(self.reg_codes, self.df["regulatory_code"])
-        self.df["emissions_tpy"] = set_selected_emission_type(self.df[emis_type])
-        self.df["ICFEmissionProcessGroupAbbr"] = set_epg_abbreviations(self.epg_abbr_map, self.df["emission_process_group"])
-        self.df["ICFSourceType"] = set_source_type(self.df["fugitive_length_sigmax_ft"], self.df["fugitive_width_sigmay_ft"], self.df["emission_release_point_type"])
-        self.df["ICFAreaVolLineReleaseHeight"] = set_release_height(self.df["stack_height (ft)"], self.df["emission_release_point_type"])
+        vset_column(self.df, "ICFCatLevelModeling", self.is_selected_regulatory_code, ["regulatory_code"])
+        vset_column(self.df, "emissions_tpy", self.set_selected_emission_type, [emis_type])
+        vset_column(self.df, "ICFEmissionProcessGroupAbbr", self.set_epg_abbreviations, ["emission_process_group"])
+        vset_column(self.df, "ICFSourceType", self.set_source_type, ["fugitive_length_sigmax_ft", "fugitive_width_sigmay_ft", "emission_release_point_type"])
+        vset_column(self.df, "ICFAreaVolLineReleaseHeight", self.set_release_height, ["stack_height (ft)", "emission_release_point_type"])
 
         self.df["ICFFacilityID"] = self.df["state_county_fips"] + self.df["sppd_facility_identifier"]
         self.df["ICFModelEmissionTPY"] = self.df["emissions_tpy"] * self.df["metal_speciation_factor"]
         self.df["ICFMetal_Speciation_Factor"] = self.df["metal_speciation_factor"]
 
         # unit conversions
-        self.df["ICFAreaVolLineReleaseHeight_m"] = release_height_m(self.ft_per_m, self.df["ICFAreaVolLineReleaseHeight"])
+        vset_column(self.df, "ICFAreaVolLineReleaseHeight_m", self.release_height_m, ["ICFAreaVolLineReleaseHeight"])
         self.df["ICFStackHeight_m"] = self.df["stack_height (ft)"] / self.ft_per_m
         self.df["ICFStackDiameter_m"] = self.df["stack_diameter (ft)"] / self.ft_per_m
         self.df["ICFExitGasVelocity_mps"] = self.df["exit_gas_velocity (ft/sec)"] / self.ft_per_m
@@ -128,56 +121,46 @@ class InitialProcessing:
             update_columns,
         ] = ""
 
+    def is_selected_regulatory_code(self, code):
+        if self.reg_codes and self.reg_codes.get(code) == 1:
+            return "Yes"
+        return "No"
 
-@np.vectorize
-def is_selected_regulatory_code(all_codes, code):
-    if all_codes and all_codes.get(code) == 1:
-        return "Yes"
-    return "No"
+    def set_selected_emission_type(self, val):
+        try:
+            return float(val)
+        except:
+            raise KeyError(
+                "Invalid emissions column name supplied. Rename through config."
+            )
 
+    def set_epg_abbreviations(self, epg):
+        return self.epg_abbr_map.get(epg, "")
 
-@np.vectorize
-def set_selected_emission_type(val):
-    try:
-        return float(val)
-    except:
-        raise KeyError("Invalid emissions column name supplied. Rename through config.")
+    def set_source_type(self, length, width, erp_type):
+        erp_type_map = {
+            "1": "A" if length > 0 and width > 0 else "P",  # area
+            "2": "P",
+            "3": "H",  # horizontal
+            "4": "H",  # horizontal
+            "5": "C",  # capped
+            "6": "H",  # horizontal
+            "7": "V",  # volume
+            "8": "P",
+            "9": "N",  # line
+        }
+        return erp_type_map.get(erp_type, "P")
 
+    def set_release_height(self, stack_height, erp_type):
+        if erp_type == "1" or erp_type == "9":
+            return stack_height
+        elif erp_type == "7":
+            return stack_height / 2
+        else:
+            return 0
 
-@np.vectorize
-def set_epg_abbreviations(epg_abbr_map, epg):
-    return epg_abbr_map.get(epg, "")
-
-
-@np.vectorize
-def set_source_type(length, width, erp_type):
-    erp_type_map = {
-        "1": "A" if length > 0 and width > 0 else "P",  # area
-        "2": "P",
-        "3": "H",  # horizontal
-        "4": "H",  # horizontal
-        "5": "C",  # capped
-        "6": "H",  # horizontal
-        "7": "V",  # volume
-        "8": "P",
-        "9": "N",  # line
-    }
-    return erp_type_map.get(erp_type, "P")
-
-
-@np.vectorize
-def set_release_height(stack_height, erp_type):
-    if erp_type == "1" or erp_type == "9":
-        return stack_height
-    elif erp_type == "7":
-        return stack_height / 2
-    else:
-        return 0
-
-
-@np.vectorize
-def release_height_m(ft_per_m, release_height_ft):
-    try:
-        return release_height_ft / ft_per_m
-    except:
-        return 0
+    def release_height_m(self, release_height_ft):
+        try:
+            return release_height_ft / self.ft_per_m
+        except:
+            return 0

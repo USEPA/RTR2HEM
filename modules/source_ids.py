@@ -1,5 +1,5 @@
 import pandas as pd
-from modules.utils import Join, set_column, config
+from modules.utils import Join, vset_column, config
 
 
 class SourceIDs:
@@ -24,55 +24,57 @@ class SourceIDs:
             raise ValueError("Exceeded range of acceptible counter values")
         return f"{zero_count}{counter}"
 
-    def reverse_str_counter(self, row):
-        src_id = row["icfsourceid"]
+    def reverse_str_counter(self, src_id):
         if not src_id:
             return 0
         counter_val = src_id[-4:]
         return int(counter_val)
 
     def run(self):
+        self.src_list_df = self.src_list_df[config.srcid_required]
         self.src_list_df = self.src_list_df.drop_duplicates(self.source_id_columns)
         self.src_list_df = self.src_list_df.sort_values(self.source_id_columns)
         if config.srcid_import is not None:
             self.import_existing_src_ids()
 
-        set_column(self.src_list_df, "ICFSourceID", self.create_source_id)
+        vset_column(
+            self.src_list_df,
+            "ICFSourceID",
+            self.create_source_id,
+            [
+                "ICFSourceID",
+                "ICFFacilityID",
+                "emission_release_point_type",
+                "ICFCatLevelModeling",
+                "emission_process_group",
+                "ICFEmissionProcessGroupAbbr",
+            ],
+        )
         self.remerge_src_ids()
 
-        config.out.accdb.write(
-            "03 - Source ID Xwalk", self.src_list_df[config.srcid_required]
-        )
+        config.out.accdb.write("03 - Source ID Xwalk", self.src_list_df)
         return self.df
 
-    def create_source_id(self, row):
-        if row["ICFSourceID"]:
-            return row["ICFSourceID"]
+    def create_source_id(
+        self, icf_srcid, f_id, erp_type, cat_lvl_modeling, epg, epg_abbr
+    ):
+        if icf_srcid:
+            return icf_srcid
 
-        f_id = row["ICFFacilityID"]
         self.facility_counter.setdefault(f_id, 0)
         self.facility_counter[f_id] += 1
         counter = self.facility_counter[f_id]
 
-        erp_type = row["emission_release_point_type"]
         erp_type = f"0{erp_type}" if len(erp_type) == 1 else f"{erp_type}"
 
-        if row["ICFCatLevelModeling"] == "Yes":
-            if not row["emission_process_group"]:
+        if cat_lvl_modeling == "Yes":
+            if not epg:
                 source_id = "C_" + erp_type + self.str_counter(counter)
             else:
-                source_id = (
-                    "CE"
-                    + row["ICFEmissionProcessGroupAbbr"]
-                    + self.str_counter(counter)
-                )
+                source_id = "CE" + epg_abbr + self.str_counter(counter)
         else:
-            if row["ICFEmissionProcessGroupAbbr"]:
-                source_id = (
-                    "NE"
-                    + row["ICFEmissionProcessGroupAbbr"]
-                    + self.str_counter(counter)
-                )
+            if epg_abbr:
+                source_id = "NE" + epg_abbr + self.str_counter(counter)
             else:
                 source_id = "N_" + erp_type + self.str_counter(counter)
 
@@ -123,11 +125,13 @@ class SourceIDs:
         self.src_list_df = self.src_list_df.reset_index(drop=True)
 
         # initialize facility counter
-        sort_by = ["icffacilityid", "srcid_tmp"]
-        set_column(config.srcid_import, "srcid_tmp", self.reverse_str_counter)
+        sort_by = ["ICFFacilityID", "srcid_tmp"]
+        vset_column(
+            config.srcid_import, "srcid_tmp", self.reverse_str_counter, ["ICFSourceID"]
+        )
         result = config.srcid_import[sort_by].sort_values(sort_by, ascending=False)
-        result = result.drop_duplicates("icffacilityid")
+        result = result.drop_duplicates("ICFFacilityID")
 
-        facility_ids = result["icffacilityid"].tolist()
+        facility_ids = result["ICFFacilityID"].tolist()
         src_id_vals = result["srcid_tmp"].tolist()
         self.facility_counter = dict(zip(facility_ids, src_id_vals))

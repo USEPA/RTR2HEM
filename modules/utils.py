@@ -43,11 +43,11 @@ def set_column(df: pd.DataFrame, column_name, func):
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
-def vset_column(df: pd.DataFrame, column_name, func, arg_columns: list = [], **kwargs):
+def vset_column(df: pd.DataFrame, column_name, func, arg_columns: list = []):
     """set columns through vectorization"""
-    for c in arg_columns:
-        kwargs[c] = df[c]
-    df[column_name] = func(**kwargs)
+    args = [df[c] for c in arg_columns]
+    vfunc = np.vectorize(func, cache=True, excluded=["self"])
+    df[column_name] = vfunc(*args)
 
 
 def group(df: pd.DataFrame, group_by, only_group=False):

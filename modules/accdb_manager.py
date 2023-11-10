@@ -1,4 +1,4 @@
-import os
+import os, time
 import logging
 import pandas as pd
 from pathlib import Path
@@ -65,7 +65,7 @@ class AccdbManager:
         self.accdb.commit()
 
     def large_write(self, table_name, df: pd.DataFrame, columns):
-        """Time floors out at about 0.035s due to the .csv write"""
+        """Time floors out due to the .csv write"""
         tmp = "tmp.csv"
         df.to_csv(tmp, index=False)
         try:
@@ -78,7 +78,14 @@ class AccdbManager:
             self.accdb.execute(accdb_query)
             self.accdb.commit()
         finally:
-            os.remove("tmp.csv")
+            attempt = 1
+            max_attempts = 10
+            while os.path.exists(tmp) and attempt <= max_attempts:
+                try:
+                    os.remove(tmp)
+                except:
+                    time.sleep(attempt)
+                attempt += 1
 
     def small_write(self, table_name, df: pd.DataFrame, columns):
         values = df.to_numpy().tolist()
