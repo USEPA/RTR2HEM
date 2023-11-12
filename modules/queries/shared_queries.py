@@ -1,4 +1,17 @@
-from modules.utils import Join, get_static, calc_agg
+from modules.utils import Join, get_static, calc_agg, config
+
+
+def split_by_reg_codes(this):
+    """Returns data split between selected and not selected regulatory codes"""
+    out_codes = [k for k, v in config.reg_codes.items() if v == 0]
+    in_codes = [k for k, v in config.reg_codes.items() if v == 1]
+
+    out_res = this.df.loc[this.df["regulatory_code"].isin(out_codes)]
+    in_res = this.df.loc[this.df["regulatory_code"].isin(in_codes)]
+
+    out_res.loc[:, "regulatory_code"] = "OUTSIDE SOURCE CATEGORY"
+    in_res.loc[:, "regulatory_code"] = "INSIDE SOURCE CATEGORY"
+    return out_res, in_res
 
 
 def qry_01a_ListSrcCatFacilities(this):

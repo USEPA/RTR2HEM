@@ -43,8 +43,6 @@ class QABase:
         self.sheet_name = self.qa_num
 
     def get(self):
-        if "None." in self.qa_result:
-            self.qa_result = ""
         return {
             "QA_Number": self.qa_num,
             "QA_Title": self.qa_title,

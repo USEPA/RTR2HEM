@@ -67,4 +67,3 @@ class SrcTypes(QABase):
         ]
         res = calc_agg(res, group_by, "count", "sppd_facility_identifier")
         self.qa_df = res[columns].sort_values("emission_release_point_type")
-        return len(res.index)

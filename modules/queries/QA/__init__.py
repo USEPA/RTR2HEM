@@ -21,6 +21,11 @@ from modules.queries.QA._13_GenericHgCr import GenericHgCr
 from modules.queries.QA._14_GenericDF import GenericDF
 from modules.queries.QA._15_UnscreenedPOMs import UnscreenedPOMs
 from modules.queries.QA._16_SrcTypes import SrcTypes
+from modules.queries.QA._17_EmissTots import EmissTots
+from modules.queries.QA._18_ZeroEmissFac import ZeroEmissFac
+from modules.queries.QA._19_FacSrcCounts import FacSrcCounts
+from modules.queries.QA._20_BadSTCOFIPS import BadSTCOFIPS
+from modules.queries.QA._21_MetalSpecs import MetalSpecs
 
 
 def run_qa():
@@ -43,6 +48,11 @@ def run_qa():
             GenericDF(),
             UnscreenedPOMs(),
             SrcTypes(),
+            EmissTots(),
+            ZeroEmissFac(),
+            FacSrcCounts(),
+            BadSTCOFIPS(),
+            MetalSpecs(),
         ],
     }
 

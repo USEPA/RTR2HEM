@@ -39,12 +39,12 @@ def get_static(filename):
 
 
 def set_column(df: pd.DataFrame, column_name, func):
-    """costly operation, reserve for complex assignment"""
+    """expensive"""
     df[column_name] = df.apply(lambda row: func(row), axis=1)
 
 
 def vset(df: pd.DataFrame, column_name, func, arg_columns: list = []):
-    """set columns through vectorization"""
+    """set column with vectorization"""
     if df.size == 0:
         df[column_name] = None
         return
@@ -193,7 +193,7 @@ class Join:
 
 class Config:
     """
-    Read in config settings, either by a .json input file or settings GUI
+    Read in config settings, either by .json input file or settings GUI
     """
 
     not_required = ["emission_process_group"]
@@ -211,6 +211,8 @@ class Config:
         "ICFEmissionProcessGroupAbbr",
     ]
     reg_codes = None
+    epg_import = None
+    srcid_import = None
     out: "WriteOutputs" = None
 
     def __init__(self):
@@ -249,7 +251,6 @@ class Config:
         self.input_df = self.get_tables(self.input_fp, self.input_table)
 
         # EPGs -- optional
-        self.epg_import = None
         epg = self.settings["emission_abbr"]
         if epg["import"]:
             self.epg_import = self.get_tables(epg["file"], epg["table"])
@@ -257,7 +258,6 @@ class Config:
             self.epg_import = self.epg_import.drop_duplicates()
 
         # Source IDs -- optional
-        self.srcid_import = None
         srcid = self.settings["src_ids"]
         if srcid["import"]:
             self.srcid_import = self.get_tables(srcid["file"], srcid["table"])
@@ -285,10 +285,21 @@ class Config:
         self.input_df = self.input_df.rename(columns=columns_map)
 
     def set_input_df_column_types(self):
+        # EIS input file exceptions
+        if "emission_process_group" not in self.input_df.columns:
+            self.input_df["emission_process_group"] = ""
+        if "allowable_emissions_tpy" not in self.input_df.columns:
+            self.input_df["allowable_emissions_tpy"] = 0
+        if "acute_emissions_tpy" not in self.input_df.columns:
+            self.input_df["acute_emissions_tpy"] = 0
+
+        # type updates
         columns_int64 = []
         columns_float64 = [
             "metal_speciation_factor",
             "actual_emissions_tpy",
+            "allowable_emissions_tpy",
+            "acute_emissions_tpy",
             "stack_height (ft)",
             "exit_gas_temperature (f)",
             "stack_diameter (ft)",
@@ -316,10 +327,6 @@ class Config:
                 self.input_df[c] = self.input_df[c].astype(np.float64)
             else:
                 self.input_df[c] = self.input_df[c].astype(str)
-
-        # exception for EIS input file
-        if "emission_process_group" not in self.input_df.columns:
-            self.input_df["emission_process_group"] = ""
 
 
 config = Config()
