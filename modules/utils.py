@@ -196,6 +196,8 @@ class Config:
     Read in config settings, either by .json input file or settings GUI
     """
 
+    run_qa = False
+
     not_required = ["emission_process_group"]
     epg_required = ["emission_process_group", "ICFEmissionProcessGroupAbbr"]
     srcid_required = [
@@ -210,6 +212,7 @@ class Config:
         "emission_process_group",
         "ICFEmissionProcessGroupAbbr",
     ]
+
     reg_codes = None
     epg_import = None
     srcid_import = None

@@ -1,4 +1,5 @@
 import os, shutil
+import logging
 import pandas as pd
 
 from modules.html_writer import QAToHTML
@@ -29,6 +30,8 @@ from modules.queries.QA._21_MetalSpecs import MetalSpecs
 
 
 def run_qa():
+    logging.info("Running QA")
+
     results = {
         "_": QABase(),
         "queries": [

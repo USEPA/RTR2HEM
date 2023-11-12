@@ -20,7 +20,7 @@ class QABase:
 
     color_map = {
         "#758c48": ["Passed QA"],  # green
-        "#ffc20e": ["Warning", "Repairs Were Needed"],  # yellow
+        "#d4a108": ["Warning", "Repairs Were Needed"],  # yellow
         "#ba1419": ["Fatal Error"],  # red
         "#807b90": ["QA Not Needed", "Repairs Not Needed", "Informational"],  # grey
         "#000000": ["N/A"],  # black

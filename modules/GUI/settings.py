@@ -31,6 +31,9 @@ class SettingsGUI(GUI):
         self.emissions_type(subroot)
         self.records_type(subroot)
 
+        qa_btn = self.qa()
+        qa_btn_width = self.width(qa_btn)
+
         # Submit
         run_setup = Button(
             self.root,
@@ -38,7 +41,11 @@ class SettingsGUI(GUI):
             command=lambda: self.run_setup(),
         )
         run_setup.grid(
-            row=self.gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W
+            row=self.gen.current(),
+            column=0,
+            pady=(5, 5),
+            padx=(20 + qa_btn_width, 10),
+            sticky=W,
         )
 
         super().main()
@@ -265,7 +272,22 @@ class SettingsGUI(GUI):
         )
         cat_whole.grid(sticky=W)
 
+    def qa(self):
+        self.qa_var = IntVar()
+        qa_btn = Checkbutton(
+            self.root,
+            text="Run QA",
+            height=1,
+            onvalue=1,
+            offvalue=0,
+            variable=self.qa_var,
+        )
+        qa_btn.grid(row=self.gen.next(), column=0, padx=(10, 10), sticky=W)
+        return qa_btn
+
     def run_setup(self):
+        config.run_qa = self.qa_var.get()
+
         # load from file
         if self.option_var.get() == "1":
             config.load_config(fp=self.import_config.filepath)

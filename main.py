@@ -19,7 +19,10 @@ class RTR2HEM:
     def __init__(self):
         self.settings_select()
         self.epgs_select()
-        self.reg_codes_and_initial_processing()
+        self.reg_codes()
+        if config.run_qa:
+            run_qa()
+        self.initial_processing()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
@@ -93,7 +96,7 @@ class RTR2HEM:
             config.epg_required[1]: list(epgs.values()),
         }
 
-    def reg_codes_and_initial_processing(self):
+    def reg_codes(self):
         """7c"""
         logging.info("Regulatory codes select")
 
@@ -104,14 +107,15 @@ class RTR2HEM:
             reg_codes = dict(zip(reg_codes, [1] * len(reg_codes)))
         else:
             reg_codes = RegCodesGUI(reg_codes).get_response()
+
         config.reg_codes = reg_codes
 
-        run_qa()  # NOTE move eventually...
-
+    def initial_processing(self):
+        """7c"""
         logging.info("Initial processing")
 
         self.processed_df = InitialProcessing(
-            config.input_df, self.epgs, reg_codes
+            config.input_df, self.epgs, config.reg_codes
         ).run()
 
         # config.out.accdb.write(
