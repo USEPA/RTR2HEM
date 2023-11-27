@@ -5,6 +5,12 @@ from pathlib import Path
 import msaccessdb, pypyodbc
 
 
+"""
+Create/open accdb files and tables
+Convert accdb tables to a dataframe, and convert a dataframe to an accdb table
+"""
+
+
 class AccdbManager:
     def __init__(self, fp, how="create"):
         self.accdb_fp = fp
@@ -32,6 +38,7 @@ class AccdbManager:
         self.conn.close()
 
     def accdb_to_df(self, table_name):
+        # slow!
         dataframe = pd.read_sql(f"SELECT * FROM [{table_name}]", self.conn)
         dataframe.columns = dataframe.columns.str.lower()
         return dataframe
@@ -41,6 +48,8 @@ class AccdbManager:
         return table_names
 
     def write(self, table_name, df: pd.DataFrame):
+        # cleaning
+        # remove trailing 0s and ? from headers, convert to string
         columns = []
         df = df.astype(str).replace("\.0+$", "", regex=True)
         for c in df.columns:
@@ -80,7 +89,7 @@ class AccdbManager:
             self.accdb.commit()
         finally:
             attempt = 1
-            max_attempts = 10
+            max_attempts = 100  # about 80 minutes
             while os.path.exists(os.path.join(dir, tmp)) and attempt <= max_attempts:
                 try:
                     os.remove(os.path.join(dir, tmp))

@@ -1,4 +1,4 @@
-import os, shutil
+import os
 import json
 import logging
 import numpy as np
@@ -161,7 +161,6 @@ if __name__ == "__main__":
         logging.exception(e)
         if config.out and os.path.exists(config.out.output_dir):
             config.out.accdb.close_accdb()
-            shutil.rmtree(config.out.output_dir)
     finally:
         from modules.GUI.generic_GUI import ErrorHandling
 

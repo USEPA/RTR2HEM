@@ -276,7 +276,7 @@ class SettingsGUI(GUI):
         self.qa_var = IntVar()
         qa_btn = Checkbutton(
             self.root,
-            text="Run QA",
+            text="Include QA",
             height=1,
             onvalue=1,
             offvalue=0,
