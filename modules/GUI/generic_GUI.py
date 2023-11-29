@@ -324,11 +324,26 @@ class GUI(ErrorHandling):
         self.root.protocol("WM_DELETE_WINDOW", on_closing)
         self.root.mainloop()
 
-    def create_toplevel(self, root, title=""):
+    """
+    toplevel specific helper methods
+    """
+
+    @staticmethod
+    def pause_for_toplevel(root, toplevel):
+        root.wait_window(toplevel)
+
+    @staticmethod
+    def create_toplevel(root, title=""):
         popup_root = Toplevel(root)
         x = root.winfo_rootx()
         y = root.winfo_rooty()
         popup_root.geometry("+%d+%d" % (x - 200, y - 200))
         popup_root.attributes("-topmost", True)
         popup_root.title(title)
+
+        def on_closing():
+            root.withdraw()  # Close Tkinter window
+            os._exit(0)  # Forecefully quit PY
+
+        popup_root.protocol("WM_DELETE_WINDOW", on_closing)
         return popup_root

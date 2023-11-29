@@ -4,10 +4,14 @@ from .generic_GUI import GUI, RowGenerator
 
 
 class EpgGUI(GUI):
-    def __init__(self, epg_list):
+    def __init__(self, base, epg_list):
         self.epg_list = list(epg_list.keys())
         self.epg_vals = list(epg_list.values())
-        super().__init__(title="Emission Process Group Abbreviations")
+
+        self.base = base
+        self.root = GUI.create_toplevel(
+            root=base, title="Emission Process Group Abbreviations"
+        )
         try:
             self.main()
         except Exception as e:
@@ -40,7 +44,7 @@ class EpgGUI(GUI):
             return self.warn("Duplicate fields", "All abbreviations must be unique.")
 
         self.epg_results = dict(zip(self.epg_list, epg_abbr))
-        self.close_window()
+        self.root.destroy()
 
     def autofill(self, is_checked, epg_entry_list):
         if is_checked.get():
@@ -131,4 +135,4 @@ class EpgGUI(GUI):
             epg_entry_list[i].grid(row=gen.current(), column=1, padx=(10, 10), sticky=W)
         self.bind_entries(epg_entry_list)
 
-        super().main()
+        GUI.pause_for_toplevel(self.base, self.root)

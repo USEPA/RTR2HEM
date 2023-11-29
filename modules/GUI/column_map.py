@@ -7,8 +7,9 @@ from modules.utils import config
 class ColumnMapGUI(GUI):
     light_red = "#f79b9f"
 
-    def __init__(self):
-        super().__init__(title="Field Mapper")
+    def __init__(self, base):
+        self.base = base
+        self.root = GUI.create_toplevel(root=base, title="Field Mapper")
         try:
             self.main()
         except Exception as e:
@@ -96,7 +97,7 @@ class ColumnMapGUI(GUI):
             renamed_column_list.append(menu)
 
         sbf.canvas.config(width=470)
-        super().main()
+        GUI.pause_for_toplevel(self.base, self.root)
 
     def _on_mousewheel(self, event):
         return "break"
@@ -115,4 +116,4 @@ class ColumnMapGUI(GUI):
                 )
                 return
 
-        self.close_window()
+        self.root.destroy()

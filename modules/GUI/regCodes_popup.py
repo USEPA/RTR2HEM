@@ -3,9 +3,11 @@ from .generic_GUI import GUI, RowGenerator
 
 
 class RegCodesGUI(GUI):
-    def __init__(self, regCode_list):
+    def __init__(self, base, regCode_list):
         self.regCode_list = regCode_list
-        super().__init__(title="Regulatory Codes")
+
+        self.base = base
+        self.root = GUI.create_toplevel(root=base, title="Regulatory Codes")
         try:
             self.main()
         except Exception as e:
@@ -25,7 +27,7 @@ class RegCodesGUI(GUI):
             regCodes.append(regCode.get())
 
         self.regCode_results = dict(zip(self.regCode_list, regCodes))
-        self.close_window()
+        self.root.destroy()
 
     def select_all(self, is_checked, regCode_button_list):
         for regCode in regCode_button_list:
@@ -85,4 +87,4 @@ class RegCodesGUI(GUI):
             regCode_button.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
             regCode_button_list.append(regCode_var)
 
-        super().main()
+        GUI.pause_for_toplevel(self.base, self.root)

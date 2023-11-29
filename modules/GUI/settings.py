@@ -3,6 +3,7 @@ import os
 from tkinter import *
 from tkinter import filedialog
 
+from modules.run import RTR2HEM
 from modules.GUI.generic_GUI import GUI, RowGenerator, FileImport
 from modules.utils import config
 
@@ -291,43 +292,46 @@ class SettingsGUI(GUI):
         # load from file
         if self.option_var.get() == "1":
             config.load_config(fp=self.import_config.filepath)
-            self.close_window()
-            return
+        else:
+            if not self.src_cat_name.get():
+                self.warn(msg="Source Category name must not be empty")
+                return
 
-        if not self.src_cat_name.get():
-            self.warn(msg="Source Category name must not be empty")
-            return
+            if not self.import_table.filepath:
+                self.warn(msg="No file selected to import")
+                return
 
-        if not self.import_table.filepath:
-            self.warn(msg="No file selected to import")
-            return
-
-        settings_json = {
-            "settings": {
-                "source_category_name": self.src_cat_name.get(),
-                "only_category_records": True
-                if self.records_var.get() == "Cat"
-                else False,
-                "emission_type": self.emiss_var.get(),
-                "emission_abbr": {
-                    "import": True if self.epgs.filepath else False,
-                    "file": self.epgs.filepath,
-                    "table": self.epgs.table,
-                },
-                "src_ids": {
-                    "import": True if self.srcids.filepath else False,
-                    "file": self.srcids.filepath,
-                    "table": self.srcids.table,
-                },
-                "input_file": self.import_table.filepath,
-                "input_table": self.import_table.table,
-                "output_dir": self.output_fp,
-                "static": "./static",
+            settings_json = {
+                "settings": {
+                    "source_category_name": self.src_cat_name.get(),
+                    "only_category_records": True
+                    if self.records_var.get() == "Cat"
+                    else False,
+                    "emission_type": self.emiss_var.get(),
+                    "emission_abbr": {
+                        "import": True if self.epgs.filepath else False,
+                        "file": self.epgs.filepath,
+                        "table": self.epgs.table,
+                    },
+                    "src_ids": {
+                        "import": True if self.srcids.filepath else False,
+                        "file": self.srcids.filepath,
+                        "table": self.srcids.table,
+                    },
+                    "input_file": self.import_table.filepath,
+                    "input_table": self.import_table.table,
+                    "output_dir": self.output_fp,
+                    "static": "./static",
+                }
             }
-        }
 
-        try:
-            config.load_config(obj=settings_json)
-        except Exception as e:
-            self.error(e)
+            try:
+                config.load_config(obj=settings_json)
+            except Exception as e:
+                self.error(e)
+                return
+        # self.close_window()
+
+        RTR2HEM(self)
+        self.note("Status Update", "Done!")
         self.close_window()
