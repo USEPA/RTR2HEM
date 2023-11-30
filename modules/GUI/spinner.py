@@ -7,7 +7,7 @@ from modules.utils import config
 
 class SpinnerGUI(GUI):
     NUM_STEPS = 5  # 6 if qa
-    is_first_step = True
+    step_tracker = 0
 
     def __init__(self, base):
         self.base = base
@@ -45,11 +45,13 @@ class SpinnerGUI(GUI):
         self.base.withdraw()  # hide root
 
     def update(self, msg):
-        if self.is_first_step:
+        if self.step_tracker == 0:
             val = 0
-            self.is_first_step = False
+        elif self.step_tracker == self.NUM_STEPS:
+            val = 99.9
         else:
             val = 100 / self.NUM_STEPS
+        self.step_tracker += 1
 
         if self.loader["value"] + val >= 100:
             self.loader["value"] = 99.9

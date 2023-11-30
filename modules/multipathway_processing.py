@@ -15,21 +15,19 @@ self.df = working_crosswalk_emissions
 
 
 class MultiPathwayProcessing:
-    def __init__(self, df, update_spinner):
+    def __init__(self, df):
         self.df = df.copy()
-        self.update_spinner = update_spinner
-
-    def run(self):
         self.qry_00aEco_DuplicateCrosswalkInventory()
         self.qry_00bEco_AddDivalentMercury()
+        self.lats_longs = LatLons(self.df)
 
-        lats_longs = LatLons(self.df)
+    def run_HH(self):
+        run_HH_module(self.df, self.lats_longs)
 
-        self.update_spinner("Running multipathway processing \nqueries (HumHealth)...")
-        run_HH_module(self.df, lats_longs)
-
-        self.update_spinner("Running multipathway processing \nqueries (Eco)...")
-        run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
+    def run_Eco(self):
+        run_Eco_module(
+            self.df, self.working_CrosswalkEmissionInventory_Eco, self.lats_longs
+        )
 
     # working_CrosswalkEmissionInventory_Eco
     def qry_00aEco_DuplicateCrosswalkInventory(self):

@@ -150,7 +150,13 @@ class RTR2HEM:
     def multipathway_processing(self):
         """7e"""
         logging.info("Running multipathway processing queries")
-        MultiPathwayProcessing(self.processed_df, self.spinner.update).run()
+        mp_queries = MultiPathwayProcessing(self.processed_df)
+
+        self.spinner.update("Running multipathway processing \nqueries (HumHealth)...")
+        mp_queries.run_HH()
+
+        self.spinner.update("Running multipathway processing \nqueries (Eco)...")
+        mp_queries.run_Eco()
 
     def write_all_remaining_outputs(self):
         """7f"""
