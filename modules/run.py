@@ -12,6 +12,7 @@ from modules import (
     WriteOutputs,
 )
 
+from modules.GUI.spinner import SpinnerGUI
 from modules.GUI.column_map import ColumnMapGUI
 from modules.GUI.epg_popup import EpgGUI
 from modules.GUI.regCodes_popup import RegCodesGUI
@@ -19,14 +20,13 @@ from modules.GUI.regCodes_popup import RegCodesGUI
 from modules.utils import get_static, config
 
 
-"""
-Add loading start and loading stop static gui methods that trigger between popups
-"""
-
-
 class RTR2HEM:
-    def __init__(self, settings_GUI):
-        self.settings = settings_GUI
+    def __init__(self, base, map_columns):
+        self.base = base
+        self.map_columns = map_columns
+
+        self.spinner = SpinnerGUI(self.base)
+
         self.columns_select()
         self.epgs_select()
         self.reg_codes_select()
@@ -38,6 +38,8 @@ class RTR2HEM:
         if config.emission_type != "Acute":
             self.multipathway_processing()
         self.write_all_remaining_outputs()
+
+        self.spinner.update("Done!", 99.9)
         config.out.accdb.close_accdb()
 
     def columns_select(self):
@@ -45,8 +47,8 @@ class RTR2HEM:
         logging.info("Columns select")
 
         # loaded from interface
-        if self.settings.option_var.get() == "0":
-            ColumnMapGUI(self.settings.root)
+        if self.map_columns:
+            ColumnMapGUI(self.base)
 
         logging.debug(
             json.dumps({"settings": config.settings, "columns_map": config.columns_map})
@@ -98,7 +100,7 @@ class RTR2HEM:
                     epgs[key] = val
 
         if epgs:
-            epgs = EpgGUI(self.settings.root, epgs).get_response()
+            epgs = EpgGUI(self.base, epgs).get_response()
 
         self.epgs = epgs
         self.epg_pairs = {
@@ -116,13 +118,14 @@ class RTR2HEM:
         if config.only_category:
             reg_codes = dict(zip(reg_codes, [1] * len(reg_codes)))
         else:
-            reg_codes = RegCodesGUI(self.settings.root, reg_codes).get_response()
+            reg_codes = RegCodesGUI(self.base, reg_codes).get_response()
 
         config.reg_codes = reg_codes
 
     def initial_processing(self):
         """7c"""
         logging.info("Initial processing")
+        self.spinner.update("Initial processing...", 20)
 
         self.processed_df = InitialProcessing(
             config.input_df, self.epgs, config.reg_codes
@@ -138,6 +141,7 @@ class RTR2HEM:
     def source_ids_create(self):
         """7d"""
         logging.info("Creating source ids")
+        self.spinner.update("Creating source ids...", 10)
 
         self.processed_df = SourceIDs(self.processed_df).run()
         config.out.accdb.write(
@@ -147,11 +151,13 @@ class RTR2HEM:
     def multipathway_processing(self):
         """7e"""
         logging.info("Running multipathway processing queries")
-        MultiPathwayProcessing(self.processed_df).run()
+        self.spinner.update("Running multipathway processing queries...", 10)
+        MultiPathwayProcessing(self.processed_df, self.spinner.update).run()
 
     def write_all_remaining_outputs(self):
         """7f"""
         logging.info("Writing outputs")
+        self.spinner.update("Writing remaining outputs...", 20)
         config.out.run(self.processed_df)
 
         user_settings = {"settings": config.settings, "columns_map": config.columns_map}

@@ -330,8 +330,8 @@ class SettingsGUI(GUI):
             except Exception as e:
                 self.error(e)
                 return
-        # self.close_window()
 
-        RTR2HEM(self)
+        columns_need_mapping = self.option_var.get() == "0"
+        RTR2HEM(self.root, columns_need_mapping)
         self.note("Status Update", "Done!")
         self.close_window()

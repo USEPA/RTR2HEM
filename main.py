@@ -2,6 +2,7 @@ import os
 import logging
 
 from modules.GUI import SettingsGUI
+
 from modules.utils import config
 
 if __name__ == "__main__":
