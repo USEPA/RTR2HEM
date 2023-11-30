@@ -25,12 +25,10 @@ class MultiPathwayProcessing:
 
         lats_longs = LatLons(self.df)
 
-        self.update_spinner(
-            "Running multipathway processing queries (HumHealth)...", 10
-        )
+        self.update_spinner("Running multipathway processing \nqueries (HumHealth)...")
         run_HH_module(self.df, lats_longs)
 
-        self.update_spinner("Running multipathway processing queries (Eco)...", 10)
+        self.update_spinner("Running multipathway processing \nqueries (Eco)...")
         run_Eco_module(self.df, self.working_CrosswalkEmissionInventory_Eco, lats_longs)
 
     # working_CrosswalkEmissionInventory_Eco

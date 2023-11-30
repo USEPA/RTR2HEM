@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import logging
 import numpy as np
@@ -12,11 +13,7 @@ from modules import (
     WriteOutputs,
 )
 
-from modules.GUI.spinner import SpinnerGUI
-from modules.GUI.column_map import ColumnMapGUI
-from modules.GUI.epg_popup import EpgGUI
-from modules.GUI.regCodes_popup import RegCodesGUI
-
+from modules.GUI import SpinnerGUI, ColumnMapGUI, EpgGUI, RegCodesGUI
 from modules.utils import get_static, config
 
 
@@ -32,6 +29,7 @@ class RTR2HEM:
         self.reg_codes_select()
 
         if config.run_qa:
+            self.spinner.update("Running QA...")
             run_qa()
         self.initial_processing()
         self.source_ids_create()
@@ -39,8 +37,9 @@ class RTR2HEM:
             self.multipathway_processing()
         self.write_all_remaining_outputs()
 
-        self.spinner.update("Done!", 99.9)
         config.out.accdb.close_accdb()
+        self.spinner.update("Done!")
+        time.sleep(1)
 
     def columns_select(self):
         """1-7a"""
@@ -125,7 +124,7 @@ class RTR2HEM:
     def initial_processing(self):
         """7c"""
         logging.info("Initial processing")
-        self.spinner.update("Initial processing...", 20)
+        self.spinner.update("Initial processing...")
 
         self.processed_df = InitialProcessing(
             config.input_df, self.epgs, config.reg_codes
@@ -141,7 +140,7 @@ class RTR2HEM:
     def source_ids_create(self):
         """7d"""
         logging.info("Creating source ids")
-        self.spinner.update("Creating source ids...", 10)
+        self.spinner.update("Creating source ids...")
 
         self.processed_df = SourceIDs(self.processed_df).run()
         config.out.accdb.write(
@@ -151,13 +150,12 @@ class RTR2HEM:
     def multipathway_processing(self):
         """7e"""
         logging.info("Running multipathway processing queries")
-        self.spinner.update("Running multipathway processing queries...", 10)
         MultiPathwayProcessing(self.processed_df, self.spinner.update).run()
 
     def write_all_remaining_outputs(self):
         """7f"""
         logging.info("Writing outputs")
-        self.spinner.update("Writing remaining outputs...", 20)
+        self.spinner.update("Writing remaining outputs...")
         config.out.run(self.processed_df)
 
         user_settings = {"settings": config.settings, "columns_map": config.columns_map}

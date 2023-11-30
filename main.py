@@ -1,7 +1,7 @@
 import os
 import logging
 
-from modules.GUI import SettingsGUI
+from modules.GUI.settings import SettingsGUI
 
 from modules.utils import config
 

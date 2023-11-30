@@ -1,43 +1,60 @@
-import os
-
 from tkinter import *
 from tkinter.ttk import Progressbar
 
-from modules.GUI.generic_GUI import GUI, RowGenerator, FileImport
+from modules.GUI.generic_GUI import GUI, RowGenerator
 from modules.utils import config
 
 
 class SpinnerGUI(GUI):
+    NUM_STEPS = 5  # 6 if qa
+    is_first_step = True
+
     def __init__(self, base):
         self.base = base
         self.root = GUI.create_toplevel(root=base, title="RTR2HEM Tool")
+        x = self.base.winfo_rootx()
+        y = self.base.winfo_rooty()
+        self.root.geometry("+%d+%d" % (x + 170, y - 200))
+        self.root.geometry("230x100")
         try:
             self.main()
         except Exception as e:
             self.error()
 
     def main(self):
+        if config.run_qa:
+            self.NUM_STEPS = 6
+
         self.gen = RowGenerator()
 
-        title_lbl = Label(self.root, text="Running tool...", font=16, justify=LEFT)
-        title_lbl.grid(row=self.gen.next(), columnspan=10, padx=10)
+        title_lbl = Label(self.root, text="Running tool...", font=16)
+        title_lbl.grid(row=self.gen.next(), padx=(15, 0))
 
         self.loader = Progressbar(
             self.root,
             orient="horizontal",
             mode="determinate",
-            length=280,
-            value=0,
-            maximum=100,
+            length=200,
+            value=0.0,
+            maximum=100.0,
         )
-        self.loader.grid(column=0, row=self.gen.next(), sticky=EW)
+        self.loader.grid(column=0, row=self.gen.next(), padx=(15, 0), sticky=EW)
 
-        self.status_msg = Label(self.root, text="", font=("", 11), justify=LEFT)
-        self.status_msg.grid(row=self.gen.next(), sticky=W)
+        self.status_msg = Label(self.root, text="", font=("", 9))
+        self.status_msg.grid(row=self.gen.next(), padx=(15, 0), sticky=W)
+        self.base.withdraw()  # hide root
 
-    def update(self, msg, val):
-        if val >= 100:
-            val = 99.9
-        self.status_msg.configure(text=msg)
-        self.loader.step(val)
+    def update(self, msg):
+        if self.is_first_step:
+            val = 0
+            self.is_first_step = False
+        else:
+            val = 100 / self.NUM_STEPS
+
+        if self.loader["value"] + val >= 100:
+            self.loader["value"] = 99.9
+        else:
+            self.loader.step(val)
+
+        self.status_msg.configure(text=msg, justify=LEFT)
         self.base.update()

@@ -15,7 +15,7 @@ class SettingsGUI(GUI):
     grey = "#d0d0d0"
 
     def __init__(self):
-        super().__init__(title="Settings")
+        super().__init__(title="RTR2HEM Tool")
         try:
             self.root.configure(background=self.blue)
             self.main()
@@ -333,5 +333,4 @@ class SettingsGUI(GUI):
 
         columns_need_mapping = self.option_var.get() == "0"
         RTR2HEM(self.root, columns_need_mapping)
-        self.note("Status Update", "Done!")
         self.close_window()
