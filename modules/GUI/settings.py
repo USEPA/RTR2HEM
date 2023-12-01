@@ -3,6 +3,7 @@ import threading
 
 from tkinter import *
 from tkinter import filedialog
+from tkinter.ttk import Style
 
 from modules.run import RTR2HEM
 from modules.GUI.generic_GUI import GUI, RowGenerator, FileImport
@@ -25,6 +26,7 @@ class SettingsGUI(GUI):
 
     def main(self):
         self.gen = RowGenerator()
+        Style().theme_use("alt")
 
         subroot = self.settings_option()
         self.config_import()

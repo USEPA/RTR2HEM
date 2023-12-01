@@ -1,5 +1,6 @@
 import os
 import gc
+import time
 import pathlib
 import traceback
 import logging
@@ -330,6 +331,8 @@ class GUI(ErrorHandling):
 
     def pause_for_toplevel(self, toplevel):
         self.root.wait_window(toplevel)
+        toplevel = None
+        gc.collect()
 
     def create_toplevel(self, title=""):
         popup_root = Toplevel(self.root)
@@ -342,7 +345,7 @@ class GUI(ErrorHandling):
         popup_root.title(title)
 
         def on_closing():
-            popup_root.destroy()  # Close Tkinter window
+            self.root.destroy()  # Close Tkinter window
             os._exit(0)  # Forecefully quit PY
 
         popup_root.protocol("WM_DELETE_WINDOW", on_closing)

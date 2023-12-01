@@ -20,7 +20,6 @@ class ColumnMapGUI(GUI):
         renamed_column_list = []
         gen = RowGenerator()
 
-        Style().theme_use("alt")
         Style().map("white.TCombobox", fieldbackground=[("readonly", "white")])
         Style().map("red.TCombobox", fieldbackground=[("readonly", self.light_red)])
 
