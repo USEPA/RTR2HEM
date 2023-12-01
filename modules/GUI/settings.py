@@ -1,4 +1,5 @@
 import os
+import threading
 
 from tkinter import *
 from tkinter import filedialog
@@ -39,7 +40,9 @@ class SettingsGUI(GUI):
         run_setup = Button(
             self.root,
             text="Run setup",
-            command=lambda: self.run_setup(),
+            command=lambda: threading.Thread(
+                target=self.run_setup, daemon=True
+            ).start(),
         )
         run_setup.grid(
             row=self.gen.current(),
@@ -334,3 +337,4 @@ class SettingsGUI(GUI):
         columns_need_mapping = self.option_var.get() == "0"
         RTR2HEM(self.root, columns_need_mapping)
         self.close_window()
+        exit()

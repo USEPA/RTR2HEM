@@ -1,5 +1,4 @@
 import os
-import time
 import json
 import logging
 import numpy as np
@@ -22,11 +21,11 @@ class RTR2HEM:
         self.base = base
         self.map_columns = map_columns
 
-        self.spinner = SpinnerGUI(self.base)
-
         self.columns_select()
         self.epgs_select()
         self.reg_codes_select()
+
+        self.spinner = SpinnerGUI(self.base)
 
         if config.run_qa:
             self.spinner.update("Running QA...")
@@ -38,8 +37,8 @@ class RTR2HEM:
         self.write_all_remaining_outputs()
 
         config.out.accdb.close_accdb()
-        self.spinner.update("Done!")
-        time.sleep(1)
+        self.spinner.update("")
+        self.spinner.note("Status", "Run complete!")
 
     def columns_select(self):
         """1-7a"""

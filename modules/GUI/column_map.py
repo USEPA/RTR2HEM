@@ -8,8 +8,8 @@ class ColumnMapGUI(GUI):
     light_red = "#f79b9f"
 
     def __init__(self, base):
-        self.base = base
-        self.root = GUI.create_toplevel(root=base, title="Field Mapper")
+        self.root = base
+        self.toplevel = self.create_toplevel(title="Field Mapper")
         try:
             self.main()
         except Exception as e:
@@ -27,7 +27,7 @@ class ColumnMapGUI(GUI):
         ##################################################
 
         title_label = Label(
-            self.root,
+            self.toplevel,
             text="Use the pulldowns (right) to map the field names from the emission inventory file"
             "\nto the fields used within the tool (left).",
             justify=LEFT,
@@ -35,7 +35,7 @@ class ColumnMapGUI(GUI):
         title_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         submit_mapping = Button(
-            self.root,
+            self.toplevel,
             text="Import Table",
             command=lambda: self.submit(renamed_column_list),
         )
@@ -45,18 +45,18 @@ class ColumnMapGUI(GUI):
 
         ##################################################
 
-        local_label = Label(self.root, text="Local Field Name")
+        local_label = Label(self.toplevel, text="Local Field Name")
         local_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         import_spacing = self.width(local_label) + 160
-        import_label = Label(self.root, text="Imported Field Name")
+        import_label = Label(self.toplevel, text="Imported Field Name")
         import_label.grid(
             row=gen.current(), column=0, padx=(import_spacing, 10), sticky=W
         )
 
         ##################################################
 
-        sbf = self.scrollbar(self.root)
+        sbf = self.scrollbar(self.toplevel)
         frame = sbf.scrolled_frame
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
@@ -97,7 +97,7 @@ class ColumnMapGUI(GUI):
             renamed_column_list.append(menu)
 
         sbf.canvas.config(width=470)
-        GUI.pause_for_toplevel(self.base, self.root)
+        self.pause_for_toplevel(self.toplevel)
 
     def _on_mousewheel(self, event):
         return "break"
@@ -116,4 +116,4 @@ class ColumnMapGUI(GUI):
                 )
                 return
 
-        self.root.destroy()
+        self.toplevel.destroy()

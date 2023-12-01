@@ -10,12 +10,9 @@ class SpinnerGUI(GUI):
     step_tracker = 0
 
     def __init__(self, base):
-        self.base = base
-        self.root = GUI.create_toplevel(root=base, title="RTR2HEM Tool")
-        x = self.base.winfo_rootx()
-        y = self.base.winfo_rooty()
-        self.root.geometry("+%d+%d" % (x + 170, y - 200))
-        self.root.geometry("230x100")
+        self.root = base
+        self.toplevel = self.create_toplevel(title="RTR2HEM Tool")
+        self.toplevel.geometry("230x100")
         try:
             self.main()
         except Exception as e:
@@ -23,15 +20,15 @@ class SpinnerGUI(GUI):
 
     def main(self):
         if config.run_qa:
-            self.NUM_STEPS = 6
+            self.NUM_STEPS += 1
 
         self.gen = RowGenerator()
 
-        title_lbl = Label(self.root, text="Running tool...", font=16)
+        title_lbl = Label(self.toplevel, text="Running tool...", font=16)
         title_lbl.grid(row=self.gen.next(), padx=(15, 0))
 
         self.loader = Progressbar(
-            self.root,
+            self.toplevel,
             orient="horizontal",
             mode="determinate",
             length=200,
@@ -40,9 +37,10 @@ class SpinnerGUI(GUI):
         )
         self.loader.grid(column=0, row=self.gen.next(), padx=(15, 0), sticky=EW)
 
-        self.status_msg = Label(self.root, text="", font=("", 9))
+        self.status_msg = Label(self.toplevel, text="", font=("", 9))
         self.status_msg.grid(row=self.gen.next(), padx=(15, 0), sticky=W)
-        self.base.withdraw()  # hide root
+
+        self.root.withdraw()  # hide root
 
     def update(self, msg):
         if self.step_tracker == 0:
@@ -59,4 +57,4 @@ class SpinnerGUI(GUI):
             self.loader.step(val)
 
         self.status_msg.configure(text=msg, justify=LEFT)
-        self.base.update()
+        self.root.update()

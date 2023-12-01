@@ -8,9 +8,9 @@ class EpgGUI(GUI):
         self.epg_list = list(epg_list.keys())
         self.epg_vals = list(epg_list.values())
 
-        self.base = base
-        self.root = GUI.create_toplevel(
-            root=base, title="Emission Process Group Abbreviations"
+        self.root = base
+        self.toplevel = self.create_toplevel(
+            title="Emission Process Group Abbreviations"
         )
         try:
             self.main()
@@ -44,7 +44,7 @@ class EpgGUI(GUI):
             return self.warn("Duplicate fields", "All abbreviations must be unique.")
 
         self.epg_results = dict(zip(self.epg_list, epg_abbr))
-        self.root.destroy()
+        self.toplevel.destroy()
 
     def autofill(self, is_checked, epg_entry_list):
         if is_checked.get():
@@ -69,7 +69,7 @@ class EpgGUI(GUI):
         gen = RowGenerator()
 
         title_label = Label(
-            self.root,
+            self.toplevel,
             text="Supply unique 2-character abbreviations (on the right) for each\nemission process group.",
             justify=LEFT,
         )
@@ -77,7 +77,7 @@ class EpgGUI(GUI):
 
         autofill_var = IntVar()
         autofill_abbreviations = Checkbutton(
-            self.root,
+            self.toplevel,
             text="Autofill abbreviations",
             height=2,
             onvalue=1,
@@ -88,7 +88,7 @@ class EpgGUI(GUI):
         autofill_abbreviations.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         clear_abbr_button = Button(
-            self.root,
+            self.toplevel,
             text="Clear abbreviations",
             command=lambda: self.clear_epgs(autofill_var, epg_entry_list),
         )
@@ -97,7 +97,7 @@ class EpgGUI(GUI):
         )
 
         run_qa = Button(
-            self.root,
+            self.toplevel,
             text="Submit",
             command=lambda: self.qa_epgs(epg_entry_list),
         )
@@ -105,7 +105,7 @@ class EpgGUI(GUI):
 
         ################################################
 
-        sbf = self.scrollbar(self.root)
+        sbf = self.scrollbar(self.toplevel)
         frame = sbf.scrolled_frame
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
@@ -135,4 +135,4 @@ class EpgGUI(GUI):
             epg_entry_list[i].grid(row=gen.current(), column=1, padx=(10, 10), sticky=W)
         self.bind_entries(epg_entry_list)
 
-        GUI.pause_for_toplevel(self.base, self.root)
+        self.pause_for_toplevel(self.toplevel)

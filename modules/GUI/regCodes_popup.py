@@ -6,8 +6,8 @@ class RegCodesGUI(GUI):
     def __init__(self, base, regCode_list):
         self.regCode_list = regCode_list
 
-        self.base = base
-        self.root = GUI.create_toplevel(root=base, title="Regulatory Codes")
+        self.root = base
+        self.toplevel = self.create_toplevel(title="Regulatory Codes")
         try:
             self.main()
         except Exception as e:
@@ -27,7 +27,7 @@ class RegCodesGUI(GUI):
             regCodes.append(regCode.get())
 
         self.regCode_results = dict(zip(self.regCode_list, regCodes))
-        self.root.destroy()
+        self.toplevel.destroy()
 
     def select_all(self, is_checked, regCode_button_list):
         for regCode in regCode_button_list:
@@ -42,14 +42,14 @@ class RegCodesGUI(GUI):
         gen = RowGenerator()
 
         title_label = Label(
-            self.root,
+            self.toplevel,
             text="Select the regulatory code(s) defining the source category.",
         )
         title_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         select_all_var = IntVar()
         select_all_btn = Checkbutton(
-            self.root,
+            self.toplevel,
             text="Select all",
             height=2,
             onvalue=1,
@@ -60,7 +60,7 @@ class RegCodesGUI(GUI):
         select_all_btn.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
 
         clear_all_btn = Button(
-            self.root,
+            self.toplevel,
             text="Clear all",
             command=lambda: self.clear_all(select_all_var, regCode_button_list),
         )
@@ -69,13 +69,13 @@ class RegCodesGUI(GUI):
         )
 
         run_qa = Button(
-            self.root,
+            self.toplevel,
             text="Submit",
             command=lambda: self.qa_regCodes(regCode_button_list),
         )
         run_qa.grid(row=gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W)
 
-        sbf = self.scrollbar(self.root, bg_color="#f0f0f0")
+        sbf = self.scrollbar(self.toplevel, bg_color="#f0f0f0")
         frame = sbf.scrolled_frame
         sbf.grid(row=gen.next(), column=0, sticky="nsew")
 
@@ -87,4 +87,4 @@ class RegCodesGUI(GUI):
             regCode_button.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
             regCode_button_list.append(regCode_var)
 
-        GUI.pause_for_toplevel(self.base, self.root)
+        self.pause_for_toplevel(self.toplevel)
