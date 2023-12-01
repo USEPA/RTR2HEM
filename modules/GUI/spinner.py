@@ -41,6 +41,7 @@ class SpinnerGUI(GUI):
         self.status_msg.grid(row=self.gen.next(), padx=(15, 0), sticky=W)
 
         self.root.withdraw()  # hide root
+        self.toplevel.resizable(False, False)
 
     def update(self, msg):
         if self.step_tracker == 0:

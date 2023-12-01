@@ -340,7 +340,7 @@ class GUI(ErrorHandling):
         x = self.root.winfo_x()
         y = self.root.winfo_y()
         popup_root.geometry("+%d+%d" % (x - 100, y - 100))
-        print(f"{popup_root.winfo_x()}x{popup_root.winfo_y()}")
+        self.root.update_idletasks()
         popup_root.attributes("-topmost", True)
         popup_root.title(title)
 
