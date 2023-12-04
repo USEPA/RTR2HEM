@@ -330,8 +330,9 @@ class GUI(ErrorHandling):
     """
 
     def pause_for_toplevel(self, toplevel):
+        toplevel.grab_set()
         self.root.wait_window(toplevel)
-        toplevel = None
+        toplevel.grab_release()
         gc.collect()
 
     def create_toplevel(self, title=""):

@@ -74,7 +74,7 @@ class AccdbManager:
         self.accdb.commit()
 
     def large_write(self, table_name, df: pd.DataFrame, columns):
-        """Execution time floor due to .csv write"""
+        """Execution time floor due to .csv create"""
         tmp = "tmp.csv"
         dir = Path(self.accdb_fp).parent
         df.to_csv(os.path.join(dir, tmp), index=False)

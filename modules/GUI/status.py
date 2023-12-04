@@ -5,7 +5,7 @@ from modules.GUI.generic_GUI import GUI, RowGenerator
 from modules.utils import config
 
 
-class SpinnerGUI(GUI):
+class statusGUI(GUI):
     NUM_STEPS = 5  # 6 if qa
     step_tracker = 0
 

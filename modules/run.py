@@ -12,7 +12,7 @@ from modules import (
     WriteOutputs,
 )
 
-from modules.GUI import SpinnerGUI, ColumnMapGUI, EpgGUI, RegCodesGUI
+from modules.GUI import statusGUI, ColumnMapGUI, EpgGUI, RegCodesGUI
 from modules.utils import get_static, config
 
 
@@ -25,10 +25,10 @@ class RTR2HEM:
         self.epgs_select()
         self.reg_codes_select()
 
-        self.spinner = SpinnerGUI(self.base)
+        self.status = statusGUI(self.base)
 
         if config.run_qa:
-            self.spinner.update("Running QA...")
+            self.status.update("Running QA...")
             run_qa()
         self.initial_processing()
         self.source_ids_create()
@@ -37,8 +37,8 @@ class RTR2HEM:
         self.write_all_remaining_outputs()
 
         config.out.accdb.close_accdb()
-        self.spinner.update("")
-        self.spinner.note("Status", "Run complete!")
+        self.status.update("")
+        self.status.note("Status", "Run complete!")
 
     def columns_select(self):
         """1-7a"""
@@ -123,7 +123,7 @@ class RTR2HEM:
     def initial_processing(self):
         """7c"""
         logging.info("Initial processing")
-        self.spinner.update("Initial processing...")
+        self.status.update("Initial processing...")
 
         self.processed_df = InitialProcessing(
             config.input_df, self.epgs, config.reg_codes
@@ -139,7 +139,7 @@ class RTR2HEM:
     def source_ids_create(self):
         """7d"""
         logging.info("Creating source ids")
-        self.spinner.update("Creating source ids...")
+        self.status.update("Creating source ids...")
 
         self.processed_df = SourceIDs(self.processed_df).run()
         config.out.accdb.write(
@@ -151,16 +151,16 @@ class RTR2HEM:
         logging.info("Running multipathway processing queries")
         mp_queries = MultiPathwayProcessing(self.processed_df)
 
-        self.spinner.update("Running multipathway processing \nqueries (HumHealth)...")
+        self.status.update("Running multipathway processing \nqueries (HumHealth)...")
         mp_queries.run_HH()
 
-        self.spinner.update("Running multipathway processing \nqueries (Eco)...")
+        self.status.update("Running multipathway processing \nqueries (Eco)...")
         mp_queries.run_Eco()
 
     def write_all_remaining_outputs(self):
         """7f"""
         logging.info("Writing outputs")
-        self.spinner.update("Writing remaining outputs...")
+        self.status.update("Writing remaining outputs...")
         config.out.run(self.processed_df)
 
         user_settings = {"settings": config.settings, "columns_map": config.columns_map}
