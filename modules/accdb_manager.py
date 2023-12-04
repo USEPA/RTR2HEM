@@ -49,7 +49,7 @@ class AccdbManager:
 
     def write(self, table_name, df: pd.DataFrame):
         # cleaning
-        # remove trailing 0s and ? from headers, convert to string
+        # remove ? from headers and trailing 0s, convert to string
         columns = []
         df = df.astype(str).replace("\.0+$", "", regex=True)
         for c in df.columns:

@@ -39,14 +39,14 @@ class SettingsGUI(GUI):
         qa_btn_width = self.width(qa_btn)
 
         # Submit
-        run_setup = Button(
+        self.run_setup = Button(
             self.root,
             text="Run setup",
             command=lambda: threading.Thread(
-                target=self.run_setup, daemon=True
+                target=self.run_settings, daemon=True
             ).start(),
         )
-        run_setup.grid(
+        self.run_setup.grid(
             row=self.gen.current(),
             column=0,
             pady=(5, 5),
@@ -291,7 +291,8 @@ class SettingsGUI(GUI):
         qa_btn.grid(row=self.gen.next(), column=0, padx=(10, 10), sticky=W)
         return qa_btn
 
-    def run_setup(self):
+    def run_settings(self):
+        self.run_setup.config(state=DISABLED)
         config.run_qa = self.qa_var.get()
 
         # load from file
@@ -300,10 +301,12 @@ class SettingsGUI(GUI):
         else:
             if not self.src_cat_name.get():
                 self.warn(msg="Source Category name must not be empty")
+                self.run_setup.config(state=NORMAL)
                 return
 
             if not self.import_table.filepath:
                 self.warn(msg="No file selected to import")
+                self.run_setup.config(state=NORMAL)
                 return
 
             settings_json = {
@@ -334,6 +337,7 @@ class SettingsGUI(GUI):
                 config.load_config(obj=settings_json)
             except Exception as e:
                 self.error(e)
+                self.run_setup.config(state=NORMAL)
                 return
 
         columns_need_mapping = self.option_var.get() == "0"
