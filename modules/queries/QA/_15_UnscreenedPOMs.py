@@ -27,7 +27,7 @@ class UnscreenedPOMs(QABase):
                 Emissions of one or more POM congeners cannot be properly screened for multipathway impacts 
                 because they have not been evaluated for oral toxicity and environmental fate-and-transport characteristics. 
                 The multipathway screen will ignore these POM congeners unless EPA directs us how to proceed. 
-                See information in the ""15"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "15" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_15_UnscreenedPOMs",
             )

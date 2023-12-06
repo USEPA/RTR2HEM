@@ -36,7 +36,7 @@ class MetalSpecs(QABase):
                 by pre-determined metal speciation factors, thus reducing the 
                 emitted mass to only the metal component of the compound. 
                 The effect of these speciations (reductions in emissions) is shown 
-                in the ""21"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                in the "21" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_21b_MetalSpecs",
             )

@@ -34,10 +34,10 @@ class HEM3Chem(QABase):
                 One or more pollutant(s) cannot be modeled for inhalation risks 
                 or hazards because they cannot be recognized and/or they are not currently in the RTR dose-response library. 
                 These emissions cannot be properly included with the modeling. 
-                See information in the ""12"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program, 
-                where unrecognized pollutants are indicated with ""No"" in the field IN CROSSWALK? in that sheet, 
+                See information in the "12" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program, 
+                where unrecognized pollutants are indicated with "No" in the field IN CROSSWALK? in that sheet, 
                 and pollutants not in the dose-response library are indicated 
-                with ""Yes"" in the field IN CROSSWALK? and a blank value in the field HEM3_CHEMICAL_NAME.
+                with "Yes" in the field IN CROSSWALK? and a blank value in the field HEM3_CHEMICAL_NAME.
                 """,
                 "qry_QA_12b_HEM3Chem",
             )

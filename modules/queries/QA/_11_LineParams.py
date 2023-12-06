@@ -36,7 +36,7 @@ class LineParams(QABase):
                 which are not designated separately from line sources in the modeling file), FUGITIVE_WIDTH_SIGMAY_FT, which must have positive values, 
                 and FUGITIVE_2D_MIDPOINT1_X_COORDINATE, FUGITIVE_2D_MIDPOINT1_Y_COORDINATE, FUGITIVE_2D_MIDPOINT2_X_COORDINATE, 
                 and FUGITIVE_2D_MIDPOINT2_Y_COORDINATE, which must have non-zero values. 
-                See information in the ""11"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "11" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_11b_LineParams",
             )

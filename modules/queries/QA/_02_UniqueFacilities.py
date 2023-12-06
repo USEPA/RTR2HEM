@@ -27,7 +27,7 @@ class UniqueFacilities(QABase):
                 f"""Number of facilities with inconsistencies in name or address information: 
                 {num_locations} (facility defined as field SPPD_FACILITY_IDENTIFIER). 
                 This will cause each facility to appear more than once in two of the output files. 
-                See information in the ""02"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program. 
+                See information in the "02" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program. 
                 """,
                 "qry_QA_02d_UniqueFac",
             )

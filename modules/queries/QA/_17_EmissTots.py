@@ -20,7 +20,7 @@ class EmissTots(QABase):
             "Informational",
             f"""
             The emission totals, within and outside the target source category, 
-            are shown in the ""17"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+            are shown in the "17" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
             """,
             "qry_QA_17_EmissTots",
         )

@@ -29,7 +29,7 @@ class ReleasePointFormat(QABase):
                 Number of sources with incorrectly formatted release point types: {num_rpf_incorrect_format} 
                 (the field EMISSION_RELEASE_POINT_TYPE must not have leading 0''s).
                 This tool has repaired the formats for proper processing.
-                See information in the ""05"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "05" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_05a_ReleasePointFormat",
             )

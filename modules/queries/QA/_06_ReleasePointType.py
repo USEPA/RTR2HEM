@@ -28,7 +28,7 @@ class ReleasePointType(QABase):
                 f"""
                 "Number of sources with unexpected values for the field EMISSION_RELEASE_POINT_TYPE: {num_facil_unexpected_vals}. 
                 These sources cannot be modeled.
-                See information in the ""06"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "06" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_06a_ReleasePointType",
             )

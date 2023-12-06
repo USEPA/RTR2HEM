@@ -26,7 +26,7 @@ class GenericHgCr(QABase):
                 f"""
                 One or more pollutants should not be modeled as-is because they are generic/unspeciated mercury or chromium. 
                 These emissions cannot be properly included with the modeling. 
-                See information in the ""13"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "13" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_13_GenericHgCr",
             )

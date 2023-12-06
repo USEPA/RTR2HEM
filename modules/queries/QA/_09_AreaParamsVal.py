@@ -32,7 +32,7 @@ class AreaParamsVal(QABase):
                 These sources cannot be modeled with these unexpected parameter values. 
                 Evaluated fields include: FUGITIVE_LENGTH_SIGMAX_FT and FUGITIVE_WIDTH_SIGMAY_FT, which must have positive values, 
                 and FUGITIVE_ANGLE_DEGREES, which must have values 0 to 90 inclusive. 
-                See information in the ""09"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "09" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_09_AreaParamsVal",
             )

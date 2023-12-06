@@ -25,7 +25,7 @@ class ZeroEmissFac(QABase):
                 "Informational",
                 f"""
                 Number of facilities with zero actual emissions: {num_facil_zero_emiss}. These facilities have zero actual emissions for all source IDs. 
-                See information in the ""18"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "18" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_18_ZeroEmissFac",
             )

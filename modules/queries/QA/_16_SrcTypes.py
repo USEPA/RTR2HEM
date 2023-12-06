@@ -19,7 +19,7 @@ class SrcTypes(QABase):
         self.update(
             "Informational",
             f"""
-            The types of sources present in the modeling file are shown in the ""16"" sheet of the 
+            The types of sources present in the modeling file are shown in the "16" sheet of the 
             "RTRtoHEMandTier1_QA" Excel file output by this QA program.
             """,
             "qry_QA_16b_SrcTypes",

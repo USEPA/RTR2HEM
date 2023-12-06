@@ -32,7 +32,7 @@ class BadSTCOFIPS(QABase):
                 This means that the facility IDs created by this tool for modeling will not be constructed as expected 
                 (i.e., five-character FIPS plus the SPPD Facility Identifier), but rather will be 
                 whatever is in the STATE_COUNTY_FIPS field (whatever its length) plus the SPPD Facility Identifier. 
-                The facilities affected by this are shown in the ""20"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                The facilities affected by this are shown in the "20" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_20_BadSTCOFIPS",
             )

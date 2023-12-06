@@ -30,7 +30,7 @@ class VolParams(QABase):
                 Number of volume sources with unexpected parameter values: {num_sources_unexpected_vals}. 
                 These sources cannot be modeled with these unexpected parameter values. 
                 Evaluated fields include: STACK_HEIGHT (ft) and FUGITIVE_WIDTH_SIGMAY_FT, which must have positive values. 
-                See information in the ""10"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "10" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_10_VolParams",
             )

@@ -36,7 +36,7 @@ class PointParams(QABase):
                 STACK_DIAMETER (ft), and EXIT_GAS_VELOCITY (ft/sec), 
                 which must have positive values, and FUGITIVE_LENGTH_SIGMAX_FT, FUGITIVE_WITDH_SIGMAY_FT, 
                 and FUGITIVE_ANGLE_DEGREES, which must be 0 or Null. 
-                See information in the ""07"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+                See information in the "07" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
                 """,
                 "qry_QA_07_PointParams",
             )

@@ -27,7 +27,7 @@ class FacSrcCounts(QABase):
             "Informational",
             f"""
             The counts of facilities and sources, within and outside the target source category, 
-            are shown in the ""19"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program.
+            are shown in the "19" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program.
             """,
             "qry_QA_19_EmissTots",
         )

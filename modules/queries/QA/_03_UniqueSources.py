@@ -44,7 +44,7 @@ class UniqueSources(QABase):
                 {num_emissions} (source defined as combination of fields SPPD_FACILITY_IDENTIFIER, EMISSION_UNIT_ID, 
                 PROCESS_ID, and EMISSION_RELEASE_POINT_ID). 
                 This will cause each such source to be modeled as more than one source. 
-                See information in the ""03"" sheet of the ""RTRtoHEMandTier1_QA"" Excel file output by this QA program. 
+                See information in the "03" sheet of the "RTRtoHEMandTier1_QA" Excel file output by this QA program. 
                 """,
                 "qry_QA_03d_UniqueSrc",
             )

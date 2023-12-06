@@ -340,6 +340,12 @@ class SettingsGUI(GUI):
                 self.run_setup.config(state=NORMAL)
                 return
 
+            tmp_emis_type = f"{self.emiss_var.get().lower()}_emissions_tpy"
+            if tmp_emis_type not in config.input_df.columns:
+                self.warn(msg="Selected emission type could not be found in input file")
+                self.run_setup.config(state=NORMAL)
+                return
+
         columns_need_mapping = self.option_var.get() == "0"
         RTR2HEM(self.root, columns_need_mapping)
         self.close_window()
