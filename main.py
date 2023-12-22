@@ -10,7 +10,7 @@ if __name__ == "__main__":
         SettingsGUI()
     except Exception as e:
         logging.exception(e)
+    finally:
         if config.out and os.path.exists(config.out.output_dir):
             config.out.accdb.close_accdb()
-    finally:
         logging.info("Done!")

@@ -31,6 +31,7 @@ from modules.queries.QA._21_MetalSpecs import MetalSpecs
 
 def run_qa():
     logging.info("Running QA")
+    fatal_err_found = False
 
     results = {
         "_": QABase(),
@@ -66,9 +67,11 @@ def run_qa():
         out_dst, engine="openpyxl", mode="a", if_sheet_exists="overlay"
     )
     for result in results["queries"]:
+        if result.qa_out == "Fatal Error":
+            fatal_err_found = True
         write_excel_sheet(writer, result.qa_df, result)
     writer.close()
-    return result
+    return fatal_err_found
 
 
 def copy_template(base: QABase):

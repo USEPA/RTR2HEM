@@ -17,7 +17,7 @@ class ErrorHandling:
 
     @staticmethod
     def note(title, msg):
-        tkinter.messagebox.showwarning(
+        tkinter.messagebox.showinfo(
             title=title,
             message=msg,
         )
@@ -33,7 +33,7 @@ class ErrorHandling:
         if not errorMsg:
             errorMsg = traceback.format_exc()
         root = Tk()
-        tkinter.messagebox.showinfo("Exception", errorMsg)
+        tkinter.messagebox.showerror("Exception", errorMsg)
         root.destroy()
         root.mainloop()
         logging.exception(errorMsg)

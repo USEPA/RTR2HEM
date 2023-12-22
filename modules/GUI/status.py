@@ -24,7 +24,7 @@ class statusGUI(GUI):
 
         self.gen = RowGenerator()
 
-        title_lbl = Label(self.toplevel, text="Running tool...", font=16)
+        title_lbl = Label(self.toplevel, text="", font=12)
         title_lbl.grid(row=self.gen.next(), padx=(15, 0))
 
         self.loader = Progressbar(

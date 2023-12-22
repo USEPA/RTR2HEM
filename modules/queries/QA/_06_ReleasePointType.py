@@ -60,14 +60,10 @@ class ReleasePointType(QABase):
         ]
 
         erpts_df = get_static("static_ERPTs")
-        res = Join().join(
-            left=erpts_df,
-            right=config.input_df,
-            how="right",
-            on="emission_release_point_type",
-        )
-        res = group(res, group_by, True)
-        res = res.loc[res["emission_release_point_type"] == ""]
+        valid_erpts = erpts_df["emission_release_point_type"].astype(str).tolist()
+
+        res = group(config.input_df, group_by, True)
+        res = res.loc[~res["emission_release_point_type"].isin(valid_erpts)]
         self.qa_df = res
         return res
 

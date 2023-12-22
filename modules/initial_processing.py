@@ -149,7 +149,7 @@ class InitialProcessing:
             "8": "P",
             "9": "N",  # line
         }
-        return erp_type_map.get(erp_type, "P")
+        return erp_type_map[erp_type]
 
     def set_release_height(self, stack_height, erp_type):
         if erp_type == "1" or erp_type == "9":

@@ -1,4 +1,5 @@
 import os
+import logging
 import threading
 
 from tkinter import *
@@ -345,8 +346,10 @@ class SettingsGUI(GUI):
                 self.warn(msg="Selected emission type could not be found in input file")
                 self.run_setup.config(state=NORMAL)
                 return
-
-        columns_need_mapping = self.option_var.get() == "0"
-        RTR2HEM(self.root, columns_need_mapping)
+        try:
+            columns_need_mapping = self.option_var.get() == "0"
+            RTR2HEM(self.root, columns_need_mapping)
+        except Exception as e:
+            self.error("Could not complete run, check log.")
         self.close_window()
         exit()

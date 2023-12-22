@@ -29,14 +29,20 @@ class RTR2HEM:
 
         if config.run_qa:
             self.status.update("Running QA...")
-            run_qa()
+            fatal = run_qa()
+            if fatal:
+                self.status.note(
+                    "Status",
+                    "Please examine QA results and remedy all fatal errors in the inputs.",
+                )
+                return
+
         self.initial_processing()
         self.source_ids_create()
         if config.emission_type != "Acute":
             self.multipathway_processing()
         self.write_all_remaining_outputs()
 
-        config.out.accdb.close_accdb()
         self.status.update("")
         self.status.note("Status", "Run complete!")
 
