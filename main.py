@@ -1,9 +1,9 @@
 import os
 import logging
 
-from modules.GUI.settings import SettingsGUI
+from src.GUI.settings import SettingsGUI
 
-from modules.utils import config
+from src.utils import config
 
 if __name__ == "__main__":
     try:

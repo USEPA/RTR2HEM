@@ -1,0 +1,118 @@
+from tkinter import *
+from tkinter.ttk import Combobox, Style
+from .generic_GUI import GUI, RowGenerator
+from src.utils import config
+
+
+class ColumnMapGUI(GUI):
+    light_red = "#f79b9f"
+
+    def __init__(self, base):
+        self.root = base
+        self.toplevel = self.create_toplevel(title="Field Mapper")
+        try:
+            self.main()
+        except Exception as e:
+            self.error()
+
+    def main(self):
+        input_columns = list(config.input_df.columns)
+        renamed_column_list = []
+        gen = RowGenerator()
+
+        Style().map("white.TCombobox", fieldbackground=[("readonly", "white")])
+        Style().map("red.TCombobox", fieldbackground=[("readonly", self.light_red)])
+
+        ##################################################
+
+        title_label = Label(
+            self.toplevel,
+            text="Use the pulldowns (right) to map the field names from the emission inventory file"
+            "\nto the fields used within the tool (left).",
+            justify=LEFT,
+        )
+        title_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
+
+        submit_mapping = Button(
+            self.toplevel,
+            text="Import Table",
+            command=lambda: self.submit(renamed_column_list),
+        )
+        submit_mapping.grid(
+            row=gen.next(), column=0, pady=(5, 5), padx=(10, 10), sticky=W
+        )
+
+        ##################################################
+
+        local_label = Label(self.toplevel, text="Local Field Name")
+        local_label.grid(row=gen.next(), column=0, padx=(10, 10), sticky=W)
+
+        import_spacing = self.width(local_label) + 160
+        import_label = Label(self.toplevel, text="Imported Field Name")
+        import_label.grid(
+            row=gen.current(), column=0, padx=(import_spacing, 10), sticky=W
+        )
+
+        ##################################################
+
+        sbf = self.scrollbar(self.toplevel)
+        frame = sbf.scrolled_frame
+        sbf.grid(row=gen.next(), column=0, sticky="nsew")
+
+        for i, column in enumerate(config.columns_map):
+            stuff, column_h = self.split_str(30, column)
+            column_txtbox = Text(
+                frame, height=column_h, width=30, borderwidth=1, relief=SOLID
+            )
+
+            column_txtbox.delete(1.0, END)
+            column_txtbox.insert(END, column)
+            column_txtbox.config(state=DISABLED)
+            column_txtbox.grid(
+                row=gen.next(),
+                column=0,
+                pady=(5, 5),
+                padx=(5, 0),
+                sticky=W,
+            )
+
+            ##################################################
+
+            menu = Combobox(frame, values=input_columns, width=30, state="readonly")
+            menu.bind("<MouseWheel>", self._on_mousewheel)
+            menu.current(0)
+            menu.grid(row=gen.current(), column=1, padx=(10, 10), sticky=W)
+
+            if column in input_columns:
+                menu.set(column)
+                menu.configure(style="white.TCombobox")
+            elif column in config.not_required:
+                menu.set("")
+                menu.configure(style="white.TCombobox")
+            else:
+                menu.set("")
+                menu.configure(style="red.TCombobox")
+
+            renamed_column_list.append(menu)
+
+        sbf.canvas.config(width=470)
+        self.pause_for_toplevel(self.toplevel)
+
+    def _on_mousewheel(self, event):
+        return "break"
+
+    def submit(self, columns_to_map):
+        for i, key in enumerate(config.columns_map):
+            renamed_col = columns_to_map[i].get()
+
+            if renamed_col and key != renamed_col:
+                config.columns_map[key] = renamed_col
+            elif key in config.not_required:
+                continue
+            elif not renamed_col:
+                self.warn(
+                    msg="Field name in red could not be found and must be selected."
+                )
+                return
+
+        self.toplevel.destroy()
