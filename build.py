@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import subprocess
 
@@ -28,7 +29,7 @@ def cleanup(include_exe=False):
 
 
 def important_files_copy():
-    srcs = ["static", "templates", "config.json"]  # why is config.json needed again?
+    srcs = ["static", "templates", "config.json"]
     for src in srcs:
         dst = os.path.join(exe_fp, src)
         if os.path.isdir(src):
@@ -39,6 +40,20 @@ def important_files_copy():
     exe_file_src = os.path.join("dist", "main.exe")
     exe_file_dst = os.path.join(exe_fp, f"{exe_name}.exe")
     shutil.copy(exe_file_src, exe_file_dst)
+
+    # clear out json
+    config_fp = os.path.join(exe_fp, "config.json")
+    with open(config_fp, "r") as fh:
+        config_file = json.load(fh)
+        config_file["settings"]["source_category_name"] = ""
+        config_file["settings"]["input_file"] = ""
+        config_file["settings"]["input_table"] = ""
+        config_file["settings"]["emission_abbr"]["file"] = ""
+        config_file["settings"]["emission_abbr"]["table"] = ""
+        config_file["settings"]["src_ids"]["file"] = ""
+        config_file["settings"]["src_ids"]["table"] = ""
+    with open(config_fp, "w") as fh:
+        json.dump(config_file, fh, indent=4)
 
 
 def run_pyinstaller():

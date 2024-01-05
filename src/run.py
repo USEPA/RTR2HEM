@@ -25,6 +25,7 @@ class RTR2HEM:
         self.epgs_select()
         self.reg_codes_select()
 
+        self.write_config()
         self.status = statusGUI(self.base)
 
         if config.run_qa:
@@ -169,10 +170,11 @@ class RTR2HEM:
         self.status.update("Writing remaining outputs...")
         config.out.run(self.processed_df)
 
+    def write_config(self):
         user_settings = {"settings": config.settings, "columns_map": config.columns_map}
         fp = os.path.join(
             config.out.output_dir,
             f"{config.out.runname}_config_{config.timestamp}.json",
         )
         with open(fp, "w") as fh:
-            json.dump(user_settings, fh)
+            json.dump(user_settings, fh, indent=4)
