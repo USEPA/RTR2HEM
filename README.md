@@ -10,7 +10,7 @@ Most of the logic is housed in `src/run.py`, however the entry point starts at `
 The following is the general process, all ran through `src/run.py`:
 
 1. All data requiring user input is first collected through various GUIs (all located in `src/GUI/`)
-2. Optional QA: all queries located in `src/modules/queries/QA`
+2. Optional QA: all queries are located in `src/modules/queries/QA`
 3. Initial processing: `src/modules/initial_processing.py`
 4. Source IDs are created, or imported: `src/modules/source_ids.py`
 5. Optional multipathway processing: starts in `src/modules/multipathway_processing.py` and splits queries into `src/modules/queries/HH` and `src/modules/queries/Eco`
@@ -19,7 +19,7 @@ The following is the general process, all ran through `src/run.py`:
 
 ### Utilities
 There are various helpful utilities in `src/utils.py`, but here are a couple to focus on:
-- There is a Join class, made because pandas merges are case sensitive, and merging on empty tables is not supported. This custom class is designed to support both of these things
+- There is a Join class, made because pandas merges are case sensitive, and merging on empty tables is not supported. This custom class is designed to support both of these operations
 - There is also a Config class, which carries a lot of important information that can be accessed from most files, such as: 
     - Input files/data
     - Required input columns (parsed in GUI)
@@ -41,6 +41,15 @@ This script can fail for various reasons, it may be helpful to try:
  - Not being connected to a VPN 
  - Restarting your computer
  - Copying all necessary folders into a new directory, and then creating a new virtual environment
+
+
+## Updating the Tool
+### QA Queries
+All queries are located in `src/modules/queries/QA`, and follow the same naming pattern. If a new query needs to be created, it should be named `_##_NAME.py` and its class should also be called `class NAME`. In order to be ran, this file needs to be imported into `src/modules/queries/QA/__init__.py`. Refer to any existing queries to check as reference. I'd recommend just copying another query as a starting point.
+
+All query classes should inherit from `qa_base.py`, which contains information like what color the QA outcome should be and file paths. In the new query, private member variables `qa_num` and `qa_title` need to be set. The `self.update` method should be used to attach the text results (outcome, message, result) to the html QA output. All results, and calls to self.update should be done in a class method called `run`. Any resulting data to write to a QA excel sheet should be assigned to `self.qa_df`.
+
+`qa_num` is used as the entry point into a tab in the QA excel sheet, so this tab, along with the appropriate columns, needs to be added into `static/Tier1_QA_Details.xlsx`.
 
 
 ## Changelog

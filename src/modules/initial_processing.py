@@ -1,5 +1,13 @@
 from src.utils import Join, vset, get_static, config
 
+"""
+Create fields starting with "ICF" to be used during processing
+Map some user inputs back into the data
+Convert some fields to metric
+Update some columns with 0 or ""
+Filter out unnecessary columns
+"""
+
 
 class InitialProcessing:
     ft_per_m = 3.2808399
@@ -127,6 +135,7 @@ class InitialProcessing:
         return "No"
 
     def set_selected_emission_type(self, val):
+        """Select from actual, allowable, or acute column depending on user input"""
         try:
             return float(val)
         except:
@@ -135,9 +144,11 @@ class InitialProcessing:
             )
 
     def set_epg_abbreviations(self, epg):
+        """Map user input abbreviations to appropriate therows"""
         return self.epg_abbr_map.get(epg, "")
 
     def set_source_type(self, length, width, erp_type):
+        """Map source type to emission release point type"""
         erp_type_map = {
             "1": "A" if length > 0 and width > 0 else "P",  # area
             "2": "P",

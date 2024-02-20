@@ -11,7 +11,7 @@ class QABase:
 
     qa_df: pd.DataFrame = None
 
-    filename = f"RTRtoHEMandTier1_QA"
+    filename = "RTRtoHEMandTier1_QA"
     template_name = "Tier1_QA_Details"
     sheet_name = "NOT SET"
 
@@ -36,6 +36,7 @@ class QABase:
     def run(self):
         return self
 
+    # updates the qa outcome, message, and result
     def update(self, out, msg, result):
         self.qa_out = out
         self.qa_msg = msg

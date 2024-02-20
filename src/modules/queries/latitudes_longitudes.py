@@ -47,7 +47,6 @@ class LatLons:
         self.working_MPLatLongs = tmp[list(columns.keys())].rename(columns=columns)
 
     # working_MPLatLongsLine
-    # TODO -- get working data for this
     def qry_03aa_LineLatLons01(self):
         columns = {
             "ICFFacilityID": "Facility ID",
@@ -72,7 +71,6 @@ class LatLons:
         self.working_MPLatLongsLine = tmp.rename(columns=columns)
 
     # working_MPLatLongsLine
-    # TODO -- get working data for this
     def qry_03aa_LineLatLons02(self):
         columns = {
             "ICFFacilityID": "Facility ID",
@@ -100,7 +98,6 @@ class LatLons:
         )
 
     # working_MPLatLongs
-    # TODO -- get working data for this
     def qry_03ab_AppendLineLatLongs(self):
         group_by = ["Facility ID", "sppd_facility_identifier", "Source ID"]
 

@@ -1,8 +1,6 @@
 import os
 import logging
-
 from src.GUI.settings import SettingsGUI
-
 from src.utils import config
 
 if __name__ == "__main__":

@@ -61,6 +61,8 @@ def run_pyinstaller():
         "python",
         "-m",
         "PyInstaller",
+        # "-m",
+        # "manifest.xml",
         "--clean",
         "--onefile",
         "--noconsole",

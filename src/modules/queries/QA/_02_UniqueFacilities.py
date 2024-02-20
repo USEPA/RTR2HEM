@@ -33,7 +33,7 @@ class UniqueFacilities(QABase):
             )
         return self
 
-    # TODO -- where is this used..?
+    # not used
     def qry_QA_02a_UniqueFac(self):
         """
         list of unique facilities using SPPD_FACILITY_IDENTIFIER
