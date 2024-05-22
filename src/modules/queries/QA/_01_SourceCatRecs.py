@@ -2,7 +2,7 @@ from src.modules.queries.QA.qa_base import QABase
 from src.utils import group, config
 
 """
-'QA 01 - Facilities Without Source Category Recrods: this QA checks that each facility in a modeling file has
+'QA 01 - Facilities Without Source Category Records: this QA checks that each facility in a modeling file has
 'at least 1 record that belongs to the source category, though it's possible (but infrequent) for this not to be the case.
 """
 
