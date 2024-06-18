@@ -1,4 +1,4 @@
-import os, time
+import os, time, csv
 import logging
 import pandas as pd
 from pathlib import Path
@@ -77,7 +77,7 @@ class AccdbManager:
         """Execution time floor due to .csv create"""
         tmp = "tmp.csv"
         dir = Path(self.accdb_fp).parent
-        df.to_csv(os.path.join(dir, tmp), index=False)
+        df.to_csv(os.path.join(dir, tmp), index=False, quoting=csv.QUOTE_NONNUMERIC)
         try:
             columns_tpl = f"{tuple(columns)}".replace("'", "")
             columns_str = ", ".join(columns)
