@@ -1,6 +1,7 @@
 /.vscode/**
 **/__pycache__/**
-/Old Refractories Run/**
+env/
+
 **/outputs/**
 **/RTR2HEM/**
 log.txt
