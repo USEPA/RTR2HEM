@@ -1,3 +1,6 @@
+RTR2HEM is a python-based executable tool that imports a modeling file from the Risk and Technology Review (RTR) program, or an export from the Emission Inventory System (EIS), converts the inventory to model input files for the Human Exposure Model version 4 (HEM4), and conducts RTR Tier 1 screening of human-health and ecological risks and hazards to selected persistent and bioaccumulative hazardous air pollutants (PB-HAPs).
+
+
 # EPA Open Source Reference
 
 ## Brief Project Description
