@@ -4,7 +4,6 @@ import pandas as pd
 from pathlib import Path
 import msaccessdb, pypyodbc
 
-
 """
 Create/open accdb files and tables
 Convert accdb tables to a dataframe, and convert a dataframe to an accdb table
@@ -59,10 +58,10 @@ class AccdbManager:
 
         self.create_table(table_name, columns)
 
-        if df.size > 1000:
-            self.large_write(table_name, df, columns)
-        else:
-            self.small_write(table_name, df, columns)
+        # if df.size > 1000:
+        #    self.large_write(table_name, df, columns)
+        # else:
+        self.small_write(table_name, df, columns)
 
     def create_table(self, table_name, columns):
         """Create new ms access table"""
@@ -73,6 +72,7 @@ class AccdbManager:
         self.accdb.execute(accdb_query)
         self.accdb.commit()
 
+    # Microsoft deprecated reading in csv files in ~December 2025
     def large_write(self, table_name, df: pd.DataFrame, columns):
         """Execution time floor due to .csv create"""
         tmp = "tmp.csv"
