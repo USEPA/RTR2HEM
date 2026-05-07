@@ -34,4 +34,4 @@ jobs:
           ssh-add ~/.ssh/rtr2hem_epa_key
 
       - name: Push Mirror
-        run: cd ~/rtr-to-hem-python.git && git push --force --mirror git@github.com:USEPA/RTR2HEM.git
+        run: cd ~/rtr-to-hem-python.git && git push --mirror git@github.com:USEPA/RTR2HEM.git
