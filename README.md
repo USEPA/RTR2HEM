@@ -5,7 +5,7 @@ RTR2HEM is a python-based executable tool that imports a modeling file from the 
 
 ## Virtual Environment
 
-It is recommended to set up a virtual environment before installing the necessary packages (pipfile or requirements.txt)
+It is recommended to set up a virtual environment before installing the necessary packages (requirements.txt or pyproject.toml)
 
 For example
 ```

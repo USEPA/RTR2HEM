@@ -2,6 +2,11 @@
 **/__pycache__/**
 env/
 
+.venv/
+.uv_cache
+uv/*
+!uv/uv-x86_64-pc-windows-msvc.zip
+
 **/outputs/**
 **/RTR2HEM/**
 log.txt
