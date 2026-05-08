@@ -11,7 +11,9 @@ If it's not possible to run the executable version of the tool, and you're unfam
 
 ![Download .zip of the directory](assets/download.png)
 
-2. Click `run_rtr2hem.bat`, which will install all necessary packages, including python, in an isolated environment using uv before launching the program
+2. Click `run_rtr2hem.bat`, which will install all necessary packages, including python, in an isolated environment using uv before launching the program. The `rtr2hem.ps1` script can also be ran directly by right clicking > "Run with PowerShell"
+
+3. All outputs will be in the `outputs/` directory
 
 
 ## Virtual Environment
