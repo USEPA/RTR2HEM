@@ -1,0 +1,37 @@
+name: RTR2HEM ICF Mirror
+on: [push, workflow_dispatch]
+concurrency:
+  group: mirror_repo
+env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+jobs:
+  mirror_repo:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'USEPA/RTR2HEM' }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh/
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null 
+
+      - name: Add EPA SSH Key
+        run: |
+          echo "${{ secrets.RTR2HEM_EPA_SSH_PRIVATE_KEY }}" > ~/.ssh/rtr2hem_epa_key
+          chmod 600 ~/.ssh/rtr2hem_epa_key
+          ssh-add ~/.ssh/rtr2hem_epa_key
+
+      - name: Clone Source
+        run: cd ~ && git clone --bare git@github.com:USEPA/RTR2HEM.git
+
+      - name: Add ICF SSH Key
+        run: |
+          ssh-add -D
+          echo "${{ secrets.RTR2HEM_ICF_SSH_PRIVATE_KEY }}" > ~/.ssh/rtr2hem_icf_key
+          chmod 600 ~/.ssh/rtr2hem_icf_key
+          ssh-add ~/.ssh/rtr2hem_icf_key
+
+      - name: Push Mirror
+        run: cd ~/rtr-to-hem-python.git && git push --mirror git@github.com:ICF-Corp/rtr-to-hem-python.git
