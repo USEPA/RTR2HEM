@@ -1,11 +1,11 @@
-name: RTR2HEM ICF Mirror
+name: Sync EPA Changes Back to ICF
 on: [push, workflow_dispatch]
 concurrency:
-  group: mirror_repo
+  group: backsync
 env:
   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 jobs:
-  mirror_repo:
+  backsync:
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'USEPA/RTR2HEM' }}
     steps:
@@ -34,4 +34,4 @@ jobs:
           ssh-add ~/.ssh/rtr2hem_icf_key
 
       - name: Push Mirror
-        run: cd ~/rtr-to-hem-python.git && git push --mirror git@github.com:ICF-Corp/rtr-to-hem-python.git
+        run: cd ~/RTR2HEM.git && git push --mirror git@github.com:ICF-Corp/rtr-to-hem-python.git
